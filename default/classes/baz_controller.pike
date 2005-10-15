@@ -9,9 +9,12 @@ public void index(Request id, Response response, mixed ... args)
 
 public void foo(Request id, Response response, mixed ... args)
 {
-  response->set_data(sprintf("foobaz! %O", args));
+   Template.Template t = Template.Template("baz_foo.tpl");
+   t->set_data((["test": "testresult", "loop": ({ (["val": "loop1"]), (["val": "loop2"])  }) ]));
+   response->set_template(t);
 }
 
 public void gazonk(Request id, Response response, mixed ... args)
 {
+   response->redirect("foo");
 }

@@ -2,7 +2,6 @@ import Fins;
 inherit Fins.Controller;
 
 Fins.Controller baz = ((program)"baz_controller.pike")();
-object gazonk = Stdio.File();
 
 public void index(Request id, Response response, mixed ... args)
 {

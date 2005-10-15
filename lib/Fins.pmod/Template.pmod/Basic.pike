@@ -1,10 +1,12 @@
 //
-//  Syntax of a template:
+//  Syntax of a simple template:
 //
 //  {element} : inserts the value of element into the placeholder.
 //  {foreach:arr} data {endforeach:arr} : loops over each element of the array arr. each element
 //      should be a mapping of data.
 //
+
+inherit .Template;
 
 static mapping data = ([]);
 string templatename;

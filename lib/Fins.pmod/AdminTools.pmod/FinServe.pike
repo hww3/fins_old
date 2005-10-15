@@ -5,6 +5,9 @@ constant my_version = "0.0";
 
 Fins.Application app;
 Protocols.HTTP.Server.Port port;
+#if constant(_Protocols_DNS_SD)
+Protocols.DNS_SD.Service bonjour;
+#endif
 string project = "default";
 
 int main(int argc, array(string) argv)
@@ -19,6 +22,10 @@ int main(int argc, array(string) argv)
   load_application();
 
   port = Protocols.HTTP.Server.Port(handle_request, my_port);  
+#if constant(_Protocols_DNS_SD)
+  bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + ")",
+                     "_http._tcp", "", my_port);
+#endif
   return -1;
 }
 

@@ -18,6 +18,9 @@ appname/       <-- the root of your Fins application.
                controller.pike      <-- by default, this is the main controller. it's loaded into application.pike
                ...                  <-- your main controller can contain other sub-controllers. they should live in this directory, too
 
+How do my requests get directed?
+
+Any public functions present in your controller will be available as paths on your url; if no path is provided, the index method will be run. If you have a method called "boo" in your main controller, it will be available as "/boo". Any additional path past that will be sent as arguments to the method. If you have a controller class present within the main controller, it will also be available as a subfolder on your application url. For example, if you have a controller class called "gazonk" in your main controller, the sub-controller will be available as "/gazonk/". note that if you just choose "/gazonk", you'll automatically be redirected so that you're at the "index" level of that controller. Note that your index function can't receive "arguments", as they could potentially mask other methods.
 
 Starting a Fins application
 

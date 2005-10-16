@@ -1,6 +1,6 @@
 //! Beginning of an XSLT templating system.
 
-inherit Fins.Template;
+inherit Fins.Template.Template;
 
 #if constant(Public.Parser.XML2)
 
@@ -21,10 +21,10 @@ static void compile_template()
    string template = load_template(templatename);
 
    // first, we should parse the template to form an xml node object.
-   
+
    XML2.Node n = XML2.parse_xml(template);
    
-   s = XML2.parse_stylesheet(n);
+   XML2.Stylesheet s = XML2.parse_xslt(n);
  
    stylesheet = s;   
    
@@ -33,24 +33,29 @@ static void compile_template()
 public string render(TemplateData d)
 {   
    XML2.Node n;
+   mapping dta;
    
    if(!d->get_data()["node"] || !objectp(d->get_data()["node"]))
    {
       throw(Error.Generic("Template.XSLT: no node to render.\n"));
    }
+   else
+   {
+      dta = d->get_data();
+      n = dta["node"];
+      m_delete(dta, "node");
+   }
    
-   mapping dta = d->get_data();
-   m_delete(dta, "node");
    
    // This is ugly, but we have to do it, otherwise we can't cache templates.
-   Thread.Mutex lock = Mutex.Lock();
+   Thread.Mutex lock = Thread.Mutex();
    Thread.MutexKey key = lock->lock();
    
    mixed e = catch
    {
    
       stylesheet->set_attributes(dta);
-      n = stylesheet->apply(d->get_data()["node"]);
+      n = stylesheet->apply(n);
    };
    
    key = 0;

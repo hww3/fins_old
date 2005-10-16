@@ -7,6 +7,7 @@ public string render(.TemplateData d);
 //! we should really do more here...
 static string load_template(string templatename)
 {
+   werror("loading template " + templatename);
    string template = Stdio.read_file("templates/" + templatename);
    return template;
 }

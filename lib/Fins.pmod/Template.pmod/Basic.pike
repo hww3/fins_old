@@ -8,13 +8,13 @@
 
 inherit .Template;
 
-static mapping data = ([]);
 string templatename;
 array contents = ({});
 
 // RegexReplacer r = RegexReplacer("{([A-Za-z0-9_\-]+)}");
 RegexReplacer s = RegexReplacer();
 
+//!
 static void create(string template)
 {
    templatename = template;
@@ -31,29 +31,25 @@ static array compile_template(array contents)
    return contents;
 }
 
-public void set_data(mapping d)
-{
-   data = d;
-}
-
-public string render()
+//!
+public string render(.TemplateData data)
 {
    String.Buffer buf = String.Buffer();  
    
    foreach(contents;;Block b)
    {
-      b->render(buf, data);
+      b->render(buf, data->get_data());
    }
      
    return buf->get();
 }
 
-class RegexReplacer{
+static class RegexReplacer{
 
   static object regexp;
   static function split_fun;
   int max_iterations = 10;
-  string match = "(:?{foreach:(?P<loopname>[a-zA-Z\\-_0-9]+)}(?:((?s).*?){endforeach:(?P=loopname)}))|(:?{(:?(:?([A-Za-z0-9_\-]+):)?([A-Za-z0-9_\-]+))})";
+  string match = "(:?{foreach:(?P<loopname>[a-zA-Z\\-_0-9]+)}(?:((?s).*?){end:(?P=loopname)}))|(:?{(:?(:?([A-Za-z0-9_\-]+):)?([A-Za-z0-9_\-]+))})";
 
   void create() {
     regexp = _Regexp_PCRE(match, Regexp.PCRE.OPTION.MULTILINE);
@@ -153,7 +149,7 @@ class RegexReplacer{
 
 
 
-class Block
+static class Block
 {
    
    void render(String.Buffer buf, mapping data)
@@ -163,7 +159,7 @@ class Block
    
 }
 
-class TextString(string contents)
+static class TextString(string contents)
 {
    inherit Block;
 
@@ -180,7 +176,7 @@ class TextString(string contents)
 }
 
 
-class ReplaceField(string scope, string name)
+static class ReplaceField(string scope, string name)
 {
    inherit Block;
    
@@ -206,7 +202,7 @@ class ReplaceField(string scope, string name)
    }
 }
 
-class Foreach(string scope, array contents)
+static class Foreach(string scope, array contents)
 {
    inherit Block;
    

@@ -1,0 +1,7 @@
+Fins comes with a built in HTML templating system, which lives in the class Fins.Template.Simple. Designed to allow separation of business logic from user interface, a Simple template consists of HTML sprinkled with markup fields. These markup fields trigger data to be inserted or loops to be run over a set of data.
+
+The format for a Simple template is:
+
+{name}  - insert the value of "name" in the output.
+{foreach:scope}...{end:scope} - loop over the array "scope", inserting the contents once for each row in "scope".
+{scope.name} - insert the value of "name" inside the current row in the loop through "scope".

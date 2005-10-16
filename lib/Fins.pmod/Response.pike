@@ -1,4 +1,5 @@
   Fins.Template.Template template;
+  Fins.Template.TemplateData template_data;
   
   static mapping response = (["type": "text/html",
                               "error": 200,
@@ -12,9 +13,10 @@
   }
 
   //!
-  public void set_template(Fins.Template.Template t)
+  public void set_template(Fins.Template.Template t, Fins.Template.TemplateData d)
   {
      template = t;
+     template_data = d;
   }
   //!
   public void set_error(int error)
@@ -64,7 +66,7 @@
   {
      if(template)
      {
-        response->data = template->render();
+        response->data = template->render(template_data);
         response->file = 0;
      }
     return response;

@@ -3,8 +3,8 @@ import Protocols.HTTP.Server;
 .Configuration config;
 
 static void create(.Configuration _config)
-{
-  config = _config;
+{  
+   config = _config;
 
   if(functionp(start))
     start();

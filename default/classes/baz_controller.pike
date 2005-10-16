@@ -9,8 +9,9 @@ public void index(Request id, Response response, mixed ... args)
 
 public void foo(Request id, Response response, mixed ... args)
 {
-   Template.Template t = Template.Template("baz_foo.tpl");
-   t->set_data((["test": "testresult", "loop": ({ (["val": "loop1"]), (["val": "loop2"])  }) ]));
+   Template.Template t = Template.get_template(Template.Simple, "baz_foo.tpl");
+   
+   t->set_data((["test": "Seventy Six Trombones", "val": "Marching Band", "loop": ({ (["blah": "Trumpets"]), (["blah": "Drums"])  }) ]));
    response->set_template(t);
 }
 

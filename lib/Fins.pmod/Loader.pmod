@@ -14,18 +14,10 @@ Fins.Application load_app(string app_dir)
 
   program p;
 
+  add_constant("app", a);
+
   cn = "application";
   p = (program)(cn);
-
-  if(!p) 
-  {
-    werror("Using stock Application class.\n");
-    p = Fins.Application;
-  }
-  else
-  {
-    werror("Using custom Application class.\n");
-  }
 
   a = p(config);
 

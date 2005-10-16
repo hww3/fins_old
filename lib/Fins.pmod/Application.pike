@@ -2,13 +2,15 @@
 .Controller controller = ((program)"controller")();
 string static_dir = Stdio.append_path(getcwd(), "static");
 
-static void create()
+.Configuration config;
+
+static void create(.Configuration _config)
 {
+   config = _config;
 }
 
 public mixed handle_request(.Request request)
 {
-
   function event;
 
   if(has_prefix(request->not_query, "/static/"))

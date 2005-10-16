@@ -1,0 +1,29 @@
+Getting started with Fins
+
+Prerequisites
+
+Fins runs on Pike 7.6 or higher. Pike 7.7 and a Bonjour ready system (such as MacOS X) will get you automatic announcement of your Fins apps. If you want to use XSLT templating, you'll need to install libxml, libxslt and the Public.Parser.XML2 module.
+
+To create a new web application, simply copy the "default" directory. You'll probably want to customize all of the files in it, based on your needs.
+
+The file layout is:
+
+appname/       <-- the root of your Fins application.
+
+   static/     <-- this tree contains static files, accessible from http://yoururl/static/
+   templates/  <-- this tree contains template files, used with the View templating system
+   classes/    <-- this tree is the core of your application. all of your pike classes should live here
+   
+               application.pike     <-- the main class that will contain your controllers and model
+               controller.pike      <-- by default, this is the main controller. it's loaded into application.pike
+               ...                  <-- your main controller can contain other sub-controllers. they should live in this directory, too
+
+
+Starting a Fins application
+
+Right now, the only way to run a Fins application is with the built in webserver (not that it's that bad). To start up your application, simply run the fin_serve program:
+
+pike -Mlib fin_serve [port] [appname]
+
+where port is the port number your Fins application should run on, which defaults to port 8080. appname is the name of the app you'd like to run. it defaults to "default". if you have a Bonjour subsystem and Pike 7.7, you'll get automatic bookmarks in your Bonjour aware applications (such as Safari).
+

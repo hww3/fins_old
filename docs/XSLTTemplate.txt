@@ -1,0 +1,5 @@
+Fins supports the use of XSLT as a templating language. In order for you to use XSLT successfully, you must have libxslt and the Public.Parser.XML2 module installed. The process of using XSLT is a little bit different compared to the use of other template systems, due to the nature of XSLT.
+
+You get the XSLT template just as you would normally for other template types, using the Fins.Template.XSLT class as an argument to Fins.Template.get_template(). What you need to do differently is include a Node object (from Public.Parser.XML2) in your TemplateData object. This Node object should be the node you'd like to transform. This Node object should be added to the TemplateData object as "node". Any additional items added to the TemplateData object will be provided to the XSLT transform engine as attributes. 
+
+Once you've placed the Node object in your TemplateData, you can continue as you would with any other template type. 

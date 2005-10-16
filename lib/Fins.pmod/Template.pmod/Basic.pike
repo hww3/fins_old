@@ -24,8 +24,9 @@ static void create(string template)
 static array compile_template(array contents)
 {
    // TODO: we should be more thorough here.
-    string template = Stdio.read_file("templates/" + templatename);
-   
+
+   string template = load_template(templatename);
+  
    contents = s->step(template, contents);
 
    return contents;

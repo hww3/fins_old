@@ -1,0 +1,23 @@
+Fins provides a templating framework for use in the construction of your View. Structured so that you can use any Pike-ready templating system, a number of built in methods enable you to return a processed template as a response to a controller event.
+
+The components of the templating system include:
+
+Fins.Template.Template
+
+This class provides the definition for all Fins compatible template systems. Use this data type anywhere you use a template.
+
+Fins.Template.get_template(program templateType, string templatename)
+
+This method will get a Template.Template object of the type templateType, using the template file templatename. All templates live in the appname/templates directory. The class templateType you provide should correspond to the markup format present in the template "templatename". Fins caches the template file in order to speed response time.
+
+Fins.Template.Simple
+
+Fins includes a simple templating system. This class (and objects created from it) use the simple template markup format described in the document SimpleTemplate.txt.
+
+Fins.Template.XSLT
+
+Fins can also render output data based on an XSLT template. See the document XSLTTemplate.txt for additional details.
+
+Fins.Response.set_template(Fins.Template.Template t, Fins.Template.TemplateData d)
+
+Use this method to set the response to the current request to be the template, which will be rendered with data provided.

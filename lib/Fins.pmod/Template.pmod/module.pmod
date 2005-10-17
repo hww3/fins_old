@@ -1,6 +1,6 @@
 static mapping templates = ([]);
 
-public .Template get_template(program templateType, string templateName)
+public Fins.Template.Template get_template(program templateType, string templateName)
 {
   object t;
   
@@ -18,7 +18,7 @@ public .Template get_template(program templateType, string templateName)
   
     if(!t)
     {
-      throw(Error.Generic(get_template(): unable to load template " + templateName + "\n"));
+      throw(Error.Generic("get_template(): unable to load template " + templateName + "\n"));
     }
 
     templates[templateType][templateName] = t;

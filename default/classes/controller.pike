@@ -8,23 +8,31 @@ public void index(Request id, Response response, mixed ... args)
    Template.Template t = Template.get_template(Template.XSLT, "index.xsl");
    Template.TemplateData dta = Template.TemplateData();
    
-   Public.Parser.XML2.Node n = Public.Parser.XML2.new_xml("1.0", "catalog");
-   
-   n->new_child("cd", "");
-   n->new_child("cd", "");
-   
-   int i = 1;
-   
-   foreach(n->children(), Public.Parser.XML2.Node cd)
-   {
-      cd->new_child("title", "Greatest Hits Volume " + i);
-      cd->new_child("artist", "Juice Newton");
+   Public.Parser.XML2.Node n = Public.Parser.XML2.new_xml("1.0", "events");
 
-      i++;
+   foreach(indices(this); int index; string name)
+   {
+      mixed event;
+      string t;
+      event = this[name];
+      if(functionp(event))
+      {
+        t = "Event";
+      }
+      else if(objectp(event))
+      {
+        t = "Sub-Controller";
+      }
+      else {werror("continuing.\n"); continue; }
+
+      object e = Public.Parser.XML2.new_node("event");
+      e->new_child("name", name);
+      e->new_child("type", t);
+      n->add_child(e);
    }
-     
+
+      
    dta->add("node", n);
-   
   response->set_template(t, dta);
 }
 

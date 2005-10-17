@@ -13,6 +13,13 @@ public mixed handle_request(.Request request)
 {
   function event;
 
+  // we have to short circuit this one...
+  if(request->not_query == "/favicon.ico")
+  {
+    request->not_query = "/static/favicon.ico";
+    return static_request(request)->get_response();
+  }
+
   if(has_prefix(request->not_query, "/static/"))
   {
     return static_request(request)->get_response();

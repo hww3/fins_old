@@ -31,6 +31,15 @@
   }
 
   //!
+  public void set_cookie(string name, string value, int expiration)
+  {
+     response->extra_heads["set-cookie"] = 
+                Protocols.HTTP.http_encode_cookie(name)+
+                "="+Protocols.HTTP.http_encode_cookie( value )+
+                "; expires="+Protocols.HTTP.Server.http_date(expiration)+"; path=/";
+  }
+
+  //!
   public void not_found(string filename)
   {
     response->error = 404;
@@ -67,6 +76,7 @@
      if(template)
      {
         response->data = template->render(template_data);
+        response->data["extra_heads"]["content-type"] = template->get_type();
         response->file = 0;
      }
     return response;

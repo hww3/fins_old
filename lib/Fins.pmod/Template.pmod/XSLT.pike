@@ -30,6 +30,17 @@ static void compile_template()
    
 }
 
+public string get_type()
+{
+   string s;
+
+   s = stylesheet->media_type();
+
+   if(s)
+     return s;
+   else return ::get_type();
+}
+
 public string render(TemplateData d)
 {   
    XML2.Node n;

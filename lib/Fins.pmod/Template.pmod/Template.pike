@@ -11,3 +11,8 @@ static string load_template(string templatename)
    string template = Stdio.read_file("templates/" + templatename);
    return template;
 }
+
+public string get_type()
+{
+  return "text/html";
+}

@@ -76,7 +76,7 @@
      if(template)
      {
         response->data = template->render(template_data);
-        response->data["extra_heads"]["content-type"] = template->get_type();
+        response["extra_heads"]["content-type"] = template->get_type();
         response->file = 0;
      }
     return response;

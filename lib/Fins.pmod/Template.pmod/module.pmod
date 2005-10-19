@@ -1,6 +1,6 @@
 static mapping templates = ([]);
 
-public Fins.Template.Template get_template(program templateType, string templateName)
+public Fins.Template.Template get_template(program templateType, string templateName, void|object context)
 {
   object t;
   
@@ -14,7 +14,7 @@ public Fins.Template.Template get_template(program templateType, string template
 
   if(!templates[templateType][templateName])
   {
-    t = templateType(templateName);
+    t = templateType(templateName, context);
   
     if(!t)
     {

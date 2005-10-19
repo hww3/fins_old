@@ -10,13 +10,17 @@ inherit .Template;
 
 string templatename;
 array contents = ({});
-
 // RegexReplacer r = RegexReplacer("{([A-Za-z0-9_\-]+)}");
 RegexReplacer s = RegexReplacer();
-
+object context;
 //!
-static void create(string template)
+static void create(string template, object|void context_obj)
 {
+   if(!context_obj)
+     context = .TemplateContext();
+   else
+      context = context_obj;
+
    templatename = template;
    contents = compile_template(contents);
 }
@@ -27,7 +31,7 @@ static array compile_template(array contents)
 
    string template = load_template(templatename);
   
-   contents = s->step(template, contents);
+   contents = s->step(template, contents, context);
 
    return contents;
 }
@@ -59,7 +63,7 @@ static class RegexReplacer{
     split_fun = regexp->split;
   }
 
-  array step(string template, array components)
+  array step(string template, array components, object context)
   {
      string sv;
      werror("STEP: %O\n", template);
@@ -97,7 +101,12 @@ static class RegexReplacer{
          // include
          if(sizeof(substrings) == 10)
          {
-            components += ({ Include(substrings[-1]) });
+            if(context->num_includes +1 > context->max_includes)
+            {
+              throw(Error.Generic("Too many included files; hit limit at include of " + substrings[-1] + ".\n"));
+            }
+            context->num_includes++;
+            components += ({ Include(substrings[-1], context) });
          }
 
          // replacement
@@ -112,7 +121,7 @@ static class RegexReplacer{
          if(sizeof(substrings)==3)
          {
             array c = ({});
-            components += ({ Foreach(substrings[1], step(substrings[2], c)) });
+            components += ({ Foreach(substrings[1], step(substrings[2], c, context)) });
          }
          i=v[1];
      }
@@ -179,10 +188,10 @@ static class Include
    string templateName;
    .Template included_template;
 
-   static void create(string template)
+   static void create(string template, void|object context)
    {
      templateName = template;
-     included_template = .get_template(.Simple, template);
+     included_template = .get_template(.Simple, template, context);
    }
 
    string _sprintf(mixed ... args)
@@ -273,5 +282,6 @@ static class Foreach(string scope, array contents)
          }
       }
    }
-   
+
+
 }

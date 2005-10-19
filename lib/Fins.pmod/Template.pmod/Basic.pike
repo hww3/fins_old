@@ -50,7 +50,9 @@ static class RegexReplacer{
   static object regexp;
   static function split_fun;
   int max_iterations = 10;
-  string match = "(:?{foreach:(?P<loopname>[a-zA-Z\\-_0-9]+)}(?:((?s).*?){end:(?P=loopname)}))|(:?{(:?(:?([A-Za-z0-9_\-]+):)?([A-Za-z0-9_\-]+))})";
+  string match = "(:?{foreach:(?P<loopname>[a-zA-Z\\-_0-9]+)}(?:((?s).*?){end:(?P=loopname)}))"
+       "|(:?{(:?(:?([A-Za-z0-9_\-]+):)?([A-Za-z0-9_\-]+))})"
+       "|(:?{include:(?P<file>[a-zA-Z\\-_0-9/\\.]+)})";
 
   void create() {
     regexp = _Regexp_PCRE(match, Regexp.PCRE.OPTION.MULTILINE);
@@ -91,12 +93,22 @@ static class RegexReplacer{
 
         
          werror("got match: %O, subparts: %O", template[v[0]..v[1]-1], substrings);
+
+         // include
+         if(sizeof(substrings) == 10)
+         {
+            components += ({ Include(substrings[-1]) });
+         }
+
+         // replacement
          if(sizeof(substrings)==8)
          {
             // this should be a replacement reference.
             components += ({ ReplaceField(substrings[-2], substrings[-1]) });
             
          }
+
+         // foreach
          if(sizeof(substrings)==3)
          {
             array c = ({});
@@ -158,6 +170,33 @@ static class Block
       
    }
    
+}
+
+static class Include
+{
+   inherit Block;
+
+   string templateName;
+   .Template included_template;
+
+   static void create(string template)
+   {
+     templateName = template;
+     included_template = .get_template(.Simple, template);
+   }
+
+   string _sprintf(mixed ... args)
+   {
+      return "Include(" + templateName + ")";
+   }
+      
+   void render(String.Buffer buf, mapping data)
+   {
+      .TemplateData d = .TemplateData();
+      d->set_data(data);
+      buf->add(included_template->render(d));
+   }
+
 }
 
 static class TextString(string contents)

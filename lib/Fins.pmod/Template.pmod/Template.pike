@@ -9,6 +9,11 @@ static string load_template(string templatename)
 {
    werror("loading template " + templatename);
    string template = Stdio.read_file("templates/" + templatename);
+
+   if(!template || !sizeof(template))
+   {
+     throw(Error.Generic("Template " + templatename + " is empty.\n"));
+   }
    return template;
 }
 

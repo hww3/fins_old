@@ -1,5 +1,6 @@
 static mapping data = ([]);
 
+//!
 void create(mapping|void defaults)
 {
   if(defaults)

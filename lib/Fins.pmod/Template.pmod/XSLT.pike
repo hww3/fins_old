@@ -1,10 +1,9 @@
 //! Beginning of an XSLT templating system.
 
-inherit Fins.Template.Template;
+inherit .Template;
 
 #if constant(Public.Parser.XML2)
 
-import Fins.Template;
 import Public.Parser;
 
 string templatename;
@@ -41,7 +40,7 @@ public string get_type()
    else return ::get_type();
 }
 
-public string render(TemplateData d)
+public string render(.TemplateData d)
 {   
    XML2.Node n;
    mapping dta;

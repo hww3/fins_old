@@ -1,5 +1,11 @@
 static mapping data = ([]);
 
+void create(mapping|void defaults)
+{
+  if(defaults)
+    data = defaults;
+}
+
 //!
 public void add(string name, mixed item)
 {

@@ -26,7 +26,7 @@ int main(int argc, array(string) argv)
   write("FinServe starting on port " + my_port + "\n");
 
   write("Starting Session Manager...\n");
-  session_startup();
+  call_out(session_startup, 0);
 
   write("FinServe loading application " + project + "\n");
   load_application();

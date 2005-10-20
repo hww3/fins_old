@@ -1,0 +1,39 @@
+inherit .Field;
+
+string name;
+
+void create(string _name)
+{
+   name = _name;
+   ::create();
+}
+
+int get_id()
+{
+  return context->sql->master_sql->insert_id();
+}
+
+string encode(mixed|void value)
+{
+  value = validate(value);
+
+  if(value == .Undefined)
+    return "NULL";
+
+  return (string)value;
+}
+
+mixed validate(mixed|void value)
+{
+   if(value == .Undefined)
+   {
+     return .Undefined;
+   }
+
+   if(!intp(value))
+   {
+      throw(Error.Generic("Cannot set " + name + " using " + basetype(value) + ".\n"));
+   }
+   
+   return value;
+}

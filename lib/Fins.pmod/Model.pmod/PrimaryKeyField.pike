@@ -10,7 +10,12 @@ void create(string _name)
 
 int get_id()
 {
-  return context->sql->master_sql->insert_id();
+  return decode(context->sql->master_sql->insert_id());
+}
+
+int decode(string value)
+{
+   return (int)value;
 }
 
 string encode(mixed|void value)

@@ -17,6 +17,11 @@ void create(string _name, int _len, int(0..1) _null, int|void _default)
    ::create();
 }
 
+int decode(string value)
+{
+   return (int)value;
+}
+
 string encode(mixed value)
 {
   value = validate(value);

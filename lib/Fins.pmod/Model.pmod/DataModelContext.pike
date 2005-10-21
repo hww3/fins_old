@@ -10,3 +10,5 @@ string quote(string s)
 {
    return sql->quote(s);
 }
+
+int debug = 0;

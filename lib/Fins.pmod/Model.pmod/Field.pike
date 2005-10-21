@@ -7,6 +7,11 @@ mixed validate(mixed value)
   return value;
 }
 
+mixed decode(string value)
+{
+   return value;
+}
+
 string encode(mixed value);
 
 string translate_fieldname()

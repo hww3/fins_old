@@ -3,7 +3,8 @@
 string object_type = "";
 multiset fields_set = (<>);
 mapping object_data = ([]);
-mixed key_value = UNDEFINED;
+mapping cached_object_data = ([]);
+static int key_value = UNDEFINED;
 int new_object = 0;
 int saved = 0;
 
@@ -21,7 +22,16 @@ void create(int|void id)
   {
     master_object->load(id, this);
   }
+}
 
+void refresh()
+{
+   master_object->load(key_value, this);
+}
+
+void set_cache(mapping c)
+{
+   cached_object_data = c;
 }
 
 .DataObjectInstance new()
@@ -51,14 +61,34 @@ int save()
    return master_object->save(this);
 }
 
+int set_atomic(mapping values)
+{
+   return master_object->set_atomic(values, this);
+}
+
 int set(string name, string value)
 {
    return master_object->set(name, value, this);
 }
 
+mixed get_atomic()
+{
+   return master_object->get_atomic(this);
+}
+
 mixed get(string name)
 {
    return master_object->get(name, this);
+}
+
+void set_id(int id)
+{
+  key_value = id;   
+}
+
+int get_id()
+{
+   return key_value;
 }
 
 void set_new_object(int(0..1) i)
@@ -83,10 +113,8 @@ int is_new_object()
 
 mixed `[]=(mixed i, mixed v)
 {
-werror("[]=: %O %O\n", i, v);
   if(v == UNDEFINED)
   {
-werror("Getting: " + i + "\n");
     return get(i);
   }
 
@@ -95,7 +123,6 @@ werror("Getting: " + i + "\n");
 
 mixed `[](mixed arg)
 {
-werror("[]: %O\n",arg);
   return get(arg);
 }
 

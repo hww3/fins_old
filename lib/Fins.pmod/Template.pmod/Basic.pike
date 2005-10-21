@@ -10,9 +10,9 @@ inherit .Template;
 
 string templatename;
 array contents = ({});
-// RegexReplacer r = RegexReplacer("{([A-Za-z0-9_\-]+)}");
 RegexReplacer s = RegexReplacer();
 object context;
+
 //!
 static void create(string template, object|void context_obj)
 {
@@ -55,8 +55,9 @@ static class RegexReplacer{
   static function split_fun;
   int max_iterations = 10;
   string match = "(:?{foreach:(?P<loopname>[a-zA-Z\\-_0-9]+)}(?:((?s).*?){end:(?P=loopname)}))"
-       "|(:?{(:?(:?([A-Za-z0-9_\-]+):)?([A-Za-z0-9_\-]+))})"
-       "|(:?{include:(?P<file>[a-zA-Z\\-_0-9/\\.]+)})";
+       "|(:?{include:(?P<file>[a-zA-Z\\-_0-9/\\.]+)})"
+       "|(:?{if:(?P<testid>[a-zA-Z0-9_\\-]+):([a-zA-Z+\\-*/_0-9]+)}(?:((?s).*?)({else:(?P=testid)}(?:((?s).*?)))?{endif:(?P=testid)}))"
+       "|(:?{(:?(:?([A-Za-z0-9_\-]+):)?([A-Za-z0-9_\-]+))})";
 
   void create() {
     regexp = _Regexp_PCRE(match, Regexp.PCRE.OPTION.MULTILINE);
@@ -66,7 +67,7 @@ static class RegexReplacer{
   array step(string template, array components, object context)
   {
      string sv;
-     werror("STEP: %O\n", template);
+ //    werror("STEP: %O\n", template);
 
      int i=0;
      for (;;)
@@ -96,10 +97,10 @@ static class RegexReplacer{
         }
 
         
-         werror("got match: %O, subparts: %O", template[v[0]..v[1]-1], substrings);
+  //       werror("got match: %O, subparts: %O", template[v[0]..v[1]-1], substrings);
 
          // include
-         if(sizeof(substrings) == 10)
+         if(sizeof(substrings) == 5)
          {
             if(context->num_includes +1 > context->max_includes)
             {
@@ -110,13 +111,25 @@ static class RegexReplacer{
          }
 
          // replacement
-         if(sizeof(substrings)==8)
+         if(sizeof(substrings)==16)
          {
             // this should be a replacement reference.
             components += ({ ReplaceField(substrings[-2], substrings[-1]) });
             
          }
-
+         
+         // if
+         if(sizeof(substrings)==9)
+         {
+            werror("GOT IF\n");
+         }
+         
+         // if:else
+         if(sizeof(substrings)==9)
+         {
+            werror("GOT IF_ELSE\n");
+         }
+         
          // foreach
          if(sizeof(substrings)==3)
          {
@@ -237,6 +250,7 @@ static class ReplaceField(string scope, string name)
    
    void render(String.Buffer buf, mapping data)
    {
+ //     werror("INSERTING: %s / %s from %O\n", scope, name, data);
       if(scope && strlen(scope) && data[scope] && mappingp(data[scope]))
       {
          if(data[scope][name] || zero_type(data[name]) != 1)
@@ -262,6 +276,7 @@ static class Foreach(string scope, array contents)
       
    void render(String.Buffer buf, mapping data)
    {
+ //     werror("RENDERING " + scope + "\n");
       if(!data[scope] && zero_type(data[scope]==1))
       {
          buf->add("<!-- VALUE " + scope + " NOT FOUND -->");

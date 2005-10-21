@@ -39,7 +39,7 @@ class name_object
 {
    inherit DataObject;
 
-   static void create(DataModelContext c)
+   static void create(DataModelContext c, name)
    {  
       ::create(c);
       set_name("name");

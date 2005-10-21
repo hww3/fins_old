@@ -25,6 +25,22 @@ void create(.DataModelContext c)
    context = c;
 }
 
+void generate_from_schema(string table)
+{
+   foreach(context->sql->list_fields(table);;mapping fieldspec)
+   {
+      switch(fieldspec->type)
+      {
+         case "string":
+            break;
+         case "long":
+            break;
+         default:
+            throw(Error.Generic("Unknown type " + fieldspec->type +" for field " + fieldspec->name + ".\n"));
+      }
+   }
+}
+
 void set_name(string _name)
 {
   name = _name;

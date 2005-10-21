@@ -1,5 +1,6 @@
 static mapping templates = ([]);
 
+//!
 public .Template get_template(program templateType, string templateName, void|object context)
 {
   object t;
@@ -26,4 +27,16 @@ public .Template get_template(program templateType, string templateName, void|ob
 
   return templates[templateType][templateName];
 
+}
+
+//!
+public int flush_template(string templateName)
+{
+   foreach(templates;; mapping templateT)
+   if(templateT[templateName])
+   {
+      m_delete(templateT, templateName);
+      return 1;
+   }
+   return 0;
 }

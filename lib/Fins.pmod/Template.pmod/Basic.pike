@@ -22,7 +22,11 @@ static void create(string template, object|void context_obj)
       context = context_obj;
 
    templatename = template;
+mixed x = gauge{
    contents = compile_template(contents);
+};
+
+werror("COMPILE_TIME: %O\n", x);
 }
 
 static array compile_template(array contents)
@@ -57,7 +61,7 @@ static class RegexReplacer{
   string match = "(:?{foreach:(?P<loopname>[a-zA-Z\\-_0-9]+)}(?:((?s).*?){end:(?P=loopname)}))"
        "|(:?{include:(?P<file>[a-zA-Z\\-_0-9/\\.]+)})"
        "|(:?{if:(?P<testid>[a-zA-Z0-9_\\-]+):([a-zA-Z+\\-*/_0-9]+)}(?:((?s).*?)({else:(?P=testid)}(?:((?s).*?)))?{endif:(?P=testid)}))"
-       "|(:?{(:?(:?([A-Za-z0-9_\-]+):)?([A-Za-z0-9_\-]+))})";
+       "|(:?{(:?(:?(!?[A-Za-z0-9_]+):)?(.*?))})";
 
   void create() {
     regexp = _Regexp_PCRE(match, Regexp.PCRE.OPTION.MULTILINE);
@@ -114,7 +118,16 @@ static class RegexReplacer{
          if(sizeof(substrings)==16)
          {
             // this should be a replacement reference.
-            components += ({ ReplaceField(substrings[-2], substrings[-1]) });
+            function f;
+            if(has_prefix(substrings[-2], "!"))
+            {
+              f = .get_simple_macro(substrings[-2][1..]);
+              if(f)
+                components += ({ MacroField(substrings[-2][1..], f, substrings[-1]) });
+              else components += ({ TextString("UNKNOWN MACRO " + substrings[-2][1..]) });
+            }
+            else
+              components += ({ ReplaceField(String.trim_whites(substrings[-2]), String.trim_whites(substrings[-1])) });
             
          }
          
@@ -262,6 +275,23 @@ static class ReplaceField(string scope, string name)
          buf->add("<!-- VALUE " + name + " NOT FOUND -->");
       else
          buf->add(data[name]);
+   }
+}
+
+static class MacroField(string name, function func, string arguments)
+{
+   inherit Block;
+   
+   string _sprintf(mixed ... args)
+   {
+      return "MacroField(" + name + ", " + arguments + ")";
+   }
+   
+   
+   void render(String.Buffer buf, mapping data)
+   {
+      werror("INSERTING: %s / %s from %O\n", name, arguments, data);
+        buf->add(func(data, arguments));
    }
 }
 

@@ -1,4 +1,17 @@
 static mapping templates = ([]);
+static mapping simple_macros = ([]);
+
+//!
+public void add_simple_macro(string name, function macrocode)
+{
+  simple_macros[name] = macrocode;
+}
+
+//!
+public function get_simple_macro(string name)
+{
+  return simple_macros[name];
+}
 
 //!
 public .Template get_template(program templateType, string templateName, void|object context)

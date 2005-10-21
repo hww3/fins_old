@@ -4,4 +4,5 @@ The format for a Simple template is:
 
 {name}  - insert the value of "name" in the output.
 {foreach:scope}...{end:scope} - loop over the array "scope", inserting the contents once for each row in "scope".
-{scope.name} - insert the value of "name" inside the current row in the loop through "scope".
+{scope:name} - insert the value of "name" inside the current row in the loop through "scope".
+{!macro:args}- runs the macro "macro" with the arguments "args". macros must be registered at application load time.

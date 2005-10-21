@@ -214,7 +214,9 @@ static int commit_changes(multiset fields_set, mapping object_data, int update_i
             // we can skip the primary key for existing objects.
          }
          // have we set nothing, and are allowed to?
-         else if(!fields_set[f->name] && f->null)
+         // if we're updating, it's not required.
+         else if((!fields_set[f->name] && f->null) || 
+                    (!fields_set[f->name] && update_id))
          {
          }
          else if(!fields_set[f->name] && !f->null)

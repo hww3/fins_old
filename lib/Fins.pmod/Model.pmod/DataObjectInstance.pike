@@ -1,6 +1,6 @@
 .DataObject master_object;
 
-string object_type = "";
+string object_type;
 multiset fields_set = (<>);
 mapping object_data = ([]);
 mapping cached_object_data = ([]);
@@ -8,10 +8,25 @@ static int key_value = UNDEFINED;
 int new_object = 0;
 int saved = 0;
 
-void create(int|void id)
+string _sprintf(mixed ... args)
 {
+  return object_type + "(" + key_value + ")";
+}
+
+static void create(int|void id, string|void _object_type)
+{
+   if(_object_type)
+     object_type = _object_type;
+
    .DataObject o = .get_object(object_type);  
+
+   if(!o)
+   {
+     throw(Error.Generic("object type " + object_type + " does not exist.\n"));
+   }
    master_object = o;
+
+   
 
   if(id == UNDEFINED)
   {

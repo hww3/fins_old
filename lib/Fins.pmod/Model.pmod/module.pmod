@@ -10,6 +10,6 @@ constant Undefined = .Undefined_Value;
 
 void add_object_type(.DataObject t)
 {
-   object_definitions[t->name] = t;
+   object_definitions[t->instance_name] = t;
 }
 

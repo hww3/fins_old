@@ -60,7 +60,7 @@ static class RegexReplacer{
   int max_iterations = 10;
   string match = "(:?{foreach:(?P<loopname>[a-zA-Z\\-_0-9]+)}(?:((?s).*?){end:(?P=loopname)}))"
        "|(:?{include:(?P<file>[a-zA-Z\\-_0-9/\\.]+)})"
-       "|(:?{if:(?P<testid>[a-zA-Z0-9_\\-]+):([a-zA-Z+\\-*/_0-9]+)}(?:((?s).*?)({else:(?P=testid)}(?:((?s).*?)))?{endif:(?P=testid)}))"
+       "|(:?{if:(?P<testid>[a-zA-Z0-9_\\-]+):(.*?)}(?:((?s).*?)({else:(?P=testid)}(?:((?s).*?)))?{endif:(?P=testid)}))"
        "|(:?{(:?(:?(!?[A-Za-z0-9_]+):)?(.*?))})";
 
   void create() {
@@ -71,7 +71,6 @@ static class RegexReplacer{
   array step(string template, array components, object context)
   {
      string sv;
- //    werror("STEP: %O\n", template);
 
      int i=0;
      for (;;)
@@ -81,14 +80,10 @@ static class RegexReplacer{
        
         if (intp(v) && !regexp->handle_exec_error([int]v)) break;
 
-//        if (v[0]>i) buf->add(template[i..v[0]-1]);
-
          sv = template[i..v[0]-1];
 
- //        werror("SV: %O\n", sv);
-
          components += ({ TextString(sv) });
-
+	
         if(sizeof(v)>2)
         {
           int c = 2;
@@ -101,7 +96,7 @@ static class RegexReplacer{
         }
 
         
-  //       werror("got match: %O, subparts: %O", template[v[0]..v[1]-1], substrings);
+         werror("got match: %O, subparts: %O", template[v[0]..v[1]-1], substrings);
 
          // include
          if(sizeof(substrings) == 5)
@@ -134,13 +129,24 @@ static class RegexReplacer{
          // if
          if(sizeof(substrings)==9)
          {
-            werror("GOT IF\n");
+werror("Got if\n");
+            components += ({ If(substrings[-2], 
+                                  step(substrings[-1], ({}), context),
+                                  ({})
+                                ) 
+                            });
          }
          
          // if:else
-         if(sizeof(substrings)==9)
+         if(sizeof(substrings)==11)
          {
-            werror("GOT IF_ELSE\n");
+werror("Got if...else\n");
+
+            components += ({ If(substrings[-4], 
+                                  step(substrings[-3], ({}), context),
+                                  step(substrings[-1], ({}), context)
+                                ) 
+                            });
          }
          
          // foreach
@@ -195,8 +201,6 @@ static class RegexReplacer{
 
 }
 
-
-
 static class Block
 {
    
@@ -204,7 +208,6 @@ static class Block
    {
       
    }
-   
 }
 
 static class Include
@@ -290,7 +293,7 @@ static class MacroField(string name, function func, string arguments)
    
    void render(String.Buffer buf, mapping data)
    {
-      werror("INSERTING: %s / %s from %O\n", name, arguments, data);
+//      werror("INSERTING: %s / %s from %O\n", name, arguments, data);
         buf->add(func(data, arguments));
    }
 }
@@ -330,3 +333,61 @@ static class Foreach(string scope, array contents)
 
 
 }
+
+
+static class If(string test, array ifval, array|void elseval)
+{
+   inherit Block;
+
+   function eval_func;   
+
+   string _sprintf(mixed ... args)
+   {
+      return "If(" + test + ")";
+   }
+
+   function compile_func(string test)
+   {
+     string tf = "int test(mapping data){ if(" + test + ") return 1; else return 0; }";
+werror("tf: %s\n", tf);
+     program tp = compile_string(tf);
+     if(tp) return tp()->test;
+     else return true_func;
+   }
+
+   int true_func(mapping data)
+   {
+     return 1;
+   }
+
+   int eval(mapping data)
+   {
+     if(!eval_func)
+       eval_func = compile_func(test);
+     if(!eval_func) werror("FAILED TO LOAD EVAL FUNC.\n");
+     return eval_func(data);
+   }
+      
+   void render(String.Buffer buf, mapping data)
+   {
+      int testresult = eval(data);
+      array resultset = ({});
+werror("TESTRESULT: %O\n", testresult);
+      if(testresult)
+      {
+        resultset = ifval;
+      }
+      else
+      {
+        resultset = elseval;
+      }
+
+      foreach(resultset;; Block b)
+      {
+        b->render(buf, data );
+      }
+   }
+
+
+}
+

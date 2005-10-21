@@ -9,11 +9,11 @@ int main()
    add_object_type(Name_object(d));
 
      
-   object a = Name();
+   object a = DataObjectInstance(UNDEFINED, "name");
    a->set("First_Name", "Bill");
    a->set("Last_Name", "Welliver");
    a["Cards_Received"] = 24;
-//   a["updated"] = Calendar.Day()-10;
+   a["updated"] = Calendar.Day()-10;
    a->save();
 
    write("!Last Name: " + a->get("Last_Name") + "\n");
@@ -21,19 +21,13 @@ int main()
 
    write("Last Name: " + a["Last_Name"] + "\n");
    werror("Cards Received: %O\n", a["Cards_Received"]);
-   object b = Name(a->get_id());
+   object b = DataObjectInstance(a->get_id(), "name");
    b->set_atomic((["Last_Name":"Welliver", "First_Name": "Jennifer", "Cards_Received": 42]));
    write("from b: " + b["First_Name"] +"\n");
    write("from b: " + b["Last_Name"] + "\n");
    write("from b: " + b["Cards_Received"] + "\n");
+   write("from b: " +sprintf("%O\n", b["updated3"]) + "\n");
    
-}
-
-class Name
-{
-   inherit DataObjectInstance;
-   
-   string object_type = "names";  
 }
 
 class Name_object
@@ -43,7 +37,8 @@ class Name_object
    static void create(DataModelContext c)
    {  
       ::create(c);
-      set_name("names");
+      set_table_name("names");
+      set_instance_name("name");
       add_field(PrimaryKeyField("id"));
       add_field(StringField("First_Name", 32, 0));
       add_field(StringField("Last_Name", 32, 0));
@@ -56,12 +51,12 @@ class Name_object
 
    static object foo()
    {
-     return Calendar.Day()-100;
+     return Calendar.Day();
    }
 
    static object foo2()
    {
-     return Calendar.Minute()-100;
+     return Calendar.Second();
    }
    
 }

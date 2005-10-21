@@ -18,7 +18,8 @@ string insert_query = "INSERT INTO %s %s VALUES %s";
 
 int autosave = 1;
 
-string name = "";
+string instance_name = "";
+string table_name = "";
 
 void create(.DataModelContext c)
 {
@@ -41,9 +42,14 @@ void generate_from_schema(string table)
    }
 }
 
-void set_name(string _name)
+void set_instance_name(string _name)
 {
-  name = _name;
+  instance_name = _name;
+}
+
+void set_table_name(string _name)
+{
+  table_name = _name;
 }
 
 void set_primary_key(string _key)
@@ -68,7 +74,7 @@ void load(int id, .DataObjectInstance i)
      _fields += ({ f->field_name });
      
    string query = sprintf(single_select_query, (_fields * ", "), 
-     name, primary_key->field_name, primary_key->encode(id));
+     table_name, primary_key->field_name, primary_key->encode(id));
 
    if(context->debug) werror("QUERY: %O\n", query);
 
@@ -76,7 +82,7 @@ void load(int id, .DataObjectInstance i)
 
    if(sizeof(result) != 1)
    {
-     throw(Error.Generic("Unable to load " + name + " id " + id + ".\n"));
+     throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
    }
 
    else 
@@ -103,7 +109,7 @@ mixed get(string field, .DataObjectInstance i)
 
    if(!fields[field])
    {
-     throw(Error.Generic("Field " + field + " does not exist in " + name + "\n"));
+     throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
    }
    
    if(has_index(i->cached_object_data, field))
@@ -111,7 +117,7 @@ mixed get(string field, .DataObjectInstance i)
      
    string query = "SELECT %s FROM %s WHERE %s=%s";
 
-   query = sprintf(query, fields[field]->field_name, name, 
+   query = sprintf(query, fields[field]->field_name, table_name, 
      primary_key->field_name, primary_key->encode(i->get_id()));
 
       if(context->debug) werror("QUERY: %O\n", query);
@@ -120,7 +126,7 @@ mixed get(string field, .DataObjectInstance i)
 
    if(sizeof(result) != 1)
    {
-     throw(Error.Generic("Unable to obtain information for " + name + " id " + i->get_id() + "\n"));
+     throw(Error.Generic("Unable to obtain information for " + instance_name + " id " + i->get_id() + "\n"));
    }
    else 
    {
@@ -138,7 +144,7 @@ int set_atomic(mapping values, .DataObjectInstance i)
    {
       if(!fields[field])
       {
-         throw(Error.Generic("Field " + field + " does not exist in object " + name + ".\n"));   
+         throw(Error.Generic("Field " + field + " does not exist in object " + instance_name + ".\n"));   
       }
 
        object_data[field] = fields[field]->validate(value);
@@ -155,7 +161,7 @@ int set(string field, mixed value, .DataObjectInstance i)
    
    if(!fields[field])
    {
-      throw(Error.Generic("Field " + field + " does not exist in object " + name + ".\n"));   
+      throw(Error.Generic("Field " + field + " does not exist in object " + instance_name + ".\n"));   
    }
    
    if(!i->is_new_object() && fields[field] == primary_key)
@@ -168,7 +174,7 @@ int set(string field, mixed value, .DataObjectInstance i)
       string new_value = fields[field]->encode(value);
       string key_value = primary_key->encode(i->get_id());
    
-      string update_query = sprintf(single_update_query, name, field, new_value, primary_key->name, key_value);
+      string update_query = sprintf(single_update_query, table_name, field, new_value, primary_key->name, key_value);
       i->set_saved(1);
       if(context->debug) werror("QUERY: %O\n", update_query);
      context->sql->query(update_query);
@@ -190,7 +196,7 @@ int delete(.DataObjectInstance i)
    // first, check to see what we link to.
    string key_value = primary_key->encode(i->get_id());
    
-   string delete_query = sprintf(single_delete_query, name, primary_key->name, key_value);
+   string delete_query = sprintf(single_delete_query, table_name, primary_key->name, key_value);
    
    if(context->debug) werror("QUERY: %O\n", delete_query);
    context->sql->query(delete_query);
@@ -207,7 +213,7 @@ static int commit_changes(multiset fields_set, mapping object_data, int update_i
       {
          if(update_id && fields_set[f->name] && f == primary_key)
          {
-            throw(Error.Generic("Changing id for " + name + " not allowed for existing objects.\n"));
+            throw(Error.Generic("Changing id for " + instance_name + " not allowed for existing objects.\n"));
          }
          else if(update_id && f == primary_key)
          {
@@ -236,7 +242,7 @@ static int commit_changes(multiset fields_set, mapping object_data, int update_i
          string fields_clause = "(" + (qfields * ", ") + ")";
          string values_clause = "(" + (qvalues * ", ") + ")";
 
-         query = sprintf(insert_query, name, fields_clause, values_clause);
+         query = sprintf(insert_query, table_name, fields_clause, values_clause);
          if(context->debug) werror("QUERY: %O\n", query);
       }
       else
@@ -251,7 +257,7 @@ static int commit_changes(multiset fields_set, mapping object_data, int update_i
 
          set_clause = (set * ", ");
          
-         query = sprintf(multi_update_query, name, set_clause, primary_key->field_name, primary_key->encode(update_id));
+         query = sprintf(multi_update_query, table_name, set_clause, primary_key->field_name, primary_key->encode(update_id));
          if(context->debug) werror("QUERY: %O\n", query);
       }
       context->sql->query(query);

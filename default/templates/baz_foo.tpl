@@ -8,8 +8,8 @@
 {end:loop}
 <p>wahoo!
 <p>
-{if:id:tesbla}  we made the if! {endif:id}
-{if:fa:tefksd}  hahaha {else:fa} hehehe {endif:fa}
+{if:id:data->val}  we made the if! {endif:id}
+{if:fa:!data->val}  hahaha {else:fa} hehehe {endif:fa}
 
 {!capitalize:val}
 

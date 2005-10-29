@@ -12,10 +12,10 @@
     // but it ensures that it's not done until we have an event
     // to pass the flashes to...
     if(request && request->misc->session_variables && 
-             request->misc->session_variables->flash)
+             request->misc->session_variables->__flash)
     {
-       request->misc->flash = request->misc->session_variables->flash;
-       m_delete(request->misc->session_variables, "flash");
+       request->misc->flash = request->misc->session_variables->__flash;
+       m_delete(request->misc->session_variables, "__flash");
     }
 
   }
@@ -36,10 +36,10 @@
   {
     if(!request) return 0;
 
-    if(!request->misc->session_variables->flash)
-      request->misc->session_variables->flash = ([]);
+    if(!request->misc->session_variables->__flash)
+      request->misc->session_variables->__flash = ([]);
 
-    request->misc->session_variables->flash[name] = data;
+    request->misc->session_variables->__flash[name] = data;
 
     return 1;
   }

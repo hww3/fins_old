@@ -1,6 +1,25 @@
   Fins.Template.Template template;
   Fins.Template.TemplateData template_data;
-  
+
+  static Fins.Request request;  
+
+  static void create(Fins.Request|void r)
+  {
+    request = r;
+    
+    // this is where we handle the "passing" of flash from request
+    // to response... it seems like a goofy place to do it,
+    // but it ensures that it's not done until we have an event
+    // to pass the flashes to...
+    if(request && request->misc->session_variables && 
+             request->misc->session_variables->flash)
+    {
+       request->misc->flash = request->misc->session_variables->flash;
+       m_delete(request->misc->session_variables, "flash");
+    }
+
+  }
+
   static mapping response = (["type": "text/html",
                               "error": 200,
                               "extra_heads": ([])
@@ -13,11 +32,27 @@
   }
 
   //!
+  public int flash(string name, mixed data)
+  {
+    if(!request) return 0;
+
+    if(!request->misc->session_variables->flash)
+      request->misc->session_variables->flash = ([]);
+
+    request->misc->session_variables->flash[name] = data;
+
+    return 1;
+  }
+
+  //!
   public void set_template(Fins.Template.Template t, Fins.Template.TemplateData d)
   {
      template = t;
      template_data = d;
+     if(request && request->misc->flash)
+       template_data->set_flash(request->misc->flash);
   }
+
   //!
   public void set_error(int error)
   {

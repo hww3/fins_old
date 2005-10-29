@@ -19,5 +19,6 @@ public void foo(Request id, Response response, mixed ... args)
 
 public void gazonk(Request id, Response response, mixed ... args)
 {
+   response->flash("moo", "the cows have come home.");
    response->redirect("foo");
 }

@@ -3,6 +3,14 @@ inherit Fins.Controller;
 
 Fins.Controller baz = ((program)"baz_controller.pike")();
 
+public void flash(Request id, Response response, mixed ... args)
+{
+   Template.TemplateData dta = Template.TemplateData();
+   Template.Template t = Template.get_template(Template.Simple, "flash.tpl");
+  
+   response->set_template(t, dta);
+}
+
 public void index(Request id, Response response, mixed ... args)
 {
    Template.Template t = Template.get_template(Template.XSLT, "index.xsl");
@@ -23,7 +31,7 @@ public void index(Request id, Response response, mixed ... args)
       {
         t = "Sub-Controller";
       }
-      else {werror("continuing.\n"); continue; }
+      else { continue; }
 
       object e = Public.Parser.XML2.new_node("event");
       e->new_child("name", name);

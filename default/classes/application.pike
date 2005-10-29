@@ -1,9 +1,11 @@
 import Fins;
 inherit Fins.Application;
 
-static void create()
+static void create(Fins.Configuration config)
 {
   Template.add_simple_macro("capitalize", macro_capitalize);
+
+  ::create(config);
 }
 
 

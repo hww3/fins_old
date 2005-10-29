@@ -1,0 +1,2 @@
+Flash: {!flash:moo}
+

@@ -73,7 +73,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
   // if we don't have the session identifier set, we should set one.
   else
   {
-    Fins.Response response = Fins.Response();
+    Fins.Response response = Fins.Response(request);
 
     string ssid=session_manager->new_sessionid();
     response->set_cookie(session_cookie_name,

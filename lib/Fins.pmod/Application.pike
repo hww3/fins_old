@@ -7,6 +7,9 @@ string static_dir = Stdio.append_path(getcwd(), "static");
 static void create(.Configuration _config)
 {
    config = _config;
+
+   .Template.add_simple_macro("capitalize", macro_capitalize);
+   .Template.add_simple_macro("flash", macro_flash);
 }
 
 public mixed handle_request(.Request request)
@@ -32,8 +35,8 @@ public mixed handle_request(.Request request)
 
   array args = x[1..];
 
-  .Response response = .Response();
-  
+  .Response response = .Response(request);
+
   if(functionp(event))
     event(request, response, @args);
 
@@ -148,3 +151,16 @@ array get_event(.Request request)
 
   return response;
 }
+
+
+string macro_capitalize(.Template.TemplateData data, string|void args)
+{
+  return String.capitalize(data->get_data()[args]||"");
+}
+
+string macro_flash(.Template.TemplateData data, string|void args)
+{
+  return (data->get_flash()[args]||"");
+}
+
+

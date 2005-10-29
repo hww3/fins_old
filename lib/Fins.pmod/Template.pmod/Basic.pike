@@ -47,7 +47,7 @@ public string render(.TemplateData data)
    
    foreach(contents;;Block b)
    {
-      b->render(buf, data->get_data());
+      b->render(buf, data);
    }
      
    return buf->get();
@@ -95,9 +95,9 @@ static class RegexReplacer{
           while(c<= (sizeof(v)-2));
         }
 
-        
+/*        
          werror("got match: %O, subparts: %O", template[v[0]..v[1]-1], substrings);
-
+*/
          // include
          if(sizeof(substrings) == 5)
          {
@@ -129,7 +129,6 @@ static class RegexReplacer{
          // if
          if(sizeof(substrings)==9)
          {
-werror("Got if\n");
             components += ({ If(substrings[-2], 
                                   step(substrings[-1], ({}), context),
                                   ({})
@@ -140,7 +139,6 @@ werror("Got if\n");
          // if:else
          if(sizeof(substrings)==11)
          {
-werror("Got if...else\n");
 
             components += ({ If(substrings[-4], 
                                   step(substrings[-3], ({}), context),
@@ -159,7 +157,6 @@ werror("Got if...else\n");
      }
 
      sv = template[i..];
-   //  werror("SV: %O\n", sv);
      components += ({ TextString(sv) });
 
      return components;
@@ -204,7 +201,7 @@ werror("Got if...else\n");
 static class Block
 {
    
-   void render(String.Buffer buf, mapping data)
+   void render(String.Buffer buf, .TemplateData data)
    {
       
    }
@@ -228,11 +225,9 @@ static class Include
       return "Include(" + templateName + ")";
    }
       
-   void render(String.Buffer buf, mapping data)
+   void render(String.Buffer buf, .TemplateData data)
    {
-      .TemplateData d = .TemplateData();
-      d->set_data(data);
-      buf->add(included_template->render(d));
+      buf->add(included_template->render(data));
    }
 
 }
@@ -247,7 +242,7 @@ static class TextString(string contents)
    }
 
       
-   void render(String.Buffer buf, mapping data)
+   void render(String.Buffer buf, .TemplateData data)
    {
       buf->add(contents);
    }
@@ -264,7 +259,7 @@ static class ReplaceField(string scope, string name)
    }
    
    
-   void render(String.Buffer buf, mapping data)
+   void render(String.Buffer buf, .TemplateData data)
    {
  //     werror("INSERTING: %s / %s from %O\n", scope, name, data);
       if(scope && strlen(scope) && data[scope] && mappingp(data[scope]))
@@ -291,7 +286,7 @@ static class MacroField(string name, function func, string arguments)
    }
    
    
-   void render(String.Buffer buf, mapping data)
+   void render(String.Buffer buf, .TemplateData data)
    {
 //      werror("INSERTING: %s / %s from %O\n", name, arguments, data);
         buf->add(func(data, arguments));
@@ -307,26 +302,30 @@ static class Foreach(string scope, array contents)
       return "Foreach(" + scope + ")";
    }
       
-   void render(String.Buffer buf, mapping data)
+   void render(String.Buffer buf, .TemplateData data)
    {
+      mapping d = data->get_data();
  //     werror("RENDERING " + scope + "\n");
-      if(!data[scope] && zero_type(data[scope]==1))
+      if(!d[scope] && zero_type(d[scope]==1))
       {
          buf->add("<!-- VALUE " + scope + " NOT FOUND -->");
          return;
       }
-      else if(data[scope] && ! arrayp(data[scope]))
+      else if(d[scope] && ! arrayp(d[scope]))
       {
          buf->add("<!-- VALUE " + scope + " NOT AN ARRAY -->");
          return;
       }
       
-      foreach(data[scope]; int num; mapping row)
+      foreach(d[scope]; int num; mapping row)
       {
          foreach(contents;; Block b)
          {
+            .TemplateData d = data->clone();
+            d->add(scope, row);
+
             // we should be able to replace the scope element in data with the row.
-            b->render(buf, data + ([scope: row]) );
+            b->render(buf, d);
          }
       }
    }
@@ -348,19 +347,19 @@ static class If(string test, array ifval, array|void elseval)
 
    function compile_func(string test)
    {
-     string tf = "int test(mapping data){ if(" + test + ") return 1; else return 0; }";
+     string tf = "int test(Fins.Template.TemplateData d){ mapping data = d->get_data(); if(" + test + ") return 1; else return 0; }";
 werror("tf: %s\n", tf);
      program tp = compile_string(tf);
      if(tp) return tp()->test;
      else return true_func;
    }
 
-   int true_func(mapping data)
+   int true_func(.TemplateData data)
    {
      return 1;
    }
 
-   int eval(mapping data)
+   int eval(.TemplateData data)
    {
      if(!eval_func)
        eval_func = compile_func(test);
@@ -368,7 +367,7 @@ werror("tf: %s\n", tf);
      return eval_func(data);
    }
       
-   void render(String.Buffer buf, mapping data)
+   void render(String.Buffer buf, .TemplateData data)
    {
       int testresult = eval(data);
       array resultset = ({});
@@ -387,7 +386,5 @@ werror("TESTRESULT: %O\n", testresult);
         b->render(buf, data );
       }
    }
-
-
 }
 

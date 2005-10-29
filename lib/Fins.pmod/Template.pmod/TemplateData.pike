@@ -1,4 +1,5 @@
 static mapping data = ([]);
+static mapping flash = ([]);
 
 //!
 void create(mapping|void defaults)
@@ -20,7 +21,28 @@ public void set_data(mapping d)
 }
 
 //!
+public void set_flash(mapping d)
+{
+   flash = d;
+}
+
+//!
 public mapping get_data()
 {
    return data;
+}
+
+//!
+public mapping get_flash()
+{
+   return flash;
+}
+
+//!
+public .TemplateData clone()
+{
+  object d = object_program(this)();
+  d->set_data(data + ([]));
+  d->set_flash(flash + ([]));
+  return d;
 }

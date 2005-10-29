@@ -93,7 +93,7 @@ void load(int id, .DataObjectInstance i)
      mapping r = ([]);
      foreach(fields; string fn; .Field f)
      {
-        r[f->name] = f->decode(result[0][f->field_name]);
+        r[f->name] = result[0][f->field_name];
      }
      i->set_cache(r);
    }
@@ -113,7 +113,7 @@ mixed get(string field, .DataObjectInstance i)
    }
    
    if(has_index(i->cached_object_data, field))
-     return i->cached_object_data[field];
+     return fields[field]->decode(i->cached_object_data[field]);
      
    string query = "SELECT %s FROM %s WHERE %s=%s";
 

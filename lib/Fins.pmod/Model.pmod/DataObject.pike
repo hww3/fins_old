@@ -119,9 +119,9 @@ array(object(.DataObjectInstance)) find(mapping qualifiers, .DataObjectInstance 
 
   foreach(qr;; mapping row)
   {
-    object item = object_program(i)(UNDEFINED, i->get_type);
-    i->set_id(primary_key->decode(row[primary_key->field_name]));
-    i->set_new_object(0);
+    object item = object_program(i)(UNDEFINED, i->get_type());
+    item->set_id(primary_key->decode(row[primary_key->field_name]));
+    item->set_new_object(0);
     low_load(row, item);
     results+= ({ item  });
   }
@@ -131,6 +131,7 @@ array(object(.DataObjectInstance)) find(mapping qualifiers, .DataObjectInstance 
 
 void load(int id, .DataObjectInstance i, int|void force)
 {
+
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
      array _fields = ({});
@@ -177,6 +178,7 @@ void low_load(mapping row, .DataObjectInstance i)
     objs[id] = ({0, ([])});
   }
 
+
   objs[id][1] = r;
 
   return;
@@ -190,14 +192,16 @@ mapping get_atomic(.DataObjectInstance i)
 mixed get(string field, .DataObjectInstance i)
 {
 
+
    if(!fields[field])
    {
      throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
    }
    
    if(has_index(objs[i->get_id()][1], field))
+   {
      return fields[field]->decode(objs[i->get_id()][1][field], i);
-     
+   }     
    string query = "SELECT %s FROM %s WHERE %s=%s";
 
    query = sprintf(query, fields[field]->field_name, table_name, 

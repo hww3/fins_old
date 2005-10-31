@@ -8,6 +8,8 @@ int main()
    d->debug = 1;
    add_object_type(Name_object(d));
    add_object_type(Author_object(d));
+   add_object_type(Comment_object(d));
+
 
 
    object author;
@@ -19,6 +21,7 @@ int main()
      author->save();
    }     
 
+
    object a = DataObjectInstance(UNDEFINED, "name");
    a->set("First_Name", "Bill");
    a->set("Last_Name", "Welliver");
@@ -26,6 +29,14 @@ int main()
    a["updated"] = Calendar.Day()-10;
    a["author"] = author;
    a->save();
+
+   object c = DataObjectInstance(UNDEFINED, "comment");
+
+   c["Description"] = "now is the time for all good men to come to the aid of their country.\n";
+   c["name"] = a;
+   c->save();
+
+   werror("A: %O\n", mkmapping(indices(a), values(a)));
 
    write("!Last Name: " + a->get("Last_Name") + "\n");
    a["Last_Name"] = "Lupart";
@@ -58,7 +69,8 @@ class Name_object
       add_field(DateField("updated", 0, foo));
       add_field(TimeField("updated2", 0, foo2));
       add_field(DateTimeField("updated3", 0, foo2));
-      add_field(InverseKeyReference("author", "author_id", "author"));
+      add_field(KeyReference("author", "author_id", "author"));
+      add_field(InverseForeignKeyReference("comments", "comment", "name"));
       set_primary_key("id");
    }
 
@@ -90,4 +102,23 @@ class Author_object
    }
 
 }
+
+
+class Comment_object
+{
+   inherit DataObject;
+
+   static void create(DataModelContext c)
+   {  
+      ::create(c);
+      set_table_name("my_comments");
+      set_instance_name("comment");
+      add_field(PrimaryKeyField("id"));
+      add_field(KeyReference("name", "name_id", "name"));
+      add_field(StringField("Description", 1024, 0));
+      set_primary_key("id");
+   }
+
+}
+
 

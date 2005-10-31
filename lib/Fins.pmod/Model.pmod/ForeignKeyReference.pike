@@ -2,23 +2,23 @@ inherit .Relationship;
 
 constant type="Foreign Key";
 
+mapping otherobjects = ([]);
+
 string otherobject; 
 string otherkey; 
 mixed default_value = .Undefined;
 int null = 0;
 int is_shadow=1;
 
-static void create(string _name, string _otherobject, string _otherkey)
+static void create(string _name)
 {
   name = _name;
-  otherobject = _otherobject;
-  otherkey = _otherkey;
 }
 
 // value will be null in a foreign key, as we're not in an object where that's a real field.
 mixed decode(string value, void|.DataObjectInstance i)
 {
-  return .DataObjectInstance(UNDEFINED, otherobject)->find(([ otherkey :
+  return .DataObjectInstance(UNDEFINED, otherobject)->find(([ i->master_object->primary_key->field_name :
                                   (int) i->get_id()]));
 }
 

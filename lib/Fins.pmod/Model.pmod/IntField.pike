@@ -19,12 +19,12 @@ void create(string _name, int _len, int(0..1) _null, int|void _default)
    ::create();
 }
 
-int decode(string value, void|.DataModelInstance i)
+int decode(string value, void|.DataObjectInstance i)
 {
    return (int)value;
 }
 
-string encode(mixed value, void|.DataModelInstance i)
+string encode(mixed value, void|.DataObjectInstance i)
 {
   value = validate(value);
 
@@ -36,7 +36,7 @@ string encode(mixed value, void|.DataModelInstance i)
   return (string)value;
 }
 
-mixed validate(mixed value, void|.DataModelInstance i)
+mixed validate(mixed value, void|.DataObjectInstance i)
 {
    if(value == .Undefined && !null && default_value == .Undefined)
    {

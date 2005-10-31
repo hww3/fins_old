@@ -33,12 +33,12 @@ void create(string _name, int(0..1) _null, mixed|void _default)
    ::create();
 }
 
-object decode(string value, void|.DataModelInstance i)
+object decode(string value, void|.DataObjectInstance i)
 {
    return Calendar.parse(output_unit_format, value);
 }
 
-string encode(mixed value, void|.DataModelInstance i)
+string encode(mixed value, void|.DataObjectInstance i)
 {
   value = validate(value);
 
@@ -50,7 +50,7 @@ string encode(mixed value, void|.DataModelInstance i)
   return "'" + value->format_ymd() + "'";
 }
 
-mixed validate(mixed value, void|.DataModelInstance i)
+mixed validate(mixed value, void|.DataObjectInstance i)
 {
    if(value == .Undefined && !null && default_value == .Undefined)
    {

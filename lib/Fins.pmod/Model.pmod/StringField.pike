@@ -16,7 +16,7 @@ void create(string _name, int _len, int(0..1) _null, string|void _default)
    ::create();
 }
 
-mixed validate(mixed value, void|.DataModelInstance i)
+mixed validate(mixed value, void|.DataObjectInstance i)
 {
    if(value == .Undefined && !null && !default_value)
    {
@@ -48,7 +48,7 @@ mixed validate(mixed value, void|.DataModelInstance i)
    return value;
 }
 
-string encode(mixed value, void|.DataModelInstance i)
+string encode(mixed value, void|.DataObjectInstance i)
 {
   value = validate(value);
   if(value == .Undefined)

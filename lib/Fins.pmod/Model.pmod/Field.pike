@@ -4,17 +4,17 @@ string field_name;
 constant type = "";
 int is_shadow = 0;
 
-mixed validate(mixed value, void|.DataModelInstance i)
+mixed validate(mixed value, void|.DataObjectInstance i)
 {
   return value;
 }
 
-mixed decode(string value, void|.DataModelInstance i)
+mixed decode(string value, void|.DataObjectInstance i)
 {
    return value;
 }
 
-string encode(mixed value, void|.DataModelInstance i);
+string encode(mixed value, void|.DataObjectInstance i);
 
 string translate_fieldname()
 {

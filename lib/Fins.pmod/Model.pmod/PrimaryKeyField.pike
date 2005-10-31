@@ -13,12 +13,12 @@ int get_id()
   return decode(context->sql->master_sql->insert_id());
 }
 
-int decode(string value, void|.DataModelInstance i)
+int decode(string value, void|.DataObjectInstance i)
 {
    return (int)value;
 }
 
-string encode(mixed|void value, void|.DataModelInstance i)
+string encode(mixed|void value, void|.DataObjectInstance i)
 {
   value = validate(value);
 
@@ -28,7 +28,7 @@ string encode(mixed|void value, void|.DataModelInstance i)
   return (string)value;
 }
 
-mixed validate(mixed|void value, void|.DataModelInstance i)
+mixed validate(mixed|void value, void|.DataObjectInstance i)
 {
    if(value == .Undefined)
    {

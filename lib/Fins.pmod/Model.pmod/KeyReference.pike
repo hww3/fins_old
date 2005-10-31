@@ -19,9 +19,11 @@ mixed decode(string value, void|.DataObjectInstance i)
 }
 
 // value should be a dataobject instance of the type we're looking to set.
-string encode(.DataObjectInstance value, void|.DataObjectInstance i)
+string encode(int|.DataObjectInstance value, void|.DataObjectInstance i)
 {
   value = validate(value);
+
+  if(intp(value)) return (string)value;
 
   if(value->is_new_object())
   {
@@ -34,6 +36,8 @@ string encode(.DataObjectInstance value, void|.DataObjectInstance i)
 
 mixed validate(mixed value, void|.DataObjectInstance i)
 {
+   if(intp(value)) return value;
+
    if(value == .Undefined && !null && default_value == .Undefined)
    {
      throw(Error.Generic("Field " + name + " cannot be null; no default value specified.\n"));
@@ -54,4 +58,3 @@ mixed validate(mixed value, void|.DataObjectInstance i)
 
    return value;
 }
-

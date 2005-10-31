@@ -7,6 +7,8 @@
 
 inherit .Field;
 
+constant type = "Date";
+
 program unit_program = Calendar.Day;
 function unit_parse = Calendar.ISO.dwim_day;
 string output_unit_format = "%Y-%M-%D";
@@ -31,12 +33,12 @@ void create(string _name, int(0..1) _null, mixed|void _default)
    ::create();
 }
 
-object decode(string value)
+object decode(string value, void|.DataModelInstance i)
 {
    return Calendar.parse(output_unit_format, value);
 }
 
-string encode(mixed value)
+string encode(mixed value, void|.DataModelInstance i)
 {
   value = validate(value);
 
@@ -48,7 +50,7 @@ string encode(mixed value)
   return "'" + value->format_ymd() + "'";
 }
 
-mixed validate(mixed value)
+mixed validate(mixed value, void|.DataModelInstance i)
 {
    if(value == .Undefined && !null && default_value == .Undefined)
    {

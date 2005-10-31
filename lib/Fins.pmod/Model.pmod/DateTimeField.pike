@@ -7,11 +7,13 @@
 
 inherit .DateField;
 
+constant type = "DateTime";
+
 program unit_program = Calendar.Second;
 function unit_parse = Calendar.ISO.dwim_time;
 string output_unit_format = "%Y-%M-%D %h:%m:%s";
 
-string encode(mixed value)
+string encode(mixed value, void|.DataModelInstance i)
 {
   value = validate(value);
 

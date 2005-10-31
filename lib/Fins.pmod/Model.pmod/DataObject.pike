@@ -11,6 +11,7 @@ mapping objs = ([]);
 mapping fields = ([]);
 
 string single_select_query = "SELECT %s FROM %s WHERE %s=%s";
+string multi_select_query = "SELECT %s FROM %s WHERE %s";
 string single_update_query = "UPDATE %s SET %s=%s WHERE %s=%s";
 string single_delete_query = "DELETE FROM %s WHERE %s=%s";
 string multi_update_query = "UPDATE %s SET %s WHERE %s=%s";
@@ -40,6 +41,8 @@ void add_ref(.DataObjectInstance o)
 
 void sub_ref(.DataObjectInstance o)
 {
+  if(!o->is_initialized()) return;
+
   objs[o->get_id()][0]--;
 
   if(objs[o->get_id()][0] == 0)
@@ -88,6 +91,44 @@ void add_field(.Field f)
    fields[f->name] = f;
 }
 
+array(object(.DataObjectInstance)) find(mapping qualifiers, .DataObjectInstance i)
+{
+  string query;
+  array(object(.DataObjectInstance)) results = ({});
+
+  array _fields = ({});
+  array _where = ({});
+  foreach(fields;; .Field f)
+    _fields += ({ f->field_name });
+
+  foreach(qualifiers; string name; mixed q)
+  {
+    if(!fields[name])
+    {
+      throw(Error.Generic("Field " + name + " does not exist in object " + instance_name + ".\n"));
+    }
+    _where += ({ fields[name]->make_qualifier(q)});
+  }      
+
+  query = sprintf(multi_select_query, (_fields * ", "), 
+    table_name, (_where * " AND "));
+
+  if(context->debug) werror("QUERY: %O\n", query);
+  
+  array qr = context->sql->query(query);
+
+  foreach(qr;; mapping row)
+  {
+    object item = object_program(i)(UNDEFINED, i->get_type);
+    i->set_id(primary_key->decode(row[primary_key->field_name]));
+    i->set_new_object(0);
+    low_load(row, item);
+    results+= ({ item  });
+  }
+
+  return results;
+}
+
 void load(int id, .DataObjectInstance i, int|void force)
 {
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
@@ -108,27 +149,37 @@ void load(int id, .DataObjectInstance i, int|void force)
        throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
      }
 
-     mapping r = ([]);
+     i->set_id(id);
+     i->set_new_object(0);
+     i->set_initialized(1);
+     low_load(result[0], i);
+  }
+  else // guess we need this here, also.
+  {
+     i->set_initialized(1);
+     i->set_id(primary_key->decode(objs[id][1][primary_key->field_name]));
+     i->set_new_object(0);
+  }
+}
 
-     foreach(fields; string fn; .Field f)
-     {
-       r[f->name] = result[0][f->field_name];
-     }
+void low_load(mapping row, .DataObjectInstance i)
+{
+  int id = i->get_id();
+  mapping r = ([]);
 
-     if(!objs[id])
-     {
-       objs[id] = ({0, ([])});
-     }
-
-     objs[id][1] = r;
-
+  foreach(fields; string fn; .Field f)
+  {
+    r[f->name] = row[f->field_name];
   }
 
-  i->set_new_object(0);
-     
-  // this is probably bad:
-  i->set_id(primary_key->decode(objs[id][1][primary_key->field_name]));
+  if(!objs[id])
+  {
+    objs[id] = ({0, ([])});
+  }
 
+  objs[id][1] = r;
+
+  return;
 }
 
 mapping get_atomic(.DataObjectInstance i)
@@ -145,12 +196,12 @@ mixed get(string field, .DataObjectInstance i)
    }
    
    if(has_index(objs[i->get_id()][1], field))
-     return fields[field]->decode(objs[i->get_id()][1][field]);
+     return fields[field]->decode(objs[i->get_id()][1][field], i);
      
    string query = "SELECT %s FROM %s WHERE %s=%s";
 
    query = sprintf(query, fields[field]->field_name, table_name, 
-     primary_key->field_name, primary_key->encode(i->get_id()));
+     primary_key->field_name, primary_key->encode(i->get_id()), i);
 
       if(context->debug) werror("QUERY: %O\n", query);
 
@@ -179,6 +230,11 @@ int set_atomic(mapping values, .DataObjectInstance i)
          throw(Error.Generic("Field " + field + " does not exist in object " + instance_name + ".\n"));   
       }
 
+      if(fields[field]->is_shadow)
+      {
+         throw(Error.Generic("Cannot set shadow field " + field + ".\n"));   
+      }
+
        object_data[field] = fields[field]->validate(value);
        fields_set[field] = 1;      
    }
@@ -195,6 +251,11 @@ int set(string field, mixed value, .DataObjectInstance i)
       throw(Error.Generic("Field " + field + " does not exist in object " + instance_name + ".\n"));   
    }
    
+   if(fields[field]->is_shadow)
+   {
+     throw(Error.Generic("Cannot set shadow field " + field + ".\n"));   
+   }
+
    if(!i->is_new_object() && fields[field] == primary_key)
    {
       throw(Error.Generic("Cannot modify primary key field " + field + ".\n"));
@@ -242,6 +303,8 @@ static int commit_changes(multiset fields_set, mapping object_data, int update_i
    array qvalues = ({});
       foreach(fields;; .Field f)
       {
+         if(f->is_shadow) continue;  // We just skip right over "shadow" fields.
+
          if(update_id && fields_set[f->name] && f == primary_key)
          {
             throw(Error.Generic("Changing id for " + instance_name + " not allowed for existing objects.\n"));

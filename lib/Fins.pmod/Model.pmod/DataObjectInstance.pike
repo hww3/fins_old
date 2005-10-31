@@ -6,10 +6,21 @@ mapping object_data = ([]);
 static int key_value = UNDEFINED;
 int new_object = 0;
 int saved = 0;
+int initialized;
 
 string _sprintf(mixed ... args)
 {
   return object_type + "(" + key_value + ")";
+}
+
+void set_initialized(int i)
+{
+  initialized = i;
+}
+
+int is_initialized()
+{
+  return initialized;
 }
 
 string get_type()
@@ -57,13 +68,18 @@ void refresh()
    return   new_object;
 }
 
-.DataObjectInstance find(int id)
+.DataObjectInstance find_by_id(int id)
 {
    .DataObjectInstance new_object = object_program(this)();
 
     master_object->load(id, new_object);
 
    return new_object;
+}
+
+array(object(.DataObjectInstance)) find(mapping qualifiers)
+{
+  return master_object->find(qualifiers, this);
 }
 
 int delete()
@@ -139,6 +155,30 @@ mixed `[]=(mixed i, mixed v)
 mixed `[](mixed arg)
 {
   return get(arg);
+}
+
+array _indices()
+{
+  array a = ({});
+
+  foreach(master_object->fields; string name; .Field f)
+  {
+    a+=({name});
+  }
+
+  return a;
+}
+
+array _values()
+{
+  array a = ({});
+
+  foreach(master_object->fields; string name; .Field f)
+  {
+    a+=({get(name)});
+  }
+
+  return a;
 }
 
 static void destroy()

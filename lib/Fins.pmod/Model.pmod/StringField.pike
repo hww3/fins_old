@@ -5,6 +5,8 @@ int null;
 string name;
 string default_value;
 
+constant type = "String";
+
 void create(string _name, int _len, int(0..1) _null, string|void _default)
 {
    name = _name;
@@ -14,7 +16,7 @@ void create(string _name, int _len, int(0..1) _null, string|void _default)
    ::create();
 }
 
-mixed validate(mixed value)
+mixed validate(mixed value, void|.DataModelInstance i)
 {
    if(value == .Undefined && !null && !default_value)
    {
@@ -46,7 +48,7 @@ mixed validate(mixed value)
    return value;
 }
 
-string encode(mixed value)
+string encode(mixed value, void|.DataModelInstance i)
 {
   value = validate(value);
   if(value == .Undefined)

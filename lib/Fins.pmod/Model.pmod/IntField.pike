@@ -5,6 +5,8 @@ int null;
 mixed default_value;
 string name;
 
+constant type = "Integer";
+
 void create(string _name, int _len, int(0..1) _null, int|void _default)
 {
    name = _name;
@@ -17,12 +19,12 @@ void create(string _name, int _len, int(0..1) _null, int|void _default)
    ::create();
 }
 
-int decode(string value)
+int decode(string value, void|.DataModelInstance i)
 {
    return (int)value;
 }
 
-string encode(mixed value)
+string encode(mixed value, void|.DataModelInstance i)
 {
   value = validate(value);
 
@@ -34,7 +36,7 @@ string encode(mixed value)
   return (string)value;
 }
 
-mixed validate(mixed value)
+mixed validate(mixed value, void|.DataModelInstance i)
 {
    if(value == .Undefined && !null && default_value == .Undefined)
    {

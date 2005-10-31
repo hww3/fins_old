@@ -13,13 +13,13 @@ static void create(string _name, string _myfield, string _otherobject)
 
 // value should be the value of the link field, which is the primary key of the 
 // other object we're about to get.
-mixed decode(string value)
+mixed decode(string value, void|.DataObjectInstance i)
 {
   return .DataObjectInstance((int)value, otherobject);
 }
 
 // value should be a dataobject instance of the type we're looking to set.
-string encode(.DataObjectInstance value)
+string encode(.DataObjectInstance value, void|.DataObjectInstance i)
 {
   value = validate(value);
 
@@ -32,7 +32,7 @@ string encode(.DataObjectInstance value)
 }
 
 
-mixed validate(mixed value)
+mixed validate(mixed value, void|.DataObjectInstance i)
 {
    if(value == .Undefined && !null && default_value == .Undefined)
    {

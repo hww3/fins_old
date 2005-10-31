@@ -20,10 +20,32 @@ int autosave = 1;
 
 string instance_name = "";
 string table_name = "";
+mapping new_object_data = ([]);
 
 void create(.DataModelContext c)
 {
    context = c;
+}
+
+void add_ref(.DataObjectInstance o)
+{
+  // FIXME: we shouldn't have to do this in more than one location!
+  if(!objs[o->get_id()])
+  {
+    objs[o->get_id()] = ({0, ([])});
+  }
+
+  objs[o->get_id()][0]++;
+}
+
+void sub_ref(.DataObjectInstance o)
+{
+  objs[o->get_id()][0]--;
+
+  if(objs[o->get_id()][0] == 0)
+  {
+    m_delete(objs, o->get_id());
+  }
 }
 
 void generate_from_schema(string table)
@@ -66,37 +88,47 @@ void add_field(.Field f)
    fields[f->name] = f;
 }
 
-void load(int id, .DataObjectInstance i)
+void load(int id, .DataObjectInstance i, int|void force)
 {
-   array _fields = ({});
-   
-   foreach(fields;; .Field f)
-     _fields += ({ f->field_name });
-     
-   string query = sprintf(single_select_query, (_fields * ", "), 
-     table_name, primary_key->field_name, primary_key->encode(id));
-
-   if(context->debug) werror("QUERY: %O\n", query);
-
-   array result = context->sql->query(query);
-
-   if(sizeof(result) != 1)
+   if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
-     throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
-   }
+     array _fields = ({});
+     foreach(fields;; .Field f)
+       _fields += ({ f->field_name });
+      
+     string query = sprintf(single_select_query, (_fields * ", "), 
+       table_name, primary_key->field_name, primary_key->encode(id));
 
-   else 
-   {
-     i->set_new_object(0);
-     // this is probably bad:
-     i->set_id(primary_key->decode(result[0][primary_key->field_name]));
+     if(context->debug) werror("QUERY: %O\n", query);
+
+     array result = context->sql->query(query);
+
+     if(sizeof(result) != 1)
+     {
+       throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
+     }
+
      mapping r = ([]);
+
      foreach(fields; string fn; .Field f)
      {
-        r[f->name] = result[0][f->field_name];
+       r[f->name] = result[0][f->field_name];
      }
-     i->set_cache(r);
-   }
+
+     if(!objs[id])
+     {
+       objs[id] = ({0, ([])});
+     }
+
+     objs[id][1] = r;
+
+  }
+
+  i->set_new_object(0);
+     
+  // this is probably bad:
+  i->set_id(primary_key->decode(objs[id][1][primary_key->field_name]));
+
 }
 
 mapping get_atomic(.DataObjectInstance i)
@@ -112,8 +144,8 @@ mixed get(string field, .DataObjectInstance i)
      throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
    }
    
-   if(has_index(i->cached_object_data, field))
-     return fields[field]->decode(i->cached_object_data[field]);
+   if(has_index(objs[i->get_id()][1], field))
+     return fields[field]->decode(objs[i->get_id()][1][field]);
      
    string query = "SELECT %s FROM %s WHERE %s=%s";
 
@@ -152,13 +184,12 @@ int set_atomic(mapping values, .DataObjectInstance i)
    }
 
    commit_changes(fields_set, object_data, i->get_id());
-   load(i->get_id(), i);
+   load(i->get_id(), i, 1);
 }
 
 
 int set(string field, mixed value, .DataObjectInstance i)
 {
-   
    if(!fields[field])
    {
       throw(Error.Generic("Field " + field + " does not exist in object " + instance_name + ".\n"));   
@@ -171,21 +202,21 @@ int set(string field, mixed value, .DataObjectInstance i)
    
    if(!i->is_new_object() && autosave)
    {
-      string new_value = fields[field]->encode(value);
-      string key_value = primary_key->encode(i->get_id());
+     string new_value = fields[field]->encode(value);
+     string key_value = primary_key->encode(i->get_id());
    
-      string update_query = sprintf(single_update_query, table_name, field, new_value, primary_key->name, key_value);
-      i->set_saved(1);
-      if(context->debug) werror("QUERY: %O\n", update_query);
+     string update_query = sprintf(single_update_query, table_name, field, new_value, primary_key->name, key_value);
+     i->set_saved(1);
+     if(context->debug) werror("QUERY: %O\n", update_query);
      context->sql->query(update_query);
-     load(i->get_id(), i);   
+     load(i->get_id(), i, 1);   
    }
    
    else
    {
-      i->set_saved(0);
-      i->object_data[field] = fields[field]->validate(value);
-      i->fields_set[field] = 1;
+     i->set_saved(0);
+     i->object_data[field] = fields[field]->validate(value);
+     i->fields_set[field] = 1;
    }
    
    return 1;
@@ -271,6 +302,7 @@ int save(.DataObjectInstance i)
       i->set_id(primary_key->get_id());
       i->set_new_object(0);
       i->set_saved(1);
+      add_ref(i);
       i->object_data = ([]);
       i->fields_set = (<>);      
    }
@@ -286,6 +318,6 @@ int save(.DataObjectInstance i)
       throw(Error.Generic("Cannot save() when autosave is enabled.\n"));
    }
 
-   load(i->get_id(), i);
+   load(i->get_id(), i, 1);
 
 }

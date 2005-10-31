@@ -26,5 +26,6 @@ void set_context(.DataModelContext c)
 
 static void create()
 {
+   name = name;
    field_name = translate_fieldname();
 }

@@ -3,7 +3,6 @@
 string object_type;
 multiset fields_set = (<>);
 mapping object_data = ([]);
-mapping cached_object_data = ([]);
 static int key_value = UNDEFINED;
 int new_object = 0;
 int saved = 0;
@@ -11,6 +10,11 @@ int saved = 0;
 string _sprintf(mixed ... args)
 {
   return object_type + "(" + key_value + ")";
+}
+
+string get_type()
+{
+  return object_type;
 }
 
 static void create(int|void id, string|void _object_type)
@@ -36,17 +40,13 @@ static void create(int|void id, string|void _object_type)
   else
   {
     master_object->load(id, this);
+    master_object->add_ref(this);
   }
 }
 
 void refresh()
 {
-   master_object->load(key_value, this);
-}
-
-void set_cache(mapping c)
-{
-   cached_object_data = c;
+   master_object->load(key_value, this, 1);
 }
 
 .DataObjectInstance new()
@@ -141,3 +141,7 @@ mixed `[](mixed arg)
   return get(arg);
 }
 
+static void destroy()
+{
+  master_object->sub_ref(this);
+}

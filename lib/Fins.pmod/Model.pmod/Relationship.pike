@@ -1,0 +1,4 @@
+
+inherit .Field;
+
+constant type = "";

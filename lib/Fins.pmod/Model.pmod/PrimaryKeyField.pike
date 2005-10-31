@@ -2,7 +2,7 @@ inherit .Field;
 
 string name;
 
-void create(string _name)
+static void create(string _name)
 {
    name = _name;
    ::create();

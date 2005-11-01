@@ -91,8 +91,10 @@ void add_field(.Field f)
    fields[f->name] = f;
 }
 
-array(object(.DataObjectInstance)) find(mapping qualifiers, .DataObjectInstance i)
+array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 {
+   if(criteria)
+      werror("Criteria: %O", criteria);
   string query;
   array(object(.DataObjectInstance)) results = ({});
 
@@ -103,15 +105,23 @@ array(object(.DataObjectInstance)) find(mapping qualifiers, .DataObjectInstance 
 
   foreach(qualifiers; string name; mixed q)
   {
-    if(!fields[name])
-    {
-      throw(Error.Generic("Field " + name + " does not exist in object " + instance_name + ".\n"));
-    }
-    _where += ({ fields[name]->make_qualifier(q)});
+     if(objectp(q) && Program.implements(object_program(q), .Criteria))
+         _where += ({ q->get() });
+     else if(!fields[name])
+     {
+        throw(Error.Generic("Field " + name + " does not exist in object " + instance_name + ".\n"));
+     }
+     else
+     _where += ({ fields[name]->make_qualifier(q)});
   }      
 
   query = sprintf(multi_select_query, (_fields * ", "), 
     table_name, (_where * " AND "));
+
+  if(criteria)
+  {
+     query += " " + criteria->get();
+  }
 
   if(context->debug) werror("QUERY: %O\n", query);
   

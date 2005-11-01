@@ -259,8 +259,9 @@ static class ReplaceField(string scope, string name)
    }
    
    
-   void render(String.Buffer buf, .TemplateData data)
+   void render(String.Buffer buf, .TemplateData d)
    {
+      mapping data = d->get_data();
  //     werror("INSERTING: %s / %s from %O\n", scope, name, data);
       if(scope && strlen(scope) && data[scope] && mappingp(data[scope]))
       {

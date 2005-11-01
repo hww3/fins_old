@@ -77,9 +77,9 @@ void refresh()
    return new_object;
 }
 
-array(object(.DataObjectInstance)) find(mapping qualifiers)
+array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void criteria)
 {
-  return master_object->find(qualifiers, this);
+  return master_object->find(qualifiers, criteria, this);
 }
 
 int delete()

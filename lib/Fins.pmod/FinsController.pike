@@ -9,7 +9,7 @@ static void create()
     start();
 }
 
-void start()
+static void start()
 {
 }
 

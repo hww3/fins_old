@@ -30,17 +30,20 @@ public mixed handle_request(.Request request)
 
   array x = get_event(request);
 
-  if(sizeof(x)>1)
+  if(sizeof(x)>=1)
     event = x[0];
 
-  array args = x[1..];
+  array args = ({});
+
+  if(sizeof(x)>1)
+   args = x[1..];
 
   .Response response = .Response(request);
 
   if(functionp(event))
     event(request, response, @args);
 
-  else response->set_data("Unknown event: %O\n");
+  else response->set_data("Unknown event: %O\n", request->not_query);
 
   return response->get_response();
 }
@@ -56,6 +59,7 @@ array get_event(.Request request)
   // first, let's find the right function to call.
   foreach(r; int i; string comp)
   {
+    werror("looking at component %O\n", comp);
     if(!strlen(comp))
     {
       // ok, the last component was a slash.
@@ -110,6 +114,11 @@ array get_event(.Request request)
           cc = cc[comp];
         }
       }
+      else if(cc && cc["index"])
+      {
+         event = cc["index"];
+         args += ({comp});
+      }
       else
       {
         throw(Error.Generic("Component " + comp + " does not exist.\n"));
@@ -128,8 +137,8 @@ array get_event(.Request request)
     };
   }
 
-  if(args)
-    return ({event, args});
+  if(sizeof(args))
+    return ({event, @args});
  
   else return ({event});
 

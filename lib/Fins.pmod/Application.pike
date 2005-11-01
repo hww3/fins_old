@@ -1,5 +1,5 @@
 
-.Controller controller = ((program)"controller")();
+.Controller controller;
 string static_dir = Stdio.append_path(getcwd(), "static");
 
 .Configuration config;
@@ -7,7 +7,8 @@ string static_dir = Stdio.append_path(getcwd(), "static");
 static void create(.Configuration _config)
 {
    config = _config;
-
+   controller = ((program)"controller")();
+   
    .Template.add_simple_macro("capitalize", macro_capitalize);
    .Template.add_simple_macro("flash", macro_flash);
 }

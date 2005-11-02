@@ -262,18 +262,35 @@ static class ReplaceField(string scope, string name)
    void render(String.Buffer buf, .TemplateData d)
    {
       mapping data = d->get_data();
- //     werror("INSERTING: %s / %s from %O\n", scope, name, data);
-      if(scope && strlen(scope) && data[scope] && mappingp(data[scope]))
+      werror("INSERTING: %s / %s from %O\n", scope, name, data);
+      mapping m;
+      m=data;
+      array e = name/".";
+      foreach(e;int i;string elem)
       {
-         if(data[scope][name] || zero_type(data[name]) != 1)
-            buf->add(data[scope][name]);
-         else
-            buf->add("<!-- VALUE " + scope + "." + name + " NOT FOUND -->");
+         if(i==(sizeof(e)-1) && mappingp(m[elem]))
+         {
+            buf->add("<!-- ERROR: LAST ELEMENT " + elem + " IS A MAPPING.-->");
+            return;
+         }
+         else if(i!=(sizeof(e)-1) && !mappingp(m[elem]))
+         {
+            buf->add("<!-- ERROR: NON-FINAL ELEMENT " + elem + " IS NOT A MAPPING.-->");
+         }
+         else if(i!=(sizeof(e)-1))
+         {
+            m = m[elem];
+         }
+         else if(i==(sizeof(e)-1))
+         {
+            if(!m[elem] && zero_type(m[elem])==1)
+               buf->add("<!-- VALUE " + elem + " NOT FOUND -->");
+            else
+               buf->add((string)m[elem]);
+            
+         }
+         
       }
-      else if(!data[name] && zero_type(data[name])==1)
-         buf->add("<!-- VALUE " + name + " NOT FOUND -->");
-      else
-         buf->add(data[name]);
    }
 }
 

@@ -13,6 +13,13 @@ string _sprintf(mixed ... args)
   return object_type + "(" + key_value + ")";
 }
 
+int _is_type(string type)
+{
+   if(type=="mapping")
+     return 1;
+   return 0;
+}
+
 void set_initialized(int i)
 {
   initialized = i;

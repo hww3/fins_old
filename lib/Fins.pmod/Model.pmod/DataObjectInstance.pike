@@ -129,6 +129,11 @@ int get_id()
    return key_value;
 }
 
+void add(string field, mixed value)
+{
+  master_object->add(field, value, this);	
+}
+
 void set_new_object(int(0..1) i)
 {
    new_object = i;

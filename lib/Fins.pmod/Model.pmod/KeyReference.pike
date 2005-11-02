@@ -3,12 +3,14 @@ inherit .Relationship;
 string otherobject; 
 mixed default_value = .Undefined;
 int null = 0;
+.Criteria criteria;
 
-static void create(string _name, string _myfield, string _otherobject)
+static void create(string _name, string _myfield, string _otherobject, void|.Criteria _criteria)
 {
   name = _name;
   field_name = _myfield;
   otherobject = _otherobject;
+  criteria = _criteria;
 }
 
 // value should be the value of the link field, which is the primary key of the 

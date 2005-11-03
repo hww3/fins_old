@@ -36,6 +36,10 @@ int main()
    c["name"] = a;
    c->save();
 
+   object z = a["comments"][0];
+
+   werror("COMMENTS: %d, %O\n", sizeof(a["comments"]),z);
+
    werror("A: %O\n", mkmapping(indices(a), values(a)));
 
    write("!Last Name: " + a->get("Last_Name") + "\n");

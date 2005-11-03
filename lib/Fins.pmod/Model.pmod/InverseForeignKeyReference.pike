@@ -19,16 +19,18 @@ static void create(string _name, string _otherobject, string _otherkey, .Criteri
   unique = _unique;
 }
 
-// value will be null in a foreign key, as we're not in an object where that's a real field.
-mixed decode(string value, void|.DataObjectInstance i)
-{
-  if(unique)
-  	 return (.DataObjectInstance(UNDEFINED, otherobject)->find(([ otherkey :
-                                  (int) i->get_id()]), criteria))[0];
-
+// value will be null in a foreign key, as we're not in an object where that's a real field. 
+mixed decode(string value, void|.DataObjectInstance i) 
+{ 
+  if(!unique)
+    return .ObjectArray(this, i);
   else
-  	 return .DataObjectInstance(UNDEFINED, otherobject)->find(([ otherkey :
-                                  (int) i->get_id()]), criteria);
+  {
+    array r = .find(otherobject, ([ otherkey : (int) i->get_id()]), criteria);
+    if(r && sizeof(r))
+      return r[0];
+    else return 0;
+  }
 }
 
 // value should be a dataobject instance of the type we're looking to set.

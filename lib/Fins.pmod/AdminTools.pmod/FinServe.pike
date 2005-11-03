@@ -122,6 +122,16 @@ void handle_request(Protocols.HTTP.Server.Request request)
       response->data = r;
       request->response_and_finish(response);
     }
+    else
+    {
+      mapping response = ([]);
+      response->server="FinServe " + my_version;
+      response->type = "text/html";
+      response->error = 404;
+      response->data = "<h1>Page not found</h1>"
+                       "Fins was unable to find a handler for " + request->not_query + ".";
+      request->response_and_finish(response);
+    }
   };
 
   if(request->misc->_session)

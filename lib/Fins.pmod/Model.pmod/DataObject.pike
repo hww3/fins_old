@@ -12,6 +12,7 @@ mapping fields = ([]);
 
 string single_select_query = "SELECT %s FROM %s WHERE %s=%s";
 string multi_select_query = "SELECT %s FROM %s WHERE %s";
+string multi_select_nowhere_query = "SELECT %s FROM %s";
 string single_update_query = "UPDATE %s SET %s=%s WHERE %s=%s";
 string single_delete_query = "DELETE FROM %s WHERE %s=%s";
 string multi_update_query = "UPDATE %s SET %s WHERE %s=%s";
@@ -91,7 +92,7 @@ void add_field(.Field f)
    fields[f->name] = f;
 }
 
-array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
+array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 {
    if(criteria)
       werror("Criteria: %O", criteria);
@@ -106,7 +107,7 @@ array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void crite
   foreach(qualifiers; string name; mixed q)
   {
      if(objectp(q) && Program.implements(object_program(q), .Criteria))
-         _where += ({ q->get() });
+         _where += ({ q->get(name) });
      else if(!fields[name])
      {
         throw(Error.Generic("Field " + name + " does not exist in object " + instance_name + ".\n"));
@@ -115,8 +116,13 @@ array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void crite
      _where += ({ fields[name]->make_qualifier(q)});
   }      
 
-  query = sprintf(multi_select_query, (_fields * ", "), 
-    table_name, (_where * " AND "));
+  if(_where && sizeof(_where)) 
+    query = sprintf(multi_select_query, (_fields * ", "), 
+      table_name, (_where * " AND "));
+
+  else
+    query = sprintf(multi_select_nowhere_query, (_fields * ", "), 
+      table_name);
 
   if(criteria)
   {
@@ -396,5 +402,4 @@ int save(.DataObjectInstance i)
    }
 
    load(i->get_id(), i, 1);
-
 }

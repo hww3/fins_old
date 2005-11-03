@@ -14,7 +14,7 @@
     if(request && request->misc->session_variables && 
              request->misc->session_variables->__flash)
     {
-       request->misc->flash = request->misc->session_variables->__flash;
+       request->misc->flash = request->misc->session_variables->__flash || ([]);
        m_delete(request->misc->session_variables, "__flash");
     }
 
@@ -49,8 +49,12 @@
   {
      template = t;
      template_data = d;
+     mapping f = ([]);
      if(request && request->misc->flash)
-       template_data->set_flash(request->misc->flash);
+       f+=(request->misc->flash);
+     if(request && request->misc->session_variables->__flash)
+       f+=(request->misc->session_variables->__flash);
+     template_data->set_flash(f);
   }
 
   //!
@@ -92,7 +96,7 @@
   //!
   public void set_data(string data, mixed ... args)
   {
-    if(args)
+    if(args && sizeof(args))
       response->data = sprintf(data, @args); 
     else  
       response->data = data;

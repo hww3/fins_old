@@ -11,7 +11,7 @@ static void create(string _criteria)
    criteria = _criteria;
 }
 
-string get()
+string get(string|void name)
 {
    return criteria;
 }

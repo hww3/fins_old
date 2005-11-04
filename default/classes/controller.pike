@@ -1,55 +1,13 @@
 import Fins;
 inherit Fins.Controller;
 
-Fins.Controller baz = ((program)"baz_controller.pike")();
-
-public void flash(Request id, Response response, mixed ... args)
-{
-   Template.TemplateData dta = Template.TemplateData();
-   Template.Template t = Template.get_template(Template.Simple, "flash.tpl");
-  
-   response->set_template(t, dta);
-}
+Fins.Controller exec = ((program)"exec_controller.pike")();
+Fins.Controller space = ((program)"app_controller.pike")();
+Fins.Controller comments = ((program)"comment_controller.pike")();
 
 public void index(Request id, Response response, mixed ... args)
 {
-   Template.Template t = Template.get_template(Template.XSLT, "index.xsl");
-   Template.TemplateData dta = Template.TemplateData();
-   
-   Public.Parser.XML2.Node n = Public.Parser.XML2.new_xml("1.0", "events");
-
-   foreach(indices(this); int index; string name)
-   {
-      mixed event;
-      string t;
-      event = this[name];
-      if(functionp(event))
-      {
-        t = "Event";
-      }
-      else if(objectp(event))
-      {
-        t = "Sub-Controller";
-      }
-      else { continue; }
-
-      object e = Public.Parser.XML2.new_node("event");
-      e->new_child("name", name);
-      e->new_child("type", t);
-      n->add_child(e);
-   }
-
-      
-   dta->add("node", n);
-  response->set_template(t, dta);
-}
-
-public void foo(Request id, Response response, mixed ... args)
-{
-  response->set_data("foo! %O", args);
-}
-
-private void bar(Request id, Response response, mixed ... args)
-{
-  response->set_data("bar");
+  if(!sizeof(args))
+   response->redirect("space");
+  else response->not_found("/" + args*"/");
 }

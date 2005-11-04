@@ -262,7 +262,6 @@ static class ReplaceField(string scope, string name)
    void render(String.Buffer buf, .TemplateData d)
    {
       mapping data = d->get_data();
-      werror("INSERTING: %s / %s from %O\n", scope, name, data);
       mapping m;
       m=data;
       array e = name/".";
@@ -366,7 +365,6 @@ static class If(string test, array ifval, array|void elseval)
    function compile_func(string test)
    {
      string tf = "int test(Fins.Template.TemplateData d){ mapping data = d->get_data(); if(" + test + ") return 1; else return 0; }";
-werror("tf: %s\n", tf);
      program tp = compile_string(tf);
      if(tp) return tp()->test;
      else return true_func;
@@ -389,7 +387,6 @@ werror("tf: %s\n", tf);
    {
       int testresult = eval(data);
       array resultset = ({});
-werror("TESTRESULT: %O\n", testresult);
       if(testresult)
       {
         resultset = ifval;

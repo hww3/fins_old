@@ -1,5 +1,6 @@
 static mapping data = ([]);
 static mapping flash = ([]);
+int debug = 0;
 
 //!
 void create(mapping|void defaults)

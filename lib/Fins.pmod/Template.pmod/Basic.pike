@@ -269,12 +269,16 @@ static class ReplaceField(string scope, string name)
       {
          if(i==(sizeof(e)-1) && mappingp(m[elem]))
          {
-            buf->add("<!-- ERROR: LAST ELEMENT " + elem + " IS A MAPPING.-->");
+				if(data->debug)
+           		buf->add("<!-- ERROR: LAST ELEMENT " + elem + " IS A MAPPING.-->");
+				else buf->add("");
             return;
          }
          else if(i!=(sizeof(e)-1) && !mappingp(m[elem]))
          {
-            buf->add("<!-- ERROR: NON-FINAL ELEMENT " + elem + " IS NOT A MAPPING.-->");
+				if(data->debug)
+            	buf->add("<!-- ERROR: NON-FINAL ELEMENT " + elem + " IS NOT A MAPPING.-->");
+				else buf->add("");
          }
          else if(i!=(sizeof(e)-1))
          {
@@ -283,7 +287,9 @@ static class ReplaceField(string scope, string name)
          else if(i==(sizeof(e)-1))
          {
             if(!m[elem] && zero_type(m[elem])==1)
-               buf->add("<!-- VALUE " + elem + " NOT FOUND -->");
+					if(data->debug)
+               	buf->add("<!-- VALUE " + elem + " NOT FOUND -->");
+					else buf->add("");
             else
                buf->add((string)m[elem]);
             
@@ -325,12 +331,16 @@ static class Foreach(string scope, array contents)
  //     werror("RENDERING " + scope + "\n");
       if(!d[scope] && zero_type(d[scope]==1))
       {
-         buf->add("<!-- VALUE " + scope + " NOT FOUND -->");
+			if(data->debug)
+         	buf->add("<!-- VALUE " + scope + " NOT FOUND -->");
+			else buf->add("");
          return;
       }
       else if(d[scope] && ! arrayp(d[scope]))
       {
-         buf->add("<!-- VALUE " + scope + " NOT AN ARRAY -->");
+			if(data->debug)
+				buf->add("<!-- VALUE " + scope + " NOT AN ARRAY -->");
+			else buf->add("");
          return;
       }
       

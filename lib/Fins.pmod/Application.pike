@@ -1,16 +1,37 @@
 
-.Controller controller;
+.FinsController controller;
+.FinsModel model;
+
 string static_dir = Stdio.append_path(getcwd(), "static");
 
 .Configuration config;
 
 static void create(.Configuration _config)
 {
+	
    config = _config;
-   controller = ((program)"controller")();
-   
+
+   load_model();
+   load_controller();
+
    .Template.add_simple_macro("capitalize", macro_capitalize);
    .Template.add_simple_macro("flash", macro_flash);
+}
+
+void load_controller()
+{
+	if(config->values->controller->class)
+		controller = ((program)config->values->controller->class)();
+	else werror("No controller defined!\n");
+}
+
+void load_model()
+{
+	if(config->values->model->class)
+   	model = ((program)config->values->model->class)();
+	else werror("No model defined!\n");
+
+	add_constant("model", model);
 }
 
 public mixed handle_request(.Request request)
@@ -51,7 +72,7 @@ public mixed handle_request(.Request request)
 
 array get_event(.Request request)
 {
-  .Controller cc = controller;
+  .FinsController cc = controller;
   function event;
   array args = ({});
 
@@ -106,7 +127,7 @@ array get_event(.Request request)
       }
       else if(cc && cc[comp] && objectp(cc[comp]))
       {
-        if(!Program.implements(object_program(cc[comp]), Fins.Controller))
+        if(!Program.implements(object_program(cc[comp]), Fins.FinsController))
         {
           throw(Error.Generic("Component " + comp + " is not a Controller.\n"));
         }    

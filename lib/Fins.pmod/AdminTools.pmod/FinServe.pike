@@ -16,26 +16,29 @@ Protocols.HTTP.Server.Port port;
 Protocols.DNS_SD.Service bonjour;
 #endif
 string project = "default";
+string config_name = "dev";
 
 int main(int argc, array(string) argv)
 {
   int my_port = default_port;
+
   if(argc>1) my_port=(int)argv[1];
   if(argc>2) project = argv[2];
+  if(argc>3) project = argv[3];
 
   write("FinServe starting on port " + my_port + "\n");
 
   write("Starting Session Manager...\n");
   call_out(session_startup, 0);
 
-  write("FinServe loading application " + project + "\n");
+  write("FinServe loading application " + project + " using configuration " + config_name + "\n");
   load_application();
 
   port = Protocols.HTTP.Server.Port(handle_request, my_port);  
   port->request_program = Fins.Request;
 
 #if constant(_Protocols_DNS_SD)
-  bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + ")",
+  bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + "/" + config_name + ")",
                      "_http._tcp", "", my_port);
 #endif
   return -1;
@@ -161,7 +164,7 @@ void load_application()
 {
   Fins.Application application;
 
-  application = Fins.Loader.load_app(project);
+  application = Fins.Loader.load_app(project, config_name);
 
   if(!application)
   {

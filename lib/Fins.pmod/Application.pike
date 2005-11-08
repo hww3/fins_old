@@ -13,8 +13,8 @@ static void create(.Configuration _config)
    config = _config;
 
    load_model();
-   load_controller();
    load_view();
+   load_controller();
 
    .Template.add_simple_macro("capitalize", macro_capitalize);
    .Template.add_simple_macro("flash", macro_flash);
@@ -26,6 +26,7 @@ void load_view()
   if(viewclass)
     view = ((program)viewclass)();
   else werror("No view defined!\n");
+  add_constant("view", view);
 
 }
 

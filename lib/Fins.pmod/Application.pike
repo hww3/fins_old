@@ -1,6 +1,7 @@
 
 .FinsController controller;
 .FinsModel model;
+.FinsView view;
 
 string static_dir = Stdio.append_path(getcwd(), "static");
 
@@ -16,6 +17,15 @@ static void create(.Configuration _config)
 
    .Template.add_simple_macro("capitalize", macro_capitalize);
    .Template.add_simple_macro("flash", macro_flash);
+}
+
+void load_view()
+{
+  string viewclass = config->get_value("view", "class");
+  if(viewclass)
+    view = ((program)viewclass)();
+  else werror("No view defined!\n");
+
 }
 
 void load_controller()

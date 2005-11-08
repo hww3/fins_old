@@ -24,9 +24,25 @@ Any public functions present in your controller will be available as paths on yo
 
 Starting a Fins application
 
-Right now, the only way to run a Fins application is with the built in webserver (not that it's that bad). To start up your application, simply run the fin_serve program:
+Right now, the only way to run a Fins application is with the built in 
+webserver (not that it's that bad). To start up your application, simply 
+run the fin_serve program:
 
-pike -Mlib fin_serve [port] [appname]
+pike -Mlib fin_serve [port] [appname [config]] 
 
-where port is the port number your Fins application should run on, which defaults to port 8080. appname is the name of the app you'd like to run. it defaults to "default". if you have a Bonjour subsystem and Pike 7.7, you'll get automatic bookmarks in your Bonjour aware applications (such as Safari).
+where port is the port number your Fins application should run on, which 
+defaults to port 8080. appname is the name of the app you'd like to run. 
+it defaults to "default". config is the name of a configuration you'd 
+like to use, which is loaded from appname/config/config.cfg. this value 
+defaults to dev, which loads config/dev.cfg. if you have a Bonjour 
+subsystem and Pike 7.7, you'll get automatic bookmarks in your Bonjour 
+aware applications (such as Safari).
 
+Interactive Fins
+
+fin_serve also supports an interactive "hilfe" mode. This is just like 
+regular hilfe, only your application is loaded and initialized, so that 
+you can call functions within your application, such as the model, 
+interactively.
+
+you can access your application through the "application" contstant.

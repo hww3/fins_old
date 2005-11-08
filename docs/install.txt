@@ -1,0 +1,5 @@
+0. Download Fins
+1. Install Public.Tools.ConfigFile
+2. Install Session to Fins/lib
+3. Install _Regexp_PCRE
+4. Install an application in the Fins directory

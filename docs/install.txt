@@ -3,3 +3,4 @@
 2. Install Session to Fins/lib
 3. Install _Regexp_PCRE
 4. Install an application in the Fins directory
+5. Request patch for multipart forms

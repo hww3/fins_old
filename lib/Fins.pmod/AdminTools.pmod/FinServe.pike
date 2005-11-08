@@ -22,7 +22,11 @@ int main(int argc, array(string) argv)
 {
   int my_port = default_port;
 
-  if(argc>1) my_port=(int)argv[1];
+  if(argc>1 && argv[1]!="hilfe")
+  {
+    my_port=(int)argv[1];
+  }
+
   if(argc>2) project = argv[2];
   if(argc>3) project = argv[3];
 
@@ -34,14 +38,26 @@ int main(int argc, array(string) argv)
   write("FinServe loading application " + project + " using configuration " + config_name + "\n");
   load_application();
 
-  port = Protocols.HTTP.Server.Port(handle_request, my_port);  
-  port->request_program = Fins.Request;
+  if(argc>1 && argv[1] == "hilfe")
+  {
+    write("Starting interactive interpreter...\n");
+    object in = Stdio.FILE("stdin");
+    object out = Stdio.File("stdout");
+    object o = FinsHilfe();
+    return 0;
+  }
+  else
+  {
+
+    port = Protocols.HTTP.Server.Port(handle_request, my_port);  
+    port->request_program = Fins.Request;
 
 #if constant(_Protocols_DNS_SD)
-  bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + "/" + config_name + ")",
+    bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + "/" + config_name + ")",
                      "_http._tcp", "", my_port);
 #endif
-  return -1;
+    return -1;
+  }
 }
 
 void session_startup()
@@ -175,3 +191,18 @@ void load_application()
   app = application;
 
 }
+
+
+class FinsHilfe
+{
+  inherit Tools.Hilfe.StdinHilfe;
+
+   void print_version()
+   {
+     safe_write("Fins " + my_version + " running " + version() +
+              " / Hilfe v3.5 (Incremental Pike Frontend)\n");
+   }
+
+}
+
+

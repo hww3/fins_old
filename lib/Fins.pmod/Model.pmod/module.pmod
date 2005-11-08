@@ -23,3 +23,8 @@ array find(string ot, mapping qualifiers, void|.Criteria criteria)
 {
    return .DataObjectInstance(id, ot);
 }
+
+.DataObjectInstance new(string ot)
+{
+  return .DataObjectInstance(UNDEFINED, ot);
+}

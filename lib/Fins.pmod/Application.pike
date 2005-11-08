@@ -20,18 +20,20 @@ static void create(.Configuration _config)
 
 void load_controller()
 {
-	if(config->values->controller->class)
-		controller = ((program)config->values->controller->class)();
-	else werror("No controller defined!\n");
+  string conclass = config->get_value("controller", "class");
+  if(conclass)
+    controller = ((program)conclass)();
+  else werror("No controller defined!\n");
 }
 
 void load_model()
 {
-	if(config->values->model->class)
-   	model = ((program)config->values->model->class)();
-	else werror("No model defined!\n");
+  string modclass = config->get_value("model", "class");
+  if(modclass)
+    model = ((program)modclass)();
+  else werror("No model defined!\n");
 
-	add_constant("model", model);
+  add_constant("model", model);
 }
 
 public mixed handle_request(.Request request)

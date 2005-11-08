@@ -28,7 +28,7 @@ string get_value(string section, string item)
     throw(Error.Generic("Item " + item + " in configuration section " + section + " does not exist.\n"));
   }
 
-  else if(arrayp(values[section][item])
+  else if(arrayp(values[section][item]))
   {
     return values[section][item][0];
   }
@@ -53,7 +53,7 @@ array get_value_array(string section, string item)
     throw(Error.Generic("Item " + item + " in configuration section " + section + " does not exist.\n"));
   }
 
-  else if(arrayp(values[section][item])
+  else if(arrayp(values[section][item]))
   {
     values[section][item];
   }

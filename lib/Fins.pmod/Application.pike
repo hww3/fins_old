@@ -14,6 +14,7 @@ static void create(.Configuration _config)
 
    load_model();
    load_controller();
+   load_view();
 
    .Template.add_simple_macro("capitalize", macro_capitalize);
    .Template.add_simple_macro("flash", macro_flash);

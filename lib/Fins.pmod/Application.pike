@@ -83,7 +83,6 @@ array get_event(.Request request)
   // first, let's find the right function to call.
   foreach(r; int i; string comp)
   {
-    werror("looking at component %O\n", comp);
     if(!strlen(comp))
     {
       // ok, the last component was a slash.
@@ -102,7 +101,6 @@ array get_event(.Request request)
          else
          {
             werror("cc: %O\n", cc);
-            werror("fall through!!!!\n");
          }
          break;
       }
@@ -150,7 +148,7 @@ array get_event(.Request request)
     }
   }
 
-  werror("got to end of path; current controller: %O, event: %O, args: %O\n", cc, event, args);
+//  werror("got to end of path; current controller: %O, event: %O, args: %O\n", cc, event, args);
 
   // we got all this way without an event.
   if(!event && r[-1] != "")

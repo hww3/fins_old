@@ -181,7 +181,7 @@ void load_application()
 {
   Fins.Application application;
 
-  application = Fins.Loader.load_app(project, config_name);
+  application = Fins.Loader.load_app(combine_path(getcwd(), project), config_name);
 
   if(!application)
   {

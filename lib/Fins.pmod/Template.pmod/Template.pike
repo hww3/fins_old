@@ -1,5 +1,8 @@
+
+static .TemplateContext context;
+
 //!
-static void create(string template);
+static void create(string template, .TemplateContext c);
 
 //!
 public string render(.TemplateData d);
@@ -8,7 +11,9 @@ public string render(.TemplateData d);
 static string load_template(string templatename)
 {
    werror("loading template " + templatename + "\n");
-   string template = Stdio.read_file("templates/" + templatename);
+   string template = Stdio.read_file(
+                          combine_path(context->application->config->app_dir, 
+                                       "templates/" + templatename));
 
    if(!template || !sizeof(template))
    {

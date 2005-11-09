@@ -1,9 +1,11 @@
+string app_dir;
 
 static mapping values;
 
 //!
-static void create(string config_file)
+static void create(string appdir, string config_file)
 {
+        app_dir = appdir;
 	string fc = Stdio.read_file(config_file);
 	
 	// the "spec" says that the file is utf-8 encoded.

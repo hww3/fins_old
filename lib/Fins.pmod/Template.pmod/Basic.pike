@@ -12,7 +12,6 @@ inherit .Template;
 string templatename;
 array contents = ({});
 RegexReplacer s = RegexReplacer();
-object context;
 
 //!
 static void create(string template, object|void context_obj)

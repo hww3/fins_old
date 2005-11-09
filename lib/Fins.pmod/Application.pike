@@ -10,7 +10,7 @@
 .FinsView view;
 
 //!
-string static_dir = Stdio.append_path(getcwd(), "static");
+string static_dir;
 
 //!
 .Configuration config;
@@ -20,6 +20,7 @@ static void create(.Configuration _config)
 {
 	
    config = _config;
+   static_dir = Stdio.append_path(config->app_dir, "static");
 
    load_model();
    load_view();

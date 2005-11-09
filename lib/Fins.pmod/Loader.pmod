@@ -8,9 +8,7 @@ Fins.Application load_app(string app_dir, string config_name)
 
   add_program_path(app_dir + "/classes"); 
 
-  cd(app_dir);
-
-  Fins.Configuration config = load_configuration(config_name);
+  Fins.Configuration config = load_configuration(app_dir, config_name);
 
   program p;
 
@@ -24,15 +22,15 @@ Fins.Application load_app(string app_dir, string config_name)
   return a;
 }
 
-Fins.Configuration load_configuration(string config_name)
+Fins.Configuration load_configuration(string app_dir, string config_name)
 {
-	string config_file = combine_path("config", config_name+".cfg");
+	string config_file = combine_path(app_dir, "config", config_name+".cfg");
 
-//	werror("config file: " + config_file + "\n");
+	werror("config file: " + config_file + "\n");
 
    Stdio.Stat stat = file_stat(config_file);
 	if(!stat || stat->isdir)
 		throw(Error.Generic("Unable to load configuration file " + config_file + "\n"));
 		
-  	return Fins.Configuration(config_file);
+  	return Fins.Configuration(app_dir, config_file);
 }

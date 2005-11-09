@@ -107,7 +107,10 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
   foreach(qualifiers; string name; mixed q)
   {
      if(objectp(q) && Program.implements(object_program(q), .Criteria))
+     {
+        werror("name: %O %O \n", name, q);
          _where += ({ q->get(name) });
+     }
      else if(!fields[name])
      {
         throw(Error.Generic("Field " + name + " does not exist in object " + instance_name + ".\n"));

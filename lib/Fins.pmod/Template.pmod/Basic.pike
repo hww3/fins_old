@@ -1,3 +1,4 @@
+
 //
 //  Syntax of a simple template:
 //
@@ -20,6 +21,8 @@ static void create(string template, object|void context_obj)
      context = .TemplateContext();
    else
       context = context_obj;
+
+   context->type = object_program(this);
 
    templatename = template;
 mixed x = gauge{
@@ -217,7 +220,7 @@ static class Include
    static void create(string template, void|object context)
    {
      templateName = template;
-     included_template = .get_template(.Simple, template, context);
+     included_template = .get_template(context->type || .Simple, template, context);
    }
 
    string _sprintf(mixed ... args)

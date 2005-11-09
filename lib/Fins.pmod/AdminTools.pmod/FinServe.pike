@@ -118,6 +118,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
   if(e)
   {
     write("Error occurred while handling request!\n");
+    werror(describe_backtrace(e));
     mapping response = ([]);
     response->error=500;
     response->type="text/html";

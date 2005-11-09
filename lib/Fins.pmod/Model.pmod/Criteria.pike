@@ -15,3 +15,8 @@ string get(string|void name)
 {
    return criteria;
 }
+
+string get_criteria_type()
+{
+  return "GENERIC";
+}

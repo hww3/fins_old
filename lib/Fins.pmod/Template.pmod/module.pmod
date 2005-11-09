@@ -39,7 +39,6 @@ public .Template get_template(program templateType, string templateName, void|ob
   }
 
   return templates[templateType][templateName];
-
 }
 
 //!

@@ -156,7 +156,7 @@ int is_new_object()
 
 mixed `[]=(mixed i, mixed v)
 {
-  werror("ARGS: %O\n", query_num_arg());
+//  werror("ARGS: %O\n", query_num_arg());
   if(!v && zero_type(v) == 1)
   {
     return get(i);

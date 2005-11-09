@@ -94,8 +94,6 @@ void add_field(.Field f)
 
 array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 {
-   if(criteria)
-      werror("Criteria: %O", criteria);
   string query;
   array(object(.DataObjectInstance)) results = ({});
 
@@ -108,7 +106,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
   {
      if(objectp(q) && Program.implements(object_program(q), .Criteria))
      {
-        werror("name: %O %O \n", name, q);
+        //werror("name: %O %O \n", name, q);
          _where += ({ q->get(name) });
      }
      else if(!fields[name])

@@ -1,3 +1,4 @@
+inherit Fins.FinsBase;
 import Protocols.HTTP.Server;
 
 //! methods have this signature:
@@ -7,8 +8,9 @@ import Protocols.HTTP.Server;
 //!
 
 //!
-static void create()
+static void create(.Application a)
 {  
+  ::create(a);
 
   if(functionp(start))
     start();

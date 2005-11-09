@@ -18,7 +18,6 @@ string static_dir;
 //!
 static void create(.Configuration _config)
 {
-	
    config = _config;
    static_dir = Stdio.append_path(config->app_dir, "static");
 
@@ -34,9 +33,8 @@ void load_view()
 {
   string viewclass = config->get_value("view", "class");
   if(viewclass)
-    view = ((program)viewclass)();
+    view = ((program)viewclass)(this);
   else werror("No view defined!\n");
-  add_constant("view", view);
 
 }
 
@@ -44,7 +42,7 @@ void load_controller()
 {
   string conclass = config->get_value("controller", "class");
   if(conclass)
-    controller = ((program)conclass)();
+    controller = ((program)conclass)(this);
   else werror("No controller defined!\n");
 }
 
@@ -52,10 +50,8 @@ void load_model()
 {
   string modclass = config->get_value("model", "class");
   if(modclass)
-    model = ((program)modclass)();
+    model = ((program)modclass)(this);
   else werror("No model defined!\n");
-
-  add_constant("model", model);
 }
 
 //!

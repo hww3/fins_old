@@ -1,4 +1,5 @@
 import Fins;
+inherit FinsBase;
 
 //!
 Model.DataObjectInstance find_by_id(Request r, string type, int id)

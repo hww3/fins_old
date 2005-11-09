@@ -1,7 +1,12 @@
 import Protocols.HTTP.Server;
 
-.Configuration config;
+//! methods have this signature:
+//!
+//!  void func(Fins.Request request, Fins.Response response, 
+//!            mixed ... args);
+//!
 
+//!
 static void create()
 {  
 
@@ -9,12 +14,8 @@ static void create()
     start();
 }
 
+//!
 static void start()
 {
 }
 
-//! methods have this signature:
-//!
-//!  void func(Fins.Request request, Fins.Response response, 
-//!            mixed ... args);
-//!

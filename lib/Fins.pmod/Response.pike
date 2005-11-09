@@ -3,6 +3,7 @@
 
   static Fins.Request request;  
 
+//!
   static void create(Fins.Request|void r)
   {
     request = r;

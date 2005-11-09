@@ -1,12 +1,21 @@
+//! this is the base application class.
 
+//!
 .FinsController controller;
+
+//!
 .FinsModel model;
+
+//!
 .FinsView view;
 
+//!
 string static_dir = Stdio.append_path(getcwd(), "static");
 
+//!
 .Configuration config;
 
+//!
 static void create(.Configuration _config)
 {
 	
@@ -48,6 +57,7 @@ void load_model()
   add_constant("model", model);
 }
 
+//!
 public mixed handle_request(.Request request)
 {
   function event;
@@ -84,6 +94,7 @@ public mixed handle_request(.Request request)
   return response->get_response();
 }
 
+//!
 array get_event(.Request request)
 {
   .FinsController cc = controller;
@@ -178,6 +189,7 @@ array get_event(.Request request)
 
 }
 
+//!
 .Response static_request(.Request request)
 {
   .Response response = .Response();

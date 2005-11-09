@@ -23,6 +23,7 @@ void parse_request()
   not_query = replace(not_query, "+", " ");
 }
 
+//!
 public string remoteaddr = "";
 
 //#endif

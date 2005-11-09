@@ -28,7 +28,7 @@ int main(int argc, array(string) argv)
   }
 
   if(argc>2) project = argv[2];
-  if(argc>3) project = argv[3];
+  if(argc>3) config_name = argv[3];
 
   write("FinServe starting on port " + my_port + "\n");
 

@@ -41,6 +41,7 @@ int main(int argc, array(string) argv)
   if(argc>1 && argv[1] == "hilfe")
   {
     write("Starting interactive interpreter...\n");
+    add_constant("application", app);
     object in = Stdio.FILE("stdin");
     object out = Stdio.File("stdout");
     object o = FinsHilfe();

@@ -45,6 +45,8 @@ void sub_ref(.DataObjectInstance o)
 {
   if(!o->is_initialized()) return;
 
+  if(!objs[o->get_id()]) return;
+
   objs[o->get_id()][0]--;
 
   if(objs[o->get_id()][0] == 0)
@@ -351,14 +353,13 @@ int delete(int|void force, .DataObjectInstance i)
      }
    }
    
-   return 0;
+//   return 0;
 
    string delete_query = sprintf(single_delete_query, table_name, primary_key->name, key_value);
 
    if(context->debug) werror("QUERY: %O\n", delete_query);
    context->sql->query(delete_query);
    m_delete(objs, i->get_id());
-   destruct(i);
    return 1;
 }
 

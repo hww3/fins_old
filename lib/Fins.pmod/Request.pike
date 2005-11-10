@@ -23,7 +23,7 @@ void parse_request()
   not_query = n_not_query;
 
   not_query = replace(not_query, "+", " ");
-  referer = request_headers["referer"];
+  referrer = request_headers["referer"];
 }
 
 //!

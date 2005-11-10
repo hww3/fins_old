@@ -9,6 +9,7 @@ object my_undef = Fins.Model.Undefined;
 mapping objs = ([]);
 
 mapping fields = ([]);
+mapping relationships = ([]);
 
 string single_select_query = "SELECT %s FROM %s WHERE %s=%s";
 string multi_select_query = "SELECT %s FROM %s WHERE %s";
@@ -90,6 +91,12 @@ void add_field(.Field f)
 {
    f->set_context(context);
    fields[f->name] = f;
+
+   if(Program.inherits(object_program(f), .Relationship))
+   {
+     werror("adding relationship\n");
+     relationships[f->name] = f;
+   }
 }
 
 array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
@@ -136,7 +143,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   foreach(qr;; mapping row)
   {
-    object item = object_program(i)(UNDEFINED, i->get_type());
+    object item = object_program(i)(UNDEFINED, this);
     item->set_id(primary_key->decode(row[primary_key->field_name]));
     item->set_new_object(0);
     low_load(row, item);
@@ -304,13 +311,37 @@ int set(string field, mixed value, .DataObjectInstance i)
    return 1;
 }
 
-int delete(.DataObjectInstance i)
+//! if we force, any objects that refer to us will also
+//! be deleted, and so on. this is a very dangerous behavior
+//! and could result in large numbers of records not directly 
+//! related to this object being deleted.
+int delete(.DataObjectInstance i, int|void force)
 {
    // first, check to see what we link to.
    string key_value = primary_key->encode(i->get_id());
-   
+
+   // we need to check any relationships to see of we're referenced 
+   // anywhere. this will be tricky, because we need to maintain
+   // data integrity, but we also don't want to delete referenced records
+   // inadvertently.   
+
    string delete_query = sprintf(single_delete_query, table_name, primary_key->name, key_value);
+
+   foreach(relationships; string n; .Relationship r)
+   {
+     if(Program.inherits(object_program(r), .InverseForeignKeyReference))
+     {
+       werror("%O is a link to this table's primary key\n", n);
+       mixed m = get(n, i);
+       if(m && sizeof(m)) // this should work, because any object should have a size.
+       {
+         throw(Error.Generic("An object of type " + r->otherobject + " refers to this object.\n"));
+       }
+     }
+   }
    
+   return 0;
+
    if(context->debug) werror("QUERY: %O\n", delete_query);
    context->sql->query(delete_query);
 

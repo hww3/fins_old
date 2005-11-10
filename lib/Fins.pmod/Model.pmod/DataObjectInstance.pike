@@ -35,19 +35,13 @@ string get_type()
   return object_type;
 }
 
-static void create(int|void id, string|void _object_type)
+static void create(int|void id, object _object_type)
 {
-   if(_object_type)
-     object_type = _object_type;
-
-   .DataObject o = .get_object(object_type);  
-
-   if(!o)
-   {
-     throw(Error.Generic("object type " + object_type + " does not exist.\n"));
-   }
-   master_object = o;
-
+  if(objectp(_object_type)) 
+  {
+    master_object = _object_type;
+     object_type = _object_type->instance_name;
+  }
    
 
   if(id == UNDEFINED)
@@ -69,7 +63,7 @@ void refresh()
 
 .DataObjectInstance new()
 {
-   .DataObjectInstance new_object = object_program(this)();  
+   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object);  
 
    new_object->set_new_object(1);
    return   new_object;
@@ -77,7 +71,7 @@ void refresh()
 
 .DataObjectInstance find_by_id(int id)
 {
-   .DataObjectInstance new_object = object_program(this)();
+   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object);  
 
     master_object->load(id, new_object);
 
@@ -196,5 +190,10 @@ array _values()
 
 static void destroy()
 {
-  master_object->sub_ref(this);
+  if(master_object) 
+    master_object->sub_ref(this);
+  else
+  {
+    werror("ERROR! No Master object on instance destroy!\n");
+  }
 }

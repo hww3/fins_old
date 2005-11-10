@@ -2,7 +2,6 @@ inherit .Relationship;
 
 constant type="Foreign Key";
 
-string otherobject; 
 string otherkey; 
 mixed default_value = .Undefined;
 int null = 0;
@@ -26,7 +25,7 @@ mixed decode(string value, void|.DataObjectInstance i)
     return .ObjectArray(this, i);
   else
   {
-    array r = .find(otherobject, ([ otherkey : (int) i->get_id()]), criteria);
+    array r = i->master_object->context->repository->find(otherobject, ([ otherkey : (int) i->get_id()]), criteria);
     if(r && sizeof(r))
       return r[0];
     else return 0;

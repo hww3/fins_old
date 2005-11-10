@@ -12,3 +12,5 @@ string quote(string s)
 }
 
 int debug = 0;
+
+object repository;

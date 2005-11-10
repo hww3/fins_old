@@ -4,7 +4,6 @@ constant type="Foreign Key";
 
 mapping otherobjects = ([]);
 
-string otherobject; 
 string otherkey; 
 mixed default_value = .Undefined;
 int null = 0;

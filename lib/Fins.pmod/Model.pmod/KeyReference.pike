@@ -1,6 +1,5 @@
 inherit .Relationship;
 
-string otherobject; 
 mixed default_value = .Undefined;
 int null = 0;
 .Criteria criteria;
@@ -17,7 +16,7 @@ static void create(string _name, string _myfield, string _otherobject, void|.Cri
 // other object we're about to get.
 mixed decode(string value, void|.DataObjectInstance i)
 {
-  return .DataObjectInstance((int)value, otherobject);
+  return i->master_object->context->repository->find_by_id(otherobject, (int)value);
 }
 
 // value should be a dataobject instance of the type we're looking to set.

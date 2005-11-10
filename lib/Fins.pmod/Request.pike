@@ -7,7 +7,7 @@
 
 inherit Protocols.HTTP.Server.Request;
 
-string referer = "";
+string referrer = "";
 
 void parse_request()
 {

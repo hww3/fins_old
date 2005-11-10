@@ -315,7 +315,7 @@ int set(string field, mixed value, .DataObjectInstance i)
 //! be deleted, and so on. this is a very dangerous behavior
 //! and could result in large numbers of records not directly 
 //! related to this object being deleted.
-int delete(.DataObjectInstance i, int|void force)
+int delete(int|void force, .DataObjectInstance i)
 {
    // first, check to see what we link to.
    string key_value = primary_key->encode(i->get_id());
@@ -325,26 +325,40 @@ int delete(.DataObjectInstance i, int|void force)
    // data integrity, but we also don't want to delete referenced records
    // inadvertently.   
 
-   string delete_query = sprintf(single_delete_query, table_name, primary_key->name, key_value);
-
    foreach(relationships; string n; .Relationship r)
    {
      if(Program.inherits(object_program(r), .InverseForeignKeyReference))
      {
        werror("%O is a link to this table's primary key\n", n);
        mixed m = get(n, i);
-       if(m && sizeof(m)) // this should work, because any object should have a size.
+       if(m && sizeof(m) && !force) // this should work, because any object should have a size.
        {
          throw(Error.Generic("An object of type " + r->otherobject + " refers to this object.\n"));
+       }
+       else if(m && sizeof(m))
+       {
+         // we do the delete.
+         if(Program.inherits(object_program(r), .DataObjectInstance))
+         {
+            m->delete(force-1);
+         }
+         if(Program.inherits(object_program(r), .ObjectArray))
+         {
+           foreach(m, object item)
+             item->delete(force-1);
+         }
        }
      }
    }
    
    return 0;
 
+   string delete_query = sprintf(single_delete_query, table_name, primary_key->name, key_value);
+
    if(context->debug) werror("QUERY: %O\n", delete_query);
    context->sql->query(delete_query);
-
+   m_delete(objs, i->get_id());
+   destruct(i);
    return 1;
 }
 

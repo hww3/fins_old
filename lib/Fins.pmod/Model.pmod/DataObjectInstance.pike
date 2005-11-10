@@ -83,9 +83,9 @@ array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void crite
   return master_object->find(qualifiers, criteria, this);
 }
 
-int delete()
+int delete(void|int force)
 {
-   return master_object->delete(this);
+   return master_object->delete(force, this);
 }
 
 int save()

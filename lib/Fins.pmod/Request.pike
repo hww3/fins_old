@@ -7,6 +7,8 @@
 
 inherit Protocols.HTTP.Server.Request;
 
+string referer = "";
+
 void parse_request()
 {
   ::parse_request();
@@ -21,6 +23,7 @@ void parse_request()
   not_query = n_not_query;
 
   not_query = replace(not_query, "+", " ");
+  referer = request_headers["referer"];
 }
 
 //!

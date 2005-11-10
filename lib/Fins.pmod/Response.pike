@@ -22,7 +22,7 @@
   }
 
   static mapping response = (["type": "text/html",
-                              "error": 200,
+                              "error": 0,
                               "extra_heads": ([])
                               ]);
 
@@ -56,6 +56,7 @@
      if(request && request->misc->session_variables->__flash)
        f+=(request->misc->session_variables->__flash);
      template_data->set_flash(f);
+     if(!response->error) response->error = 200;
   }
 
   //!
@@ -101,18 +102,22 @@
       response->data = sprintf(data, @args); 
     else  
       response->data = data;
+    if(!response->error) response->error = 200;
   }
 
   //!
   public void set_file(Stdio.File file)
   {
     response->file = file;
+    if(!response->error)
+      response->error = 200;
     response->data = 0;
   }
 
   //!
   public mapping get_response()
   {
+     if(!response->error) return 0;
      if(template)
      {
         response->data = template->render(template_data);

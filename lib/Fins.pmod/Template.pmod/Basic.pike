@@ -254,7 +254,9 @@ static class TextString(string contents)
 static class ReplaceField(string scope, string name)
 {
    inherit Block;
-   
+
+   array(string) e;
+
    string _sprintf(mixed ... args)
    {
       return "ReplaceField(" + scope + "." + name + ")";
@@ -266,7 +268,8 @@ static class ReplaceField(string scope, string name)
       mapping data = d->get_data();
       mapping m;
       m=data;
-      array e = name/".";
+      if(!e)
+			e = name/".";
       foreach(e;int i;string elem)
       {
          if(i==(sizeof(e)-1) && mappingp(m[elem]))

@@ -2,7 +2,7 @@ Getting started with Fins
 
 Prerequisites
 
-Fins runs on Pike 7.6 or higher. Pike 7.7 and a Bonjour ready system (such as MacOS X) will get you automatic announcement of your Fins apps. If you want to use XSLT templating, you'll need to install libxml, libxslt and the Public.Parser.XML2 module.
+Fins runs on Pike 7.6 or higher. Pike 7.7 and a Bonjour ready system (such as MacOS X) will get you automatic announcement of your Fins apps. If you want to use XSLT templating, you'll need to install libxml, libxslt and the Public.Parser.XML2 module. To use Simple templates, you need to have pcre installed, and the _Regexp_PCRE module enabled in your Pike.
 
 To create a new web application, simply copy the "default" directory. You'll probably want to customize all of the files in it, based on your needs.
 

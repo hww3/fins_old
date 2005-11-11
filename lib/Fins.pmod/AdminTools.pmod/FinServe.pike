@@ -1,4 +1,4 @@
-#!/usr/local/bin/pike -Mlib
+#!/sw/bin/pike -Mlib
 
 constant default_port = 8080;
 constant my_version = "0.0";

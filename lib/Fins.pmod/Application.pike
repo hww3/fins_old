@@ -10,6 +10,9 @@
 .FinsView view;
 
 //!
+.FinsCache cache;
+
+//!
 string static_dir;
 
 //!
@@ -20,13 +23,21 @@ static void create(.Configuration _config)
 {
    config = _config;
    static_dir = Stdio.append_path(config->app_dir, "static");
-
+   
+   load_cache();
    load_model();
    load_view();
    load_controller();
 
    .Template.add_simple_macro("capitalize", macro_capitalize);
    .Template.add_simple_macro("flash", macro_flash);
+}
+
+void load_cache()
+{
+  werror("Starting Cache...\n");
+
+  cache = .FinsCache();
 }
 
 void load_view()

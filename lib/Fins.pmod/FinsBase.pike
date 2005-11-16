@@ -2,6 +2,16 @@
 
 private object __this_app;
 
+object cache()
+{
+  if(__this_app)
+  {
+    return __this_app->cache;
+  }
+
+  else return 0;
+}
+
 object model()
 {
   if(__this_app)

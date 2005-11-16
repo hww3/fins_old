@@ -33,6 +33,20 @@ mixed get(string key)
 
 void cleanup()
 {
+  int t = time();
+  int cleaned = 0;
   werror("FinsCache: cleanup()\n");
+  {
+    foreach(values; string key; mixed value)
+    {
+       if(value[0]<t)
+       {
+         m_delete(values, key);
+         cleaned ++;
+       }
+    }
+  }
+  if(cleaned)
+    werror("FinsCache(): cleaned " + cleaned + " objects.\n");
   call_out(cleanup, 60);
 }

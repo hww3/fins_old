@@ -108,16 +108,29 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   array _fields = ({});
   array _where = ({});
-  foreach(fields;; .Field f)
-    _fields += ({ f->field_name });
+  array _tables = ({table_name});
 
-  foreach(qualifiers; string name; mixed q)
+  foreach(fields;; .Field f)
+   if(f->field_name)
+      _fields += ({ table_name + "." + f->field_name });
+
+  foreach(qualifiers; mixed name; mixed q)
   {
+	werror("Qualifier: %O\n", name);
+	werror("Field: %O\n", fields);
      if(objectp(q) && Program.implements(object_program(q), .Criteria))
      {
         //werror("name: %O %O \n", name, q);
-         _where += ({ q->get(name) });
+         _where += ({ q->get(name, q) });
+			if(q->get_table)
+			  _tables += ({q->get_table(name, q)});
      }
+	  else if(objectp(name) && Program.implements(object_program(name), .MultiKeyReference))
+	  {
+		  _where += ({ name->get(q, i) });
+			if(name->get_table)
+			  _tables += ({name->get_table(q, i)});
+	  }
      else if(!fields[name])
      {
         throw(Error.Generic("Field " + name + " does not exist in object " + instance_name + ".\n"));
@@ -128,7 +141,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   if(_where && sizeof(_where)) 
     query = sprintf(multi_select_query, (_fields * ", "), 
-      table_name, (_where * " AND "));
+      (_tables * ", "), (_where * " AND "));
 
   else
     query = sprintf(multi_select_nowhere_query, (_fields * ", "), 
@@ -253,13 +266,16 @@ int set_atomic(mapping values, .DataObjectInstance i)
    multiset fields_set = (<>);
    mixed key_value;
 
-   foreach(values; string field; string value)
+   foreach(values; string field; mixed value)
    {
       if(!fields[field])
       {
          throw(Error.Generic("Field " + field + " does not exist in object " + instance_name + ".\n"));   
       }
-
+		if(Program.implements(object_program(fields[field]), .ObjectArray))
+		{
+			continue;
+		}
       if(fields[field]->is_shadow)
       {
          throw(Error.Generic("Cannot set shadow field " + field + ".\n"));   
@@ -281,6 +297,11 @@ int set(string field, mixed value, .DataObjectInstance i)
       throw(Error.Generic("Field " + field + " does not exist in object " + instance_name + ".\n"));   
    }
    
+	if(Program.inherits(object_program(fields[field]), .Relationship))
+	{
+		return 0;
+	}
+	
    if(fields[field]->is_shadow)
    {
      throw(Error.Generic("Cannot set shadow field " + field + ".\n"));   

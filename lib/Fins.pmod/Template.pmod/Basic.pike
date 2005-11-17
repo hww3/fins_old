@@ -75,6 +75,11 @@ static class RegexReplacer{
      string sv;
 
      int i=0;
+     if(!template) 
+     {
+       template = "empty template";
+     }
+
      for (;;)
      {
         array substrings = ({});
@@ -268,10 +273,15 @@ static class ReplaceField(string scope, string name)
       mapping data = d->get_data();
       mapping m;
       m=data;
+if(name=="categories.category")
+  werror("RENDER ON REPLACEFIELD: %O %O\n", name, data);
+
       if(!e)
 			e = name/".";
       foreach(e;int i;string elem)
       {
+if(name=="categories.category")
+werror("Looking at component %O\n", elem);
          if(i==(sizeof(e)-1) && mappingp(m[elem]))
          {
 				if(data->debug)
@@ -296,7 +306,10 @@ static class ReplaceField(string scope, string name)
                	buf->add("<!-- VALUE " + elem + " NOT FOUND -->");
 					else buf->add("");
             else
-               buf->add((string)m[elem]);
+            {
+               if(catch(buf->add((string)m[elem])))
+                  werror("failed to cast %O, %O to string\n", elem, m[elem]);
+            }
             
          }
          
@@ -333,7 +346,7 @@ static class Foreach(string scope, array contents)
    void render(String.Buffer buf, .TemplateData data)
    {
       mapping d = data->get_data();
- //     werror("RENDERING " + scope + "\n");
+      werror("RENDERING " + scope + "\n");
       if(!d[scope] && zero_type(d[scope]==1))
       {
 			if(data->debug)
@@ -348,21 +361,23 @@ static class Foreach(string scope, array contents)
 			else buf->add("");
          return;
       }
-      
-      foreach(d[scope]; int num; mapping row)
+
+werror("looping through : %O\n", d[scope]);
+      if(d[scope])
       {
-         foreach(contents;; Block b)
-         {
+        foreach(d[scope]; int num; mapping row)
+        {
+           foreach(contents;; Block b)
+           {
             .TemplateData d = data->clone();
             d->add(scope, row);
 
             // we should be able to replace the scope element in data with the row.
             b->render(buf, d);
-         }
-      }
+           }
+        }
+     }
    }
-
-
 }
 
 

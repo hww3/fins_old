@@ -116,8 +116,8 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   foreach(qualifiers; mixed name; mixed q)
   {
-	werror("Qualifier: %O\n", name);
-	werror("Field: %O\n", fields[name]);
+//	werror("Qualifier: %O\n", name);
+//	werror("Field: %O\n", fields[name]);
      if(objectp(q) && Program.implements(object_program(q), .Criteria))
      {
          _where += ({ q->get(name, q) });

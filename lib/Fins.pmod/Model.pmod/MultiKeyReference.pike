@@ -2,6 +2,7 @@ inherit .Relationship;
 
 constant type="Multi Key";
 
+object parent;
 string otherkey; 
 int null = 0;
 int is_shadow=1;
@@ -11,7 +12,7 @@ string mappingtable;
 string my_mappingfield;
 string other_mappingfield;
 
-static void create(string _name, string _mappingtable, string _my_mappingfield, 
+static void create(object p, string _name, string _mappingtable, string _my_mappingfield, 
 	string _other_mappingfield, string _otherobject, string _otherkey, .Criteria|void _criteria)
 {
   name = _name;
@@ -21,6 +22,7 @@ static void create(string _name, string _mappingtable, string _my_mappingfield,
   otherobject = _otherobject;
   otherkey = _otherkey;
   criteria = _criteria;
+  parent = p;
 }
 
 // value will be null in a foreign key, as we're not in an object where that's a real field. 
@@ -41,13 +43,34 @@ mixed validate(mixed value, void|.DataObjectInstance i)
   return 0;
 }
 
+string make_qualifier(mixed value)
+{
+  string v = "";
+
+  if(arrayp(value))
+  {
+    error("We don't do arrays yet!\n");	
+  }
+  else
+  {
+     v = mappingtable + "." + other_mappingfield + "=" + value->get_id() + " AND " + 
+	      parent->table_name + "." + parent->primary_key->field_name + "=" + mappingtable + "." + my_mappingfield ;	
+  }
+
+  return v;
+}
+
 string get(mixed name, mixed value, .DataObjectInstance i)
 {
 	string v = "";
-	werror("Get: %O %O\n", value, i);
-	v = mappingtable + "." + my_mappingfield + "=" + name->get_id() + " AND " + 
-	    name->master_object->context->repository->get_object(otherobject)->table_name + "." + otherkey + "=" + mappingtable + "." + other_mappingfield ;
+	werror("Get: %O %O %O\n", name, value, i);
 
+   if(value)
+   {
+     v = mappingtable + "." + my_mappingfield + "=" + name->get_id() + " AND " + 
+	    name->master_object->context->repository->get_object(otherobject)->table_name + "." + 
+	    otherkey + "=" + mappingtable + "." + other_mappingfield ;
+   }
    return v;
 }
 

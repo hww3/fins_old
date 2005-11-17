@@ -117,10 +117,9 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
   foreach(qualifiers; mixed name; mixed q)
   {
 	werror("Qualifier: %O\n", name);
-	werror("Field: %O\n", fields);
+	werror("Field: %O\n", fields[name]);
      if(objectp(q) && Program.implements(object_program(q), .Criteria))
      {
-        //werror("name: %O %O \n", name, q);
          _where += ({ q->get(name, q) });
 			if(q->get_table)
 			  _tables += ({q->get_table(name, q)});
@@ -136,12 +135,20 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
         throw(Error.Generic("Field " + name + " does not exist in object " + instance_name + ".\n"));
      }
      else
-     _where += ({ fields[name]->make_qualifier(q)});
+     {
+       _where += ({ fields[name]->make_qualifier(q)});
+       if(objectp(name) && name->get_table)
+         _tables += ({name->get_table(q, i)});
+		 else if(fields[name]->get_table)
+		{
+			_tables += ({fields[name]->get_table(q, i)});
+		}
+     }
   }      
 
   if(_where && sizeof(_where)) 
     query = sprintf(multi_select_query, (_fields * ", "), 
-      (_tables * ", "), (_where * " AND "));
+      (Array.uniq(_tables) * ", "), (_where * " AND "));
 
   else
     query = sprintf(multi_select_nowhere_query, (_fields * ", "), 
@@ -297,7 +304,7 @@ int set(string field, mixed value, .DataObjectInstance i)
       throw(Error.Generic("Field " + field + " does not exist in object " + instance_name + ".\n"));   
    }
    
-	if(Program.inherits(object_program(fields[field]), .Relationship))
+	if(Program.inherits(object_program(fields[field]), .Relationship) && fields[field]->is_shadow)
 	{
 		return 0;
 	}

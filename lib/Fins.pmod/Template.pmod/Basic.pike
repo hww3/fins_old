@@ -63,7 +63,7 @@ static class RegexReplacer{
   string match = "(:?{foreach:(?P<loopname>[a-zA-Z\\-_0-9]+)}(?:((?s).*?){end:(?P=loopname)}))"
        "|(:?{include:(?P<file>[a-zA-Z\\-_0-9/\\.]+)})"
        "|(:?{if:(?P<testid>[a-zA-Z0-9_\\-]+):(.*?)}(?:((?s).*?)({else:(?P=testid)}(?:((?s).*?)))?{endif:(?P=testid)}))"
-       "|(:?{(:?(:?(!?[A-Za-z0-9_]+):)?(.*?))})";
+       "|(:?{(:?(:?(!?[A-Za-z0-9\\-_]+):)?(.*?))})";
 
   void create() {
     regexp = _Regexp_PCRE(match, Regexp.PCRE.OPTION.MULTILINE);
@@ -273,14 +273,14 @@ static class ReplaceField(string scope, string name)
       mapping data = d->get_data();
       mapping m;
       m=data;
-if(name=="categories.category")
+if(name=="existing-categories.category")
   werror("RENDER ON REPLACEFIELD: %O %O\n", name, data);
 
       if(!e)
 			e = name/".";
       foreach(e;int i;string elem)
       {
-if(name=="categories.category")
+if(name=="existing-categories.category")
 werror("Looking at component %O\n", elem);
          if(i==(sizeof(e)-1) && mappingp(m[elem]))
          {

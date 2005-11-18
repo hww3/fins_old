@@ -35,7 +35,6 @@ void cleanup()
 {
   int t = time();
   int cleaned = 0;
-  werror("FinsCache: cleanup()\n");
   {
     foreach(values; string key; mixed value)
     {

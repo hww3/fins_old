@@ -204,7 +204,5 @@ class FinsHilfe
      safe_write("Fins " + my_version + " running " + version() +
               " / Hilfe v3.5 (Incremental Pike Frontend)\n");
    }
-
 }
-
 

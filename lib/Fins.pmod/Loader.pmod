@@ -12,8 +12,6 @@ Fins.Application load_app(string app_dir, string config_name)
 
   program p;
 
-  add_constant("app", a);
-
   cn = "application";
   p = (program)(cn);
 

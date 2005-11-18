@@ -19,7 +19,7 @@ void create(string _name, string _transformfield, function _transformer)
 
 int decode(string value, void|.DataObjectInstance i)
 {
-   return transformer(i[transformfield]);
+   return transformer(i[transformfield], i);
 }
 
 string encode(mixed value, void|.DataObjectInstance i)

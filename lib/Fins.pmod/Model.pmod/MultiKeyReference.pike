@@ -63,7 +63,6 @@ string make_qualifier(mixed value)
 string get(mixed name, mixed value, .DataObjectInstance i)
 {
 	string v = "";
-	werror("Get: %O %O %O\n", name, value, i);
 
    if(value)
    {

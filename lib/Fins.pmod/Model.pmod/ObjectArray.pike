@@ -11,7 +11,6 @@ static void create(.Field f, object parent)
   otherobject = parent->master_object->context->repository->get_object(field->otherobject);
   changed = 1;
 
-  werror("Other object: %O\n", otherobject);
 
 }
 
@@ -50,13 +49,11 @@ void get_contents()
   contents = parentobject->master_object->context->repository->find(otherobject, ([ field->otherkey :
                                   (int) parentobject->get_id()]));
 
-werror("CONTENTS: %O\n", contents);
   changed = 0;
 }
 
 mixed `+(mixed arg)
 {
-  werror("`+(%O)\n", arg);
 
   // do we have the right kind of object?
   if(!objectp(arg) || !arg->master_object || arg->master_object != otherobject)
@@ -87,7 +84,6 @@ mixed `+(mixed arg)
 
 mixed `[]=(int i, mixed v)
 {
-werror("`[]=(%O, %O\n", i, v);
   if(v == UNDEFINED)
   {
 return 0;
@@ -100,7 +96,6 @@ return 0;
 
 mixed `[](int arg)
 {
-werror("`[](%O)\n", arg);
   return get_element(arg);
 
 }

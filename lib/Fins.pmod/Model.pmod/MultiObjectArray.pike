@@ -2,16 +2,13 @@ inherit .ObjectArray;
 
 void get_contents()
 {
-	werror("get_contents(): %O\n", field->name);
   contents = parentobject->master_object->context->repository->find(otherobject, ([ field : parentobject]));
 
-werror("CONTENTS: %O\n", contents);
   changed = 0;
 }
 
 mixed `+(mixed arg)
 {
-  werror("`+(%O)\n", arg);
 
   // do we have the right kind of object?
   if(!objectp(arg) || !arg->master_object || arg->master_object != otherobject)
@@ -33,7 +30,6 @@ mixed `+(mixed arg)
 
 mixed `-(mixed arg)
 {
-  werror("`-(%O)\n", arg);
 
   // do we have the right kind of object?
   if(!objectp(arg) || !arg->master_object || arg->master_object != otherobject)

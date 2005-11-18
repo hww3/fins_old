@@ -96,7 +96,6 @@ void add_field(.Field f)
 
    if(Program.inherits(object_program(f), .Relationship))
    {
-     werror("adding relationship\n");
      relationships[f->name] = f;
    }
 }
@@ -116,8 +115,6 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   foreach(qualifiers; mixed name; mixed q)
   {
-//	werror("Qualifier: %O\n", name);
-//	werror("Field: %O\n", fields[name]);
      if(objectp(q) && Program.implements(object_program(q), .Criteria))
      {
          _where += ({ q->get(name, q) });

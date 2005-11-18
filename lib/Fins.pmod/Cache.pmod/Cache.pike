@@ -9,6 +9,17 @@ static void create()
 }
 
 //!
+int clear(string key)
+{
+  if(values[key] || !zero_type(values[key]))
+  {
+    m_delete(values, key);
+    return 1;
+  } 
+  else return 0;
+}
+
+//!
 int set(string key, mixed value, int|void timeout)
 {
   values[key] = ({timeout + time(), value});

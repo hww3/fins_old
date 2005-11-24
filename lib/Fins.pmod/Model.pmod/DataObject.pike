@@ -162,8 +162,11 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   foreach(qr;; mapping row)
   {
+werror("ROW: %O\n", row);
+werror("key: %O\n", primary_key->field_name);
+    string fn = table_name + "." + primary_key->field_name;
     object item = object_program(i)(UNDEFINED, this);
-    item->set_id(primary_key->decode(row[primary_key->field_name]));
+    item->set_id(primary_key->decode(row[fn]));
     item->set_new_object(0);
     low_load(row, item);
     results+= ({ item  });
@@ -179,8 +182,11 @@ void load(int id, .DataObjectInstance i, int|void force)
    {
      array _fields = ({});
      foreach(fields;; .Field f)
-       _fields += ({ f->field_name });
-      
+     {
+       werror("%s: %O\n", f->name, f->field_name);
+       if(!f->field_name) continue;
+       _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name });
+     }      
      string query = sprintf(single_select_query, (_fields * ", "), 
        table_name, primary_key->field_name, primary_key->encode(id));
 
@@ -213,7 +219,12 @@ void low_load(mapping row, .DataObjectInstance i)
 
   foreach(fields; string fn; .Field f)
   {
-    r[f->name] = row[f->field_name];
+    string fn;
+    if(f->get_table)
+      fn = f->get_table()  + "." + f->field_name;
+    else 
+      fn = table_name + "." + f->field_name;
+    r[f->name] = row[fn];
   }
 
   if(!objs[id])
@@ -321,7 +332,7 @@ int set(string field, mixed value, .DataObjectInstance i)
      string new_value = fields[field]->encode(value);
      string key_value = primary_key->encode(i->get_id());
    
-     string update_query = sprintf(single_update_query, table_name, field, new_value, primary_key->name, key_value);
+     string update_query = sprintf(single_update_query, table_name, fields[field]->field_name, new_value, primary_key->name, key_value);
      i->set_saved(1);
      if(context->debug) werror("QUERY: %O\n", update_query);
      context->sql->query(update_query);
@@ -385,6 +396,7 @@ int delete(int|void force, .DataObjectInstance i)
    if(context->debug) werror("QUERY: %O\n", delete_query);
    context->sql->query(delete_query);
    m_delete(objs, i->get_id());
+   destruct(i);
    return 1;
 }
 

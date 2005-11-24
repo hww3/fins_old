@@ -10,7 +10,10 @@ static void create(string _name)
 
 int get_id()
 {
-  return decode(context->sql->master_sql->insert_id());
+  if(context->sql->master_sql->insert_id)
+    return decode(context->sql->master_sql->insert_id());
+  else if(context->sql->master_sql->last_insert_rowid)
+    return decode(context->sql->master_sql->last_insert_rowid());
 }
 
 int decode(string value, void|.DataObjectInstance i)

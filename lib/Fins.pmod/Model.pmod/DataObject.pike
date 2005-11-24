@@ -162,8 +162,6 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   foreach(qr;; mapping row)
   {
-werror("ROW: %O\n", row);
-werror("key: %O\n", primary_key->field_name);
     string fn = table_name + "." + primary_key->field_name;
     object item = object_program(i)(UNDEFINED, this);
     item->set_id(primary_key->decode(row[fn]));
@@ -183,7 +181,6 @@ void load(int id, .DataObjectInstance i, int|void force)
      array _fields = ({});
      foreach(fields;; .Field f)
      {
-       werror("%s: %O\n", f->name, f->field_name);
        if(!f->field_name) continue;
        _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name });
      }      

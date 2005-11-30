@@ -32,7 +32,6 @@ string method;
 
 void response_write_and_finish(mixed ... args)
 {
-werror("response: %O\n", args);
         Thread.Mutex lock;
         Thread.MutexKey key;
 
@@ -99,7 +98,6 @@ static private void decode_cookies()
     }
   }
 }
-
 
 private void decode_post()
 {

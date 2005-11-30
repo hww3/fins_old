@@ -224,8 +224,8 @@ void create(object fcgir)
   if(stringp(contents) && strlen(contents))
     pragma |= aggregate_multiset(@replace(contents, " ", "")/ ",");
 
-  not_query = getenv("REQUEST_URI");
-  query = getenv("QUERY_STRING");
+  not_query = http_decode_string(replace(getenv("REQUEST_URI"), "+", " "));
+  query = http_decode_string(replace(getenv("QUERY_STRING"), "+", " "));;
   method = getenv("REQUEST_METHOD") || "GET";
   prot = getenv("SERVER_PROTOCOL");
 

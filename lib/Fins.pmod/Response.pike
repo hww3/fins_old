@@ -85,7 +85,9 @@
   {
     response->error = 404;
     response->data = "<h1>404: File Not Found</h1>\n"
-                     "The file " + filename + " was not found.";
+                     "The file " + filename + " was not found."
+                     "<p/>&nbsp;<p/>&nbsp;<p/>\n<hr/>\n<i>Fins</i>";
+
   }
   
   //!

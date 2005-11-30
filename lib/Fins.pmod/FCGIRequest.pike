@@ -223,6 +223,9 @@ void create(object fcgir)
     pragma |= aggregate_multiset(@replace(contents, " ", "")/ ",");
 
   not_query = http_decode_string(replace(getenv("REQUEST_URI"), "+", " "));
+  int q = search(not_query, "?");
+  if(q!=-1)
+     not_query = not_query[..q-1];     
   query = http_decode_string(replace(getenv("QUERY_STRING"), "+", " "));;
   method = getenv("REQUEST_METHOD") || "GET";
   prot = getenv("SERVER_PROTOCOL");

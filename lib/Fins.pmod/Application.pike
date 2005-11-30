@@ -83,7 +83,6 @@ public mixed handle_request(.Request request)
   }
 
   array x = get_event(request);
-
   if(sizeof(x)>=1)
     event = x[0];
 

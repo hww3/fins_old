@@ -51,7 +51,7 @@ int main(int argc, array(string) argv)
   {
 
     port = Protocols.HTTP.Server.Port(handle_request, my_port);  
-    port->request_program = Fins.Request;
+    port->request_program = Fins.HTTPRequest;
 
 #if constant(_Protocols_DNS_SD)
     bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + "/" + config_name + ")",

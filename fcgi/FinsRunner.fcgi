@@ -3,7 +3,9 @@
 constant my_version = "0.1";
 
 string session_storagedir = "/tmp/finsrunner_storage";
+#ifdef LOGGING
 string logfile_path = "/tmp/finsrunner.log";
+#endif
 string session_cookie_name = "PSESSIONID";
 int session_timeout = 3600;
 
@@ -11,7 +13,9 @@ Session.SessionManager session_manager;
 
 Fins.Application app;
 Stdio.File f;
+#ifdef LOGGING
 Stdio.File logfile;
+#endif
 int shutdown = 0;
 int requests = 0;
 
@@ -29,9 +33,10 @@ int main(int argc, array(string) argv)
   write("FinsRunner loading application " + project_dir + " using configuration " + config_name + "\n");
   load_application();
 
+#ifdef LOGGING
     if(logfile_path)
       logfile=Stdio.File(logfile_path, "rwac");
-
+#endif
     f = Stdio.stdin.dup();
 
   #ifdef RUN_THREADED
@@ -134,15 +139,15 @@ void request_loop(int sock, int id)
                         req += "&"+request_id->query;
                       }
                       response->redirect(req);
-
+#ifdef LOGGING
 		                  log( "Created new session sid='%s' host='%s'\n",ssid,request_id->remoteaddr);
+#endif
                       request_id->response_write_and_finish(response_to_string(response));
                       continue;
                     }
 
                   // the moment of truth!
                   mixed response;
-                werror("Request: %O\n", request_id->not_query);
                   
                   e = catch {
                     response = app->handle_request(request_id);
@@ -151,10 +156,12 @@ void request_loop(int sock, int id)
                  
                   if(e)
                   {
+#ifdef LOGGING
                     if(objectp(e))
                       log("got an error: %s\n", e->describe());
                     else
                       log("got an error: %O\n", e);
+#endif
                     response_string+="Content-type: text/html\r\n\r\n";
                     response_string+=sprintf("<h1>\n%s\n</h1>", describe_error(e)); 
                     response_string+=sprintf("<pre>\n%s\n</pre>", describe_backtrace(e)); 
@@ -171,12 +178,13 @@ void request_loop(int sock, int id)
                   response_string += response_to_string(response);
                 }
               request_id->response_write_and_finish(response_string->get());
-
+#ifdef LOGGING
               log("request finished\n");
-                
+#endif  
 	} while(!shutdown);
 }
 
+#ifdef LOGGING
 void log(string t, mixed ... args)
 {
   if(!logfile) return;
@@ -185,6 +193,8 @@ void log(string t, mixed ... args)
     t = sprintf(t, @args);
   logfile->write(sprintf("[%s] %s", (ctime(time())- "\n"), t));
 }
+
+#endif
 
 string response_to_string(mixed r)
 {
@@ -199,7 +209,6 @@ string response_to_string(mixed r)
    }
    
    if(!r) return "";
-   werror("RESPONSE: %O\n", r);  
    if(objectp(r))
     retval = r->get_response();
    else retval = r;

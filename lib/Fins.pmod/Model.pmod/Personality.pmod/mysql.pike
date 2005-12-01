@@ -1,1 +1,1 @@
-inherit .personality;
+inherit .Personality;

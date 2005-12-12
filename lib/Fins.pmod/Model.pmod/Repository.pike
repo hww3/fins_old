@@ -14,11 +14,13 @@ program get_instance(string name)
 
 void add_object_type(.DataObject t)
 {
+werror("adding type def: %O\n", t->instance_name);
    object_definitions[t->instance_name] = t;
 }
 
 void add_instance_type(program t)
 {
+werror("adding instance: %O\n", t->type_name);
    instance_definitions[t->type_name] = t;
 }
 

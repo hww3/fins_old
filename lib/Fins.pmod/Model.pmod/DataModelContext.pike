@@ -1,4 +1,16 @@
+//!
+int debug = 0;
 
+//!
+object repository;
+
+//!
+object cache;
+
+//!
+object app;
+
+//!
 Sql.Sql sql;
 
 string _sprintf(mixed ... args)
@@ -15,11 +27,6 @@ string type()
 {
   return (sprintf("%O", object_program(sql->master_sql))/".")[-1];
 }
-
-int debug = 0;
-
-object repository;
-object cache;
 
 program personality()
 {

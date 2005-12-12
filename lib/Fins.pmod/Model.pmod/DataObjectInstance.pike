@@ -37,6 +37,9 @@ string get_type()
 
 static void create(int|void id, object _object_type)
 {
+
+  werror("object: %O\n", _object_type);
+
   if(objectp(_object_type)) 
   {
     master_object = _object_type;

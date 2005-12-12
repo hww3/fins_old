@@ -1,28 +1,36 @@
 import Fins.Model;
 
+object repo;
+
 int main()
 {
    object s = Sql.Sql("mysql://hww3:pastram.@localhost/hww3");
    object d = Fins.Model.DataModelContext(); 
+   repo = Fins.Model.Repository();
+
    d->sql = s;
+   d->repo = repo;
    d->debug = 1;
-   add_object_type(Name_object(d));
-   add_object_type(Author_object(d));
-   add_object_type(Comment_object(d));
+   repo->add_object_type(Name_object(d));
+   repo->add_instance_type(Name);   
+   repo->add_object_type(Author_object(d));
+   repo->add_instance_type(Author);   
+   repo->add_object_type(Comment_object(d));
+   repo->add_instance_type(Comment);   
 
 
 
    object author;
-   if(catch(author = DataObjectInstance(1, "author")))
+   if(catch(author = Author(1)))
    {
-     author = DataObjectInstance(UNDEFINED, "author");
+     author = Author(UNDEFINED);
      author["Name"] = "Bubba";
      author["UserName"] = "bub";
      author->save();
    }     
 
 
-   object a = DataObjectInstance(UNDEFINED, "name");
+   object a = Name(UNDEFINED);
    a->set("First_Name", "Bill");
    a->set("Last_Name", "Welliver");
    a["Cards_Received"] = 24;
@@ -30,7 +38,7 @@ int main()
    a["author"] = author;
    a->save();
 
-   object c = DataObjectInstance(UNDEFINED, "comment");
+   object c = Comment(UNDEFINED);
 
    c["Description"] = "now is the time for all good men to come to the aid of their country.\n";
    c["name"] = a;
@@ -47,7 +55,7 @@ int main()
 
    write("Last Name: " + a["Last_Name"] + "\n");
    werror("Cards Received: %O\n", a["Cards_Received"]);
-   object b = DataObjectInstance(a->get_id(), "name");
+   object b = Name(a->get_id());
    b->set_atomic((["Last_Name":"Welliver", "First_Name": "Jennifer", "Cards_Received": 42]));
    write("from b: " + b["id"] +"\n");
    write("from b: " + b["First_Name"] +"\n");
@@ -88,6 +96,27 @@ class Name_object
      return Calendar.Second();
    }
    
+}
+
+class Name
+{
+  inherit DirectAccessInstance;
+
+  constant type_name = "name";
+}
+
+class Author
+{
+  inherit DirectAccessInstance;
+
+  constant type_name = "author";
+}
+
+class Comment
+{
+  inherit DirectAccessInstance;
+
+  constant type_name = "comment";
 }
 
 class Author_object

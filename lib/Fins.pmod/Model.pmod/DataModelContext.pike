@@ -19,6 +19,7 @@ string type()
 int debug = 0;
 
 object repository;
+object cache;
 
 program personality()
 {

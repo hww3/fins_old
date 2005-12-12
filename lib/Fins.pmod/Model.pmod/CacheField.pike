@@ -17,13 +17,13 @@ void create(string _name, string _cachefield, object ctx)
 
 int decode(string value, void|.DataObjectInstance i)
 {
-   mixed o = context->repository->cache()->get(sprintf("CACHEFIELD%s-%d",
+   mixed o = context->cache->get(sprintf("CACHEFIELD%s-%d",
        name, i->get_id()));
    if(o) return o;
 
    o = i[cachefield];
 
-    context->repository->cache()->set(sprintf("CACHEFIELD%s-%d", 
+    context->cache->set(sprintf("CACHEFIELD%s-%d", 
        name, i->get_id()), o, 600);
    return o;
 }

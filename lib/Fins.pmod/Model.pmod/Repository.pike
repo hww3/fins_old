@@ -1,14 +1,25 @@
 
 mapping(string:.DataObject) object_definitions = ([]);
+mapping(string:program) instance_definitions = ([]);
 
 .DataObject get_object(string name)
 {
    return object_definitions[name];
 }
 
+program get_instance(string name)
+{
+   return instance_definitions[name];
+}
+
 void add_object_type(.DataObject t)
 {
    object_definitions[t->instance_name] = t;
+}
+
+void add_instance_type(program t)
+{
+   instance_definitions[t->type_name] = t;
 }
 
 array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
@@ -19,7 +30,7 @@ array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
    else
      o = ot;
    if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
-   return .DataObjectInstance(UNDEFINED, o)->find(qualifiers, criteria);
+   return get_instance(o->instance_name)(UNDEFINED)->find(qualifiers, criteria);
 }
 
 
@@ -31,7 +42,7 @@ array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
    else
      o = ot;
    if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
-   return .DataObjectInstance(id, o);
+   return  get_instance(o->instance_name)(id);
 }
 
 .DataObjectInstance new(string|object ot)
@@ -42,7 +53,5 @@ array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
    else
      o = ot;
   if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
-  return .DataObjectInstance(UNDEFINED, o);
+  return  get_instance(o->instance_name)(UNDEFINED);
 }
-
-

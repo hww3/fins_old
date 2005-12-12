@@ -8,6 +8,10 @@ int main()
    object d = Fins.Model.DataModelContext(); 
 
    d->sql = s;
+
+   // we can use Fins.Model as the repository if we're willing to have a shared model
+   // definition repository. otherwise, we should create our own instance of 
+   // Fins.Model.Repository; most likely as a module.
    d->repository = Fins.Model;
    d->debug = 1;
    Fins.Model.add_object_type(Name_object(d));

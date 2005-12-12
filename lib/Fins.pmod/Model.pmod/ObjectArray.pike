@@ -8,7 +8,7 @@ static void create(.Field f, object parent)
 {
   field = f; 
   parentobject = parent;
-  otherobject = parent->master_object->context->repository->get_object(field->otherobject);
+  otherobject = parent->master_object->context->repository["get_object"](field->otherobject);
   changed = 1;
 
 
@@ -46,7 +46,7 @@ int(0..1) _is_type(string t)
 
 void get_contents()
 {
-  contents = parentobject->master_object->context->repository->find(otherobject, ([ field->otherkey :
+  contents = parentobject->master_object->context->repository["find"](otherobject, ([ field->otherkey :
                                   (int) parentobject->get_id()]));
 
   changed = 0;

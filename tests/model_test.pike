@@ -103,6 +103,10 @@ class Name
   inherit DirectAccessInstance;
 
   constant type_name = "name";
+
+  // note that if you want a shared model repository, you don't have to overwrite anything,
+  // otherwise, you need to set the value of "repository" to a class that impliments
+  // Fins.Model.Repository.
 }
 
 class Author
@@ -110,6 +114,10 @@ class Author
   inherit DirectAccessInstance;
 
   constant type_name = "author";
+
+  // note that if you want a shared model repository, you don't have to overwrite anything,
+  // otherwise, you need to set the value of "repository" to a class that impliments
+  // Fins.Model.Repository.
 }
 
 class Comment
@@ -117,6 +125,10 @@ class Comment
   inherit DirectAccessInstance;
 
   constant type_name = "comment";
+
+  // note that if you want a shared model repository, you don't have to overwrite anything,
+  // otherwise, you need to set the value of "repository" to a class that impliments
+  // Fins.Model.Repository.
 }
 
 class Author_object

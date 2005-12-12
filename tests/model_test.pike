@@ -4,19 +4,18 @@ object repo;
 
 int main()
 {
-   object s = Sql.Sql("mysql://hww3:pastram.@localhost/hww3");
+   object s = Sql.Sql("mysql://hww3:f00bar@localhost/hww3");
    object d = Fins.Model.DataModelContext(); 
-   repo = Fins.Model.Repository();
 
    d->sql = s;
-   d->repo = repo;
+   d->repository = Fins.Model;
    d->debug = 1;
-   repo->add_object_type(Name_object(d));
-   repo->add_instance_type(Name);   
-   repo->add_object_type(Author_object(d));
-   repo->add_instance_type(Author);   
-   repo->add_object_type(Comment_object(d));
-   repo->add_instance_type(Comment);   
+   Fins.Model.add_object_type(Name_object(d));
+   Fins.Model.add_instance_type(Name);   
+   Fins.Model.add_object_type(Author_object(d));
+   Fins.Model.add_instance_type(Author);   
+   Fins.Model.add_object_type(Comment_object(d));
+   Fins.Model.add_instance_type(Comment);   
 
 
 

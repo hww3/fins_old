@@ -14,12 +14,9 @@ int main()
    // Fins.Model.Repository; most likely as a module.
    d->repository = Fins.Model;
    d->debug = 1;
-   Fins.Model.add_object_type(Name_object(d));
-   Fins.Model.add_instance_type(Name);   
-   Fins.Model.add_object_type(Author_object(d));
-   Fins.Model.add_instance_type(Author);   
-   Fins.Model.add_object_type(Comment_object(d));
-   Fins.Model.add_instance_type(Comment);   
+   Fins.Model.add_object_type(Name_object(d), Name);   
+   Fins.Model.add_object_type(Author_object(d), Author);
+   Fins.Model.add_object_type(Comment_object(d), Comment);   
 
 
 
@@ -105,7 +102,7 @@ class Name
 {
   inherit DirectAccessInstance;
 
-  constant type_name = "name";
+  string type_name = "name";
 
   // note that if you want a shared model repository, you don't have to overwrite anything,
   // otherwise, you need to set the value of "repository" to a class that impliments
@@ -116,7 +113,7 @@ class Author
 {
   inherit DirectAccessInstance;
 
-  constant type_name = "author";
+  string type_name = "author";
 
   // note that if you want a shared model repository, you don't have to overwrite anything,
   // otherwise, you need to set the value of "repository" to a class that impliments
@@ -127,7 +124,7 @@ class Comment
 {
   inherit DirectAccessInstance;
 
-  constant type_name = "comment";
+  string type_name = "comment";
 
   // note that if you want a shared model repository, you don't have to overwrite anything,
   // otherwise, you need to set the value of "repository" to a class that impliments
@@ -168,5 +165,3 @@ class Comment_object
    }
 
 }
-
-

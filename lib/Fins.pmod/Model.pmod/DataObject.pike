@@ -4,7 +4,7 @@
 
 .DataModelContext context;
 
-object my_undef = Fins.Model.Undefined;
+object my_undef = .Undefined;
 
 mapping objs = ([]);
 
@@ -253,9 +253,8 @@ mixed get(string field, .DataObjectInstance i)
    {
      return fields[field]->decode(objs[i->get_id()][1][field], i);
    }     
-   string query = "SELECT %s FROM %s WHERE %s=%s";
 
-   query = sprintf(query, fields[field]->field_name, table_name, 
+   string query = sprintf(single_select_query, fields[field]->field_name, table_name, 
      primary_key->field_name, primary_key->encode(i->get_id()), i);
 
       if(context->debug) werror("QUERY: %O\n", query);

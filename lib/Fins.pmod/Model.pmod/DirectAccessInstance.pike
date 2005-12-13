@@ -1,7 +1,7 @@
 inherit .DataObjectInstance;
 
-constant type_name = "unknown";
-object repository = Fins.Model;
+string type_name = "unknown";
+object repository = .module;
 
 static void create(int identifier)
 {
@@ -10,4 +10,3 @@ static void create(int identifier)
   werror("name: %O, object: %O\n", type_name, o);
   ::create(identifier, o);
 }
-

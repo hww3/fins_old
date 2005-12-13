@@ -32,7 +32,7 @@ program personality()
 {
   if(!sql) throw(Error.Generic("No SQL connection defined.\n"));
 
-  return Fins.Model.Personality[type()];
+  return .Personality[type()];
 }
 
 int initialize()

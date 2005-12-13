@@ -108,10 +108,15 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
   array _fields = ({});
   array _where = ({});
   array _tables = ({table_name});
+  mapping _fieldnames = ([]);
 
   foreach(fields;; .Field f)
    if(f->field_name)
-      _fields += ({ table_name + "." + f->field_name });
+   {
+      string mfn = table_name + "__" + f->field_name;
+      _fields += ({ table_name + "." + f->field_name + " AS " + mfn});
+      _fieldnames += ([f:mfn]);
+   }
 
   foreach(qualifiers; mixed name; mixed q)
   {
@@ -162,27 +167,31 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   foreach(qr;; mapping row)
   {
-    string fn = table_name + "." + primary_key->field_name;
+    string fn = table_name + "__" + primary_key->field_name;
     object item = object_program(i)(UNDEFINED, this);
     item->set_id(primary_key->decode(row[fn]));
     item->set_new_object(0);
-    low_load(row, item);
+    low_load(row, item, _fieldnames);
     results+= ({ item  });
   }
 
   return results;
 }
 
-void load(int id, .DataObjectInstance i, int|void force)
+void load(mixed id, .DataObjectInstance i, int|void force)
 {
 
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
+     mapping _fieldnames = ([]);
      array _fields = ({});
+
      foreach(fields;; .Field f)
      {
        if(!f->field_name) continue;
-       _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name });
+       string mfn = (f->get_table?f->get_table():table_name) + "__" + f->field_name;
+       _fieldnames[f] = mfn;
+       _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name + " AS " + mfn});
      }      
      string query = sprintf(single_select_query, (_fields * ", "), 
        table_name, primary_key->field_name, primary_key->encode(id));
@@ -199,7 +208,7 @@ void load(int id, .DataObjectInstance i, int|void force)
      i->set_id(id);
      i->set_new_object(0);
      i->set_initialized(1);
-     low_load(result[0], i);
+     low_load(result[0], i, _fieldnames);
   }
   else // guess we need this here, also.
   {
@@ -209,25 +218,28 @@ void load(int id, .DataObjectInstance i, int|void force)
   }
 }
 
-void low_load(mapping row, .DataObjectInstance i)
+void low_load(mapping row, .DataObjectInstance i, mapping|void fieldnames)
 {
-  int id = i->get_id();
+  mixed id = i->get_id();
   mapping r = ([]);
-
+  int n = 0;
   foreach(fields; string fn; .Field f)
   {
     string fn;
-    if(f->get_table)
+    if(fieldnames && fieldnames[f] && f->field_name)
+      fn = fieldnames[f];
+    else if(f->get_table)
       fn = f->get_table()  + "." + f->field_name;
     else 
       fn = table_name + "." + f->field_name;
     r[f->name] = row[fn];
+    n++;
   }
-
   if(!objs[id])
   {
     objs[id] = ({0, ([])});
   }
+
 
 
   objs[id][1] = r;
@@ -396,7 +408,7 @@ int delete(int|void force, .DataObjectInstance i)
    return 1;
 }
 
-static int commit_changes(multiset fields_set, mapping object_data, int update_id)
+static int commit_changes(multiset fields_set, mapping object_data, mixed update_id)
 {
    string query;
    array qfields = ({});
@@ -462,7 +474,7 @@ int save(.DataObjectInstance i)
    if(i->is_new_object())
    {
       commit_changes(i->fields_set, i->object_data, 0);
-      i->set_id(primary_key->get_id());
+      i->set_id(primary_key->get_id(i));
       i->set_new_object(0);
       i->set_saved(1);
       add_ref(i);
@@ -472,6 +484,7 @@ int save(.DataObjectInstance i)
    else if(autosave == 0)
    {
       commit_changes(i->fields_set, i->object_data, i->get_id());
+      i->set_id(primary_key->get_id(i));
       i->set_saved(1);
       i->object_data = ([]);
       i->fields_set = (<>);            

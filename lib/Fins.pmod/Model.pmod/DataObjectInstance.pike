@@ -3,7 +3,7 @@
 string object_type;
 multiset fields_set = (<>);
 mapping object_data = ([]);
-static int key_value = UNDEFINED;
+static mixed key_value = UNDEFINED;
 int new_object = 0;
 int saved = 0;
 int initialized;
@@ -35,10 +35,8 @@ string get_type()
   return object_type;
 }
 
-static void create(int|void id, object _object_type)
+static void create(mixed|void id, object _object_type)
 {
-
-  werror("object: %O\n", _object_type);
 
   if(objectp(_object_type)) 
   {
@@ -116,12 +114,12 @@ mixed get(string name)
    return master_object->get(name, this);
 }
 
-void set_id(int id)
-{
+void set_id(mixed id)
+{ 
   key_value = id;   
 }
 
-int get_id()
+mixed get_id()
 {
    return key_value;
 }

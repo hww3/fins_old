@@ -31,6 +31,7 @@ void create(string _name, int(0..1) _null, mixed|void _default)
    else default_value = .Undefined;
 
    ::create();
+
 }
 
 object decode(string value, void|.DataObjectInstance i)

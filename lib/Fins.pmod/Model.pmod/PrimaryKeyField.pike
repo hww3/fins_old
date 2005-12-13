@@ -8,9 +8,12 @@ static void create(string _name)
    ::create();
 }
 
-int get_id()
+mixed get_id(void|.DataObjectInstance i)
 {
-  if(context->sql->master_sql->insert_id)
+  mixed v;
+  if(v=i->get(name))
+    return v;
+  else if(context->sql->master_sql->insert_id)
     return decode(context->sql->master_sql->insert_id());
   else if(context->sql->master_sql->last_insert_rowid)
     return decode(context->sql->master_sql->last_insert_rowid());

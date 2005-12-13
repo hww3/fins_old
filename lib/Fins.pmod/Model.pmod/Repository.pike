@@ -27,7 +27,6 @@ array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
    else
      o = ot;
    if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
-werror("n: %O\n", o->instance_name);
    return get_instance(o->instance_name)(UNDEFINED)->find(qualifiers, criteria);
 }
 

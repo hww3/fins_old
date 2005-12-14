@@ -93,7 +93,7 @@ public mixed handle_request(.Request request)
 
   .Response response = .Response(request);
 
-  if(functionp(event))
+  if(objectp(event) || functionp(event))
     event(request, response, @args);
 
   else response->set_data("Unknown event: %O\n", request->not_query);
@@ -157,13 +157,17 @@ array get_event(.Request request)
       }
       else if(cc && cc[comp] && objectp(cc[comp]))
       {
-        if(!Program.implements(object_program(cc[comp]), Fins.FinsController))
+        if(Program.implements(object_program(cc[comp]), Fins.Helpers.Runner))
         {
-          throw(Error.Generic("Component " + comp + " is not a Controller.\n"));
+          event = cc[comp];
+        }    
+        else if(Program.implements(object_program(cc[comp]), Fins.FinsController))
+        {
+          cc = cc[comp];
         }    
         else
         {
-          cc = cc[comp];
+          throw(Error.Generic("Component " + comp + " is not a Controller.\n"));
         }
       }
       else if(cc && cc["index"])

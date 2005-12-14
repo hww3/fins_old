@@ -11,7 +11,10 @@ static void create(string _name)
 mixed get_id(void|.DataObjectInstance i)
 {
   mixed v;
-  if(v=i->get(name))
+  // if we don't have an id set, we should get it.
+  catch(v=i->get(name));
+
+  if(v)
     return v;
   else if(context->sql->master_sql->insert_id)
     return decode(context->sql->master_sql->insert_id());

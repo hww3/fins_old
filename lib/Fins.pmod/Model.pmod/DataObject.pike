@@ -255,12 +255,11 @@ mapping get_atomic(.DataObjectInstance i)
 mixed get(string field, .DataObjectInstance i)
 {
 
-
    if(!fields[field])
    {
      throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
    }
-   
+
    if(objs[i->get_id()] && has_index(objs[i->get_id()][1], field))
    {
      return fields[field]->decode(objs[i->get_id()][1][field], i);

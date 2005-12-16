@@ -14,6 +14,17 @@ static void create(.Field f, object parent)
 
 }
 
+static mixed cast(string rt)
+{
+  if(rt != "array")
+    throw(Error.Generic("Cannot cast ObjectArray to " + rt + ".\n"));
+
+  if(changed)
+    get_contents();
+
+  return contents;
+}
+
 Iterator _get_iterator()
 {
   if(changed)

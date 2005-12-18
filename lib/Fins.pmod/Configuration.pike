@@ -2,6 +2,7 @@ string app_dir;
 
 static mapping values;
 
+
 //!
 static void create(string appdir, string config_file)
 {
@@ -61,4 +62,25 @@ array get_value_array(string section, string item)
   }
   
   else return ({ values[section][item] }); 
+}
+
+mixed `[](string arg)
+{
+//	werror("GOT %O\n", arg);
+  return values[arg];
+
+}
+ 
+int(0..1) _is_type(string t)
+{
+  int v=0;
+
+  switch(t)
+  {
+    case "mapping":
+      v = 1;
+      break;
+  }
+
+  return v;
 }

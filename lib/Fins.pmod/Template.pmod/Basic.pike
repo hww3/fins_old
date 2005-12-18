@@ -31,6 +31,12 @@ mixed x = gauge{
 werror("COMPILE_TIME: %O\n", x);
 }
 
+// public string get_type()
+// {
+//   return "text/html; charset=UTF-8";
+// }
+// 
+
 static array compile_template(array contents)
 {
    // TODO: we should be more thorough here.
@@ -273,15 +279,13 @@ static class ReplaceField(string scope, string name)
       mapping data = d->get_data();
       mapping m;
       m=data;
-if(name=="existing-categories.category")
-  werror("RENDER ON REPLACEFIELD: %O %O\n", name, data);
+ // werror("RENDER ON REPLACEFIELD: %O\n", name);
 
       if(!e)
 			e = name/".";
       foreach(e;int i;string elem)
       {
-if(name=="existing-categories.category")
-werror("Looking at component %O\n", elem);
+// werror("Looking at component %O\n", elem);
          if(i==(sizeof(e)-1) && mappingp(m[elem]))
          {
 				if(data->debug)

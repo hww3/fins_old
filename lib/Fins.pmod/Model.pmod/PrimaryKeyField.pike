@@ -16,9 +16,11 @@ mixed get_id(void|.DataObjectInstance i)
 
   if(v)
     return v;
-  else if(context->sql->master_sql->insert_id)
+  if(context->personality->get_last_insert_id)
+    return decode(context->personality->get_last_insert_id(this, i));
+  if(context->sql->master_sql->insert_id)
     return decode(context->sql->master_sql->insert_id());
-  else if(context->sql->master_sql->last_insert_rowid)
+  if(context->sql->master_sql->last_insert_rowid)
     return decode(context->sql->master_sql->last_insert_rowid());
 }
 
@@ -32,7 +34,7 @@ string encode(mixed|void value, void|.DataObjectInstance i)
   value = validate(value);
 
   if(value == .Undefined)
-    return "NULL";
+    return context->personality->get_serial_insert_value();
 
   return (string)value;
 }

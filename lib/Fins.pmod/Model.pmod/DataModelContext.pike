@@ -7,6 +7,9 @@ object repository;
 //!
 object cache;
 
+//! 
+object personality;
+
 //!
 object app;
 
@@ -28,7 +31,7 @@ string type()
   return (sprintf("%O", object_program(sql->master_sql))/".")[-1];
 }
 
-program personality()
+program get_personality()
 {
   if(!sql) throw(Error.Generic("No SQL connection defined.\n"));
 
@@ -37,10 +40,10 @@ program personality()
 
 int initialize()
 {
-  program p = personality();
+  program p = get_personality();
   if(!p) throw(Error.Generic("Unknown database type. No personality.\n"));
 
-  object dp = p(sql);
+  personality = p(sql);
 
-  dp->initialize();
+  personality->initialize();
 }

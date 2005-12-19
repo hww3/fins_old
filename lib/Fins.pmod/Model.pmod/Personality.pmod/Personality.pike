@@ -14,3 +14,4 @@ string get_serial_insert_value()
 {
 	return "NULL";
 }
+

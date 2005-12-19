@@ -17,6 +17,7 @@ static void create(string _name, string _myfield, string _otherobject, void|.Cri
 // other object we're about to get.
 mixed decode(string value, void|.DataObjectInstance i)
 {
+//	werror("INSTANCE: %O\n", i);
   return i->master_object->context->repository["find_by_id"](otherobject, (int)value);
 }
 

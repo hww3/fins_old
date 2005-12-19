@@ -278,7 +278,8 @@ mixed get(string field, .DataObjectInstance i)
    }
    else 
    {
-     return fields[field]->decode(result[0][fields[field]->field_name]);
+//	  werror("R: %O, %O\n", result[0], fields[field]->field_name);
+     return fields[field]->decode(result[0][fields[field]->field_name], i);
    }
 }
 

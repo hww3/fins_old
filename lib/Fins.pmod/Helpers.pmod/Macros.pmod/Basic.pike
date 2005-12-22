@@ -17,3 +17,22 @@ string simple_macro_sizeof(Fins.Template.TemplateData data, mapping|void args)
 
 }
 
+
+string simple_macro_boolean(Template.TemplateData data, mapping|void args)
+{
+        mixed v = get_var_value(args->var, data->get_data());
+                if (intp(v))
+                {
+                        return (v != 0)?"Yes":"No";
+                }
+                else if(stringp(v))
+                {
+                        return ((int)v != 0)?"Yes":"No";
+                }
+                else
+                {
+                        return "invalid type for boolean ";
+                }
+}
+
+

@@ -18,7 +18,7 @@ string simple_macro_sizeof(Fins.Template.TemplateData data, mapping|void args)
 }
 
 
-string simple_macro_boolean(Template.TemplateData data, mapping|void args)
+string simple_macro_boolean(Fins.Template.TemplateData data, mapping|void args)
 {
         mixed v = get_var_value(args->var, data->get_data());
                 if (intp(v))

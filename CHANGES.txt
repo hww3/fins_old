@@ -1,0 +1,6 @@
+Version 0.1
+
+- added macros library: boolean, sizeof, capitalize
+- added javascript macros: remote_form, javascript_includes
+- add_ref() is called more consistently when creating new 
+  data object instances.

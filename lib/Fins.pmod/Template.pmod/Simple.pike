@@ -371,7 +371,7 @@ class PikeBlock
        foreach(a->var/".";;string v)
         ac += ({ "[\"" + v + "\"]" }); 
        return " catch { foreach(data" + (ac*"") + ";; mixed __q) {"
-         "mapping odata=data; mapping data=odata + ([\"" + a->val + "\":__q]);" ;
+         "object __d = __d->clone(); __d->add(\"" + a->val + "\", __q); mapping odata=data; mapping data=odata + ([\"" + a->val + "\":__q]);" ;
        break;
 
      case "end":

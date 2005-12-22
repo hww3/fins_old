@@ -42,7 +42,6 @@ static void create(mixed|void id, object _object_type)
     master_object = _object_type;
      object_type = _object_type->instance_name;
   }
-werror("DataObjectInstance\n");
    
 
   if(id == UNDEFINED)
@@ -153,7 +152,6 @@ int is_new_object()
 
 mixed `[]=(mixed i, mixed v)
 {
-//  werror("ARGS: %O\n", query_num_arg());
   if(!v && zero_type(v) == 1)
   {
     return get(i);

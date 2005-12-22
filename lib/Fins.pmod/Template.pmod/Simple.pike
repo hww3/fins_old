@@ -30,9 +30,7 @@ static void create(string templatename, .TemplateContext|void context_obj)
    context->type = object_program(this);
 
    string template = load_template(templatename);
-werror("loaded template.\n");
    string psp = parse_psp(template, templatename);
-werror("parsed template.\n");
    script = psp;   
 mixed x = gauge{
    compiled_template = compile_string(template, templatename );
@@ -140,7 +138,6 @@ string parse_psp(string file, string realname)
   pikescript+="object __context; static void create(object context){__context = context; }\n void render(String.Buffer buf, Fins.Template.TemplateData __d){ mapping data = __d->get_data();\n";
 
   array(Block) contents = psp_to_blocks(file, realname);
-werror("psp_to_blocks() finished.\n");
   string ps, h;
  
   [ps, h] = render_psp(contents, "", "");
@@ -394,8 +391,7 @@ class PikeBlock
        function f = Fins.Template.get_simple_macro(cmd);
        if(!f)
          throw(Error.Generic(sprintf("PSP format error: invalid command at line %d.\n", start)));
-       return "werror(\"" + cmd + "\\n\"); werror(\"%O\\n\", buf->add(Fins.Template.get_simple_macro(\"" + cmd + "\")(__d, " + argify(arg) + ")));"
-              "werror(\"%O\\n\", " + argify(arg) + ");";
+       return " buf->add(Fins.Template.get_simple_macro(\"" + cmd + "\")(__d, " + argify(arg) + "));";
 //       return "werror(\"" + cmd + "\\n\"); (Fins.Template.get_simple_macro(\"" + cmd + "\");//(__d, "
 //               + argify(arg) + "));";
        break;

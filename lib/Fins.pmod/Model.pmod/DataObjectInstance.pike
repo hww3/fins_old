@@ -37,12 +37,12 @@ string get_type()
 
 static void create(mixed|void id, object _object_type)
 {
-
   if(objectp(_object_type)) 
   {
     master_object = _object_type;
      object_type = _object_type->instance_name;
   }
+werror("DataObjectInstance\n");
    
 
   if(id == UNDEFINED)
@@ -55,6 +55,8 @@ static void create(mixed|void id, object _object_type)
     master_object->load(id, this);
     master_object->add_ref(this);
   }
+
+
 }
 
 void refresh()
@@ -75,7 +77,7 @@ void refresh()
    .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object);  
 
     master_object->load(id, new_object);
-
+    master_object->add_ref(new_object);
    return new_object;
 }
 

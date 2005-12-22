@@ -172,6 +172,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
     item->set_id(primary_key->decode(row[fn]));
     item->set_new_object(0);
     low_load(row, item, _fieldnames);
+    add_ref(item);
     results+= ({ item  });
   }
 

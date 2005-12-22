@@ -10,7 +10,7 @@ public string render(.TemplateData d);
 //! we should really do more here...
 static string load_template(string templatename)
 {
-   werror("loading template " + templatename + " from " + context->application->config->app_dir + "\n");
+//   werror("loading template " + templatename + " from " + context->application->config->app_dir + "\n");
    string template = Stdio.read_file(
                           combine_path(context->application->config->app_dir, 
                                        "templates/" + templatename));

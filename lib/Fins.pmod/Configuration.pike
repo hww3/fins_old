@@ -66,7 +66,7 @@ array get_value_array(string section, string item)
 
 mixed `[](string arg)
 {
-//	werror("GOT %O\n", arg);
+//      werror("GOT %O\n", arg);
   return values[arg];
 
 }
@@ -84,3 +84,4 @@ int(0..1) _is_type(string t)
 
   return v;
 }
+

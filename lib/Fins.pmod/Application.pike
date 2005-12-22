@@ -1,5 +1,8 @@
 //! this is the base application class.
 
+inherit Fins.Helpers.Macros.JavaScript;
+inherit Fins.Helpers.Macros.Basic;
+
 //!
 .FinsController controller;
 
@@ -29,8 +32,16 @@ static void create(.Configuration _config)
    load_view();
    load_controller();
 
-   .Template.add_simple_macro("capitalize", macro_capitalize);
-   .Template.add_simple_macro("flash", macro_flash);
+   load_macros();
+}
+
+void load_macros()
+{
+  foreach(glob("simple_macro_*", indices(this)); ; string mf)
+  {
+    werror("loading macro %O\n", mf[13..]);
+    .Template.add_simple_macro(mf[13..], this[mf]);
+  }
 }
 
 void load_cache()

@@ -1,9 +1,13 @@
 #!/usr/local/bin/pike -Mlib
 
 constant default_port = 8080;
-constant my_version = "0.0";
+constant my_version = "0.1";
 
-string session_storagedir = "/tmp/scriptrunner_storage";
+string session_storagetype = "ram";
+//string session_storagetype = "file";
+//string session_storagetype = "sqlite";
+//string session_storagedir = "/tmp/scriptrunner_storage";
+string session_storagedir = "/tmp/scriptrunner_storage.db";
 string logfile_path = "/tmp/scriptrunner.log";
 string session_cookie_name = "PSESSIONID";
 int session_timeout = 3600;
@@ -63,9 +67,23 @@ int main(int argc, array(string) argv)
 
 void session_startup()
 {
+  Session.SessionStorage s;
   session_manager = Session.SessionManager();
-  Session.SessionStorage s = Session.FileSessionStorage();
-  s->set_storagedir(session_storagedir);
+
+  if(session_storagetype == "ram")
+  {
+    s = Session.RAMSessionStorage();
+  }
+  if(session_storagetype == "file")
+  {
+    s = Session.FileSessionStorage();
+    s->set_storagedir(session_storagedir);
+  }
+  else if(session_storagetype == "sqlite")
+  {
+    s = Session.SQLiteSessionStorage();
+    s->set_storagedir(session_storagedir);
+  }
   session_manager->set_default_timeout(session_timeout);
   session_manager->set_cleaner_interval(session_timeout);
   session_manager->session_storage = ({s});

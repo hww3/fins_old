@@ -4,3 +4,5 @@ Version 0.1
 - added javascript macros: remote_form, javascript_includes
 - add_ref() is called more consistently when creating new 
   data object instances.
+- added support for cache headers for /static/ requests.
+- added Response()->not_modified()

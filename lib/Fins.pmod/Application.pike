@@ -80,7 +80,6 @@ void load_model()
 public mixed handle_request(.Request request)
 {
   function event;
-
   // we have to short circuit this one...
   if(request->not_query == "/favicon.ico")
   {
@@ -223,6 +222,15 @@ array get_event(.Request request)
     return response;
   }
   
+  if(request->request_headers["if-modified-since"] && 
+      Protocols.HTTP.Server.http_decode_date(request->request_headers["if-modified-since"]) 
+        > stat->mtime) 
+  {
+    response->not_modified();
+    return response;
+  }
+
+  response->set_header("Cache-Control", "max-age=3600");
   response->set_type(Protocols.HTTP.Server.filename_to_type(basename(fn)));
   response->set_file(Stdio.File(fn));
 

@@ -89,6 +89,12 @@
                      "<p/>&nbsp;<p/>&nbsp;<p/>\n<hr/>\n<i>Fins</i>";
 
   }
+
+  //!
+  public void not_modified()
+  {
+    response->error = 304;
+  }
   
   //!
   public void redirect(string to)

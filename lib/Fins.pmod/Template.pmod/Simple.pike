@@ -18,7 +18,7 @@ string script;
 string templatename;
 array contents = ({});
 program compiled_template;
-
+multiset macros_used = (<>);
 //!
 static void create(string templatename, .TemplateContext|void context_obj)
 {
@@ -28,6 +28,8 @@ static void create(string templatename, .TemplateContext|void context_obj)
       context = context_obj;
 
    context->type = object_program(this);
+
+   this->templatename = templatename;
 
    string template = load_template(templatename);
    string psp = parse_psp(template, templatename);
@@ -144,8 +146,11 @@ string parse_psp(string file, string realname)
 
   pikescript += ps;
 
+  foreach(macros_used; string macroname ;)
+    header += ("function __macro_" + macroname + " = Fins.Template.get_simple_macro(\"" + macroname + "\");");
+
+
   header += h;
- 
   return header + "\n\n" + pikescript + "}";
 }
 
@@ -340,7 +345,7 @@ class PikeBlock
      array a = array_sscanf(expr, "%[a-zA-Z0-9_] %s");
      if(sizeof(a) !=2)
      {
-       throw(Error.Generic(sprintf("PSP format error: invalid command format at line %d.\n", start)));
+       throw(Error.Generic(sprintf("PSP format error: invalid command format in %s at line %d.\n", templatename, start)));
      }
 
      arg = String.trim_all_whites(a[1]);
@@ -364,7 +369,7 @@ class PikeBlock
        mapping a = p_argify(arg);
        if(!a->var && a->val)
        {
-         throw(Error.Generic(sprintf("PSP format error: invalid foreach syntax at line %d.\n", start)));
+         throw(Error.Generic(sprintf("PSP format error: invalid foreach syntax in %s at line %d.\n", templatename, start)));
        }
        array ac = ({});
 
@@ -388,10 +393,17 @@ class PikeBlock
        break;
 
      default:
+       string rx = "";
        function f = Fins.Template.get_simple_macro(cmd);
        if(!f)
          throw(Error.Generic(sprintf("PSP format error: invalid command at line %d.\n", start)));
-       return " buf->add(Fins.Template.get_simple_macro(\"" + cmd + "\")(__d, " + argify(arg) + "));";
+
+       macros_used[cmd] ++;
+
+       return ("{catch{ "
+              " buf->add(__macro_" + cmd + "(__d, " + argify(arg) + "));};}");
+//       macros_used[cmd] = 1;
+//       return " buf->add(Fins.Template.get_simple_macro(\"" + cmd + "\")(__d, " + argify(arg) + "));";
 //       return "werror(\"" + cmd + "\\n\"); (Fins.Template.get_simple_macro(\"" + cmd + "\");//(__d, "
 //               + argify(arg) + "));";
        break;
@@ -440,7 +452,7 @@ class PikeBlock
    exp = String.trim_all_whites(exp);
  
    if(search(exp, "\n")!=-1)
-     throw(Error.Generic("PSP format error: invalid directive format.\n"));
+     throw(Error.Generic("PSP format error: invalid directive format in " + templatename + ".\n"));
  
    // format of a directive is: keyword option="value" ...
  
@@ -455,7 +467,7 @@ class PikeBlock
        break;
 
      default:
-       throw(Error.Generic("PSP format error: unknown directive " + keyword + ".\n"));
+       throw(Error.Generic("PSP format error: unknown directive " + keyword + " in " + templatename + ".\n"));
  
    }
  }
@@ -466,14 +478,14 @@ class PikeBlock
    string file;
    string contents;
 
-   if(includes > max_includes) throw(Error.Generic("PSP Error: too many includes, possible recursion!\n")); 
+   if(includes > max_includes) throw(Error.Generic("PSP Error: too many includes, possible recursion in " + templatename + " !\n")); 
 
    includes++;
 
    int r = sscanf(exp, "%*sfile=\"%s\"%*s", file);
  
    if(r != 3) 
-     throw(Error.Generic("PSP format error: unknown include format.\n"));
+     throw(Error.Generic("PSP format error: unknown include format in " + templatename + ".\n"));
 
    contents = load_template(file);
  

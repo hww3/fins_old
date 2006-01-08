@@ -247,5 +247,3 @@ string macro_flash(.Template.TemplateData data, string|void args)
 {
   return (data->get_flash()[args]||"");
 }
-
-

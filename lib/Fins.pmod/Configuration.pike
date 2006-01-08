@@ -1,4 +1,5 @@
 string app_dir;
+string app_name;
 
 static mapping values;
 
@@ -7,6 +8,8 @@ static mapping values;
 static void create(string appdir, string config_file)
 {
         app_dir = appdir;
+        app_name = (appdir/"/")[-1];
+
 	string fc = Stdio.read_file(config_file);
 	
 	// the "spec" says that the file is utf-8 encoded.

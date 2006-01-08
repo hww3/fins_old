@@ -1,11 +1,13 @@
+object fins_app;
+
 //! returns a 3 letter iso 639 language code based on accept-language headers
 //!
 //! @todo
 //! this value is cached for the life of the session
 string get_lang()
 {
-  if(misc->session_variables->__lang)
-    return misc->session_variables->__lang;
+  if(this->misc->session_variables->__lang)
+    return this->misc->session_variables->__lang;
 
   // we need to figure out the language.
 //  else
@@ -15,8 +17,8 @@ string get_lang()
     array al = ({});
     array aq = ({});
 
-    if(request_headers["accept-language"])
-      lh = request_headers["accept-language"];
+    if(this->request_headers["accept-language"])
+      lh = this->request_headers["accept-language"];
 
     foreach(lh/",";;string lang)
     {
@@ -38,11 +40,11 @@ string get_lang()
     al = reverse(al);
 
     al = map_languages(al);
-    array available = Locale.list_languages(LOCALE_PROJECT);
+    array available = Locale.list_languages(fins_app->config->app_name);
 
 #ifdef DEBUG
     werror("REQUESTED LANGUAGES: %O\n", al);
-    werror("AVAILABLE LANGUAGES: %O\n", Locale.list_languages(LOCALE_PROJECT));
+    werror("AVAILABLE LANGUAGES: %O\n", Locale.list_languages(fins_app->config->app_name));
 #endif
     foreach(al;;string desired)
       if(search(available, desired) != -1)
@@ -53,7 +55,7 @@ string get_lang()
 		#ifdef DEBUG
 		     werror("SELECTED LANGUAGE: %O\n", lang);
 		#endif
-		    misc->session_variables->__lang = lang;
+		    this->misc->session_variables->__lang = lang;
 		    return lang;
 		  }
 		}

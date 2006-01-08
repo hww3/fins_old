@@ -80,6 +80,9 @@ void load_model()
 public mixed handle_request(.Request request)
 {
   function event;
+
+  request->fins_app = this;
+
   // we have to short circuit this one...
   if(request->not_query == "/favicon.ico")
   {

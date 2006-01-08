@@ -6,3 +6,7 @@ Version 0.1
   data object instances.
 - added support for cache headers for /static/ requests.
 - added Response()->not_modified()
+- added Response()->get_lang() for localization
+- added Response()->fins_app
+- added Configuration()->app_name
+- Template.Simple macro functionality is slightly optimized

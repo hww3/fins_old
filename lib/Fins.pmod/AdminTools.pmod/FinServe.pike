@@ -1,4 +1,6 @@
-#!/usr/local/bin/pike -Mlib
+#!/usr/local/bin/pike -Mlib -DLOCALE_DEBUG
+
+import Tools.Logging;
 
 constant default_port = 8080;
 constant my_version = "0.1";
@@ -74,12 +76,12 @@ int main(int argc, array(string) argv)
 		return 0;
 	}
 
-  write("FinServe starting on port " + my_port + "\n");
+  Log.info("FinServe starting on port " + my_port);
 
-  write("Starting Session Manager...\n");
+  Log.info("Starting Session Manager.");
   call_out(session_startup, 0);
 
-  write("FinServe loading application " + project + " using configuration " + config_name + "\n");
+  Log.info("FinServe loading application " + project + " using configuration " + config_name);
   load_application();
 
   if(hilfe_mode)
@@ -135,7 +137,7 @@ void session_startup()
 
 void handle_request(Protocols.HTTP.Server.Request request)
 {
-  write(sprintf("got request: %O\n", request));
+  Log.debug("got request: %O", request);
   mixed r;
 
   // Do we have either the session cookie or the PSESSIONID var?
@@ -165,7 +167,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
     }
     response->redirect(req);
 
-    werror( "Created new session sid='%s' host='%s'\n",ssid,request->remoteaddr);
+    Log.debug( "Created new session sid='%s' host='%s'",ssid,request->remoteaddr);
     request->response_and_finish(response->get_response());
     return;
   }
@@ -176,8 +178,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
 
   if(e)
   {
-    write("Error occurred while handling request!\n");
-    werror(describe_backtrace(e));
+    Log.exception("Error occurred while handling request!", e);
     mapping response = ([]);
     response->error=500;
     response->type="text/html";
@@ -223,7 +224,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
 
   if(e)
   {
-    write("Internal Server Error!\n");
+    Log.exception("Internal Server Error!", e);
     mapping response = ([]);
     response->error=500;
     response->type="text/html";
@@ -244,7 +245,7 @@ void load_application()
 
   if(!application)
   {
-    werror("No Application!\n");
+    Log.critical("No Application!");
     exit(1);
   }
 

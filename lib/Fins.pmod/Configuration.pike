@@ -3,7 +3,6 @@ string app_name;
 
 static mapping values;
 
-
 //!
 static void create(string appdir, string config_file)
 {
@@ -67,6 +66,7 @@ array get_value_array(string section, string item)
   else return ({ values[section][item] }); 
 }
 
+//!
 mixed `[](string arg)
 {
 //      werror("GOT %O\n", arg);

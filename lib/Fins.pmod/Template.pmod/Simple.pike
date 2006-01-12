@@ -52,7 +52,7 @@ public string render(.TemplateData d)
 program compile_string(string code, string realfile)
 {
   string psp = parse_psp(code, realfile);
-
+werror("PSP: %O\n", psp);
   return predef::compile_string(psp, realfile);
 }
 
@@ -134,20 +134,24 @@ string parse_psp(string file, string realname)
   // now, let's render some pike!
   string pikescript = "";
   string header = "";
-  pikescript+="object __context; static void create(object context){__context = context; }\n void render(String.Buffer buf, Fins.Template.TemplateData __d){ mapping data = __d->get_data();\n";
+  string initialization = "";
 
   array(Block) contents = psp_to_blocks(file, realname);
   string ps, h;
  
   [ps, h] = render_psp(contents, "", "");
 
-  pikescript += ps;
 
   foreach(macros_used; string macroname ;)
-    header += ("function __macro_" + macroname + " = __context->get_simple_macro(\"" + macroname + "\");");
-
+  {
+    header += ("function __macro_" + macroname + ";");
+    initialization += ("__macro_" + macroname + " = __context->view->get_simple_macro(\"" + macroname + "\");");
+  }
 
   header += h;
+  pikescript+=("object __context; static void create(object context){__context = context; " + initialization + "}\n void render(String.Buffer buf, Fins.Template.TemplateData __d){ mapping data = __d->get_data();\n");
+  pikescript += ps;
+
   return header + "\n\n" + pikescript + "}";
 }
 
@@ -391,7 +395,7 @@ class PikeBlock
 
      default:
        string rx = "";
-       function f = context->get_simple_macro(cmd);
+       function f = context->view->get_simple_macro(cmd);
        if(!f)
          throw(Error.Generic(sprintf("PSP format error: invalid command at line %d.\n", start)));
 
@@ -484,7 +488,7 @@ class PikeBlock
    if(r != 3) 
      throw(Error.Generic("PSP format error: unknown include format in " + templatename + ".\n"));
 
-   contents = load_template(file + ".phtml");
+   contents = load_template(file);
  
  //werror("contents: %O\n", contents);
  

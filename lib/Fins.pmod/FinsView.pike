@@ -23,9 +23,9 @@ static void load_macros()
 {
   foreach(glob("simple_macro_*", indices(this)); ; string mf)
   {
-#ifdef DEBUG
+//#ifdef DEBUG
     werror("loading macro %O\n", mf[13..]);
-#endif
+//#endif
     add_simple_macro(mf[13..], this[mf]);
   }
 }
@@ -42,6 +42,33 @@ public function get_simple_macro(string name)
   return simple_macros[name];
 }
 
+//!
+public string render_partial(string view, mapping data, string|void collection_name, array|void collection)
+{
+	string result = "";
+	object v = get_view(view);
+	
+	if(collection_name)
+	{
+		foreach(collection;; mixed c)
+		{
+			mapping d = data + ([]);
+			d[collection_name] = c;
+			
+			v->data->set_data(d);
+			result += v->render();
+		}
+	}
+    else
+	{
+		v->data->set_data(data);
+		result += v->render();
+	}	
+	
+	return result;
+}
+
+//!
 public Template.View get_view(string tn)
 {
   object t;
@@ -50,7 +77,7 @@ public Template.View get_view(string tn)
 
   object d = default_data();
 
-  d->set_data((["config": app()->config])); 
+  d->set_data((["config": config])); 
 
   return Template.View(t, d);
 }
@@ -102,11 +129,13 @@ public int flush_template(string templateName)
    return 0;
 }
 
+//!
 string macro_capitalize(.Template.TemplateData data, string|void args)
 {
   return String.capitalize(data->get_data()[args]||"");
 }
 
+//!
 string macro_flash(.Template.TemplateData data, string|void args)
 {
   return (data->get_flash()[args]||"");

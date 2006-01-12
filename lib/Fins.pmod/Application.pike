@@ -32,28 +32,28 @@ static void create(.Configuration _config)
    start();
 }
 
+//!
 void start()
 {
 	
 }
 
-void load_cache()
+static void load_cache()
 {
   werror("Starting Cache...\n");
 
   cache = .FinsCache();
 }
 
-void load_view()
+static void load_view()
 {
   string viewclass = config->get_value("view", "class");
   if(viewclass)
     view = ((program)viewclass)(this);
   else werror("No view defined!\n");
-
 }
 
-void load_controller()
+static void load_controller()
 {
   string conclass = config->get_value("controller", "class");
   if(conclass)
@@ -61,7 +61,7 @@ void load_controller()
   else werror("No controller defined!\n");
 }
 
-void load_model()
+static void load_model()
 {
   string modclass = config->get_value("model", "class");
   if(modclass)

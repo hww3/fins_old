@@ -20,22 +20,19 @@ array contents = ({});
 program compiled_template;
 multiset macros_used = (<>);
 //!
-static void create(string templatename, .TemplateContext|void context_obj)
+static void create(string _templatename, .TemplateContext|void context_obj)
 {
-   if(!context_obj)
-     context = .TemplateContext();
-   else
-      context = context_obj;
+   context = context_obj;
 
    context->type = object_program(this);
 
-   this->templatename = templatename;
+   templatename = _templatename + ".phtml";
 
    string template = load_template(templatename);
    string psp = parse_psp(template, templatename);
    script = psp;   
 mixed x = gauge{
-   compiled_template = compile_string(template, templatename );
+   compiled_template = compile_string(template, templatename);
 };
 
 }
@@ -147,7 +144,7 @@ string parse_psp(string file, string realname)
   pikescript += ps;
 
   foreach(macros_used; string macroname ;)
-    header += ("function __macro_" + macroname + " = Fins.Template.get_simple_macro(\"" + macroname + "\");");
+    header += ("function __macro_" + macroname + " = __context->get_simple_macro(\"" + macroname + "\");");
 
 
   header += h;
@@ -394,7 +391,7 @@ class PikeBlock
 
      default:
        string rx = "";
-       function f = Fins.Template.get_simple_macro(cmd);
+       function f = context->get_simple_macro(cmd);
        if(!f)
          throw(Error.Generic(sprintf("PSP format error: invalid command at line %d.\n", start)));
 
@@ -487,7 +484,7 @@ class PikeBlock
    if(r != 3) 
      throw(Error.Generic("PSP format error: unknown include format in " + templatename + ".\n"));
 
-   contents = load_template(file);
+   contents = load_template(file + ".phtml");
  
  //werror("contents: %O\n", contents);
  

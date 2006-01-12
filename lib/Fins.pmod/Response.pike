@@ -45,6 +45,11 @@
     return 1;
   }
 
+  public void set_view(Fins.Template.View v)
+  {
+    set_template(v->template, v->data);	
+  }
+
   //!
   public void set_template(Fins.Template.Template t, Fins.Template.TemplateData d)
   {

@@ -52,7 +52,7 @@ public string render(.TemplateData d)
 program compile_string(string code, string realfile)
 {
   string psp = parse_psp(code, realfile);
-werror("PSP: %O\n", psp);
+//werror("PSP: %O\n", psp);
   return predef::compile_string(psp, realfile);
 }
 

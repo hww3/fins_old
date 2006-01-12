@@ -78,7 +78,7 @@ mixed validate(mixed value, void|.DataObjectInstance i)
    {
      return unit_parse(value);
    }
-   if(objectp(value) && Program.implements(object_program(value), Calendar.YMD.YMD))
+   if(objectp(value) && Program.implements(object_program(value), unit_program))
    {
      return value;
    }

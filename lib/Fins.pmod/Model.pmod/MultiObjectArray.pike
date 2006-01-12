@@ -10,10 +10,12 @@ void get_contents()
 mixed `+(mixed arg)
 {
 
+werror("otherobject: %O\n", otherobject);
+
   // do we have the right kind of object?
   if(!objectp(arg) || !arg->master_object || arg->master_object != otherobject)
   {
-    throw(Error.Generic("Wrong kind of object: got " + sprintf("%O", arg) + ", expected DataObjectInstance.\n"));
+    throw(Error.Generic("Wrong kind of object: got " + sprintf("%O", arg) + ", expected " + otherobject->instance_name + ".\n"));
   }
 
   // ok, we have the right kind of object, now we need to get the id.

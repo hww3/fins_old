@@ -1,3 +1,5 @@
+import Tools.Logging;
+
 Fins.Application load_app(string app_dir, string config_name)
 {
   string cn;
@@ -25,7 +27,7 @@ Fins.Configuration load_configuration(string app_dir, string config_name)
 {
 	string config_file = combine_path(app_dir, "config", config_name+".cfg");
 
-	werror("config file: " + config_file + "\n");
+	Log.debug("config file: " + config_file);
 
    Stdio.Stat stat = file_stat(config_file);
 	if(!stat || stat->isdir)

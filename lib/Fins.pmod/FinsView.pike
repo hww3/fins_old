@@ -1,3 +1,4 @@
+import Tools.Logging;
 import Fins;
 inherit FinsBase : base;
 inherit Fins.Helpers.Macros.JavaScript;
@@ -24,7 +25,7 @@ static void load_macros()
   foreach(glob("simple_macro_*", indices(this)); ; string mf)
   {
 //#ifdef DEBUG
-    werror("loading macro %O\n", mf[13..]);
+    Log.debug("loading macro %O", mf[13..]);
 //#endif
     add_simple_macro(mf[13..], this[mf]);
   }

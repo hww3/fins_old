@@ -55,12 +55,6 @@
   {
      template = t;
      template_data = d;
-     mapping f = ([]);
-     if(request && request->misc->flash)
-       f+=(request->misc->flash);
-     if(request && request->misc->session_variables->__flash)
-       f+=(request->misc->session_variables->__flash);
-     template_data->set_flash(f);
      if(!response->error) response->error = 200;
   }
 
@@ -133,6 +127,13 @@
      if(!response->error) return 0;
      if(template)
      {
+       mapping f = ([]);
+       if(request && request->misc->flash)
+         f+=(request->misc->flash);
+       if(request && request->misc->session_variables->__flash)
+         f+=(request->misc->session_variables->__flash);
+       template_data->set_flash(f);
+
         response->data = template->render(template_data);
         response["extra_heads"]["content-type"] = template->get_type();
         response->file = 0;

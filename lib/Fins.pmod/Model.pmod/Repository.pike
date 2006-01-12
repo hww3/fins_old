@@ -1,3 +1,4 @@
+import Tools.Logging;
 
 mapping(string:.DataObject) object_definitions = ([]);
 mapping(string:program) instance_definitions = ([]);
@@ -14,7 +15,7 @@ program get_instance(string name)
 
 void add_object_type(.DataObject t, program i)
 {
-werror("adding type def: %O\n", t->instance_name);
+   Log.debug("adding type def: %O", t->instance_name);
    object_definitions[t->instance_name] = t;
    instance_definitions[t->instance_name] = i;
 }

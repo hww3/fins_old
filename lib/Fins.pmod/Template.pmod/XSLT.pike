@@ -11,7 +11,7 @@ XML2.Stylesheet stylesheet;
 
 static void create(string template)
 {
-   templatename = template;
+   templatename = template + ".xslt";
    compile_template();
 }
 

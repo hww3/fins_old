@@ -19,20 +19,60 @@ Protocols.HTTP.Server.Port port;
 #if constant(_Protocols_DNS_SD)
 Protocols.DNS_SD.Service bonjour;
 #endif
+
+int hilfe_mode = 0;
 string project = "default";
 string config_name = "dev";
+int go_background = 0;
+void print_help()
+{
+	werror("Help: fin_serve [-p portnum|--port=portnum|--hilfe] [-d]  appname configname\n");
+}
 
 int main(int argc, array(string) argv)
 {
   int my_port = default_port;
 
-  if(argc>1 && argv[1]!="hilfe")
-  {
-    my_port=(int)argv[1];
-  }
+  foreach(Getopt.find_all_options(argv,aggregate(
+    ({"port",Getopt.HAS_ARG,({"-p", "--port"}) }),
+    ({"daemon",Getopt.NO_ARG,({"-d"}) }),
+    ({"hilfe",Getopt.NO_ARG,({"--hilfe"}) }),
+    ({"help",Getopt.NO_ARG,({"--help"}) }),
+    )),array opt)
+    {
+      switch(opt[0])
+      {
+		case "port":
+		my_port = opt[1];
+		break;
+		
+		case "hilfe":
+		hilfe_mode = 1;
+		break;
+		
+		case "daemon":
+		go_background = 1;
+		break;
+		
+        case "help":
+		print_help();
+		return 0;
+		break;
+	  }
+	}
+	
+	argv-=({0});
+	argc = sizeof(argv);
 
-  if(argc>2) project = argv[2];
-  if(argc>3) config_name = argv[3];
+
+  if(argc>=2) project = argv[1];
+  if(argc>=3) config_name = argv[2];
+
+  if(!hilfe_mode && go_background && fork())
+	{
+		werror("Entered Daemon mode...\n");
+		return 0;
+	}
 
   write("FinServe starting on port " + my_port + "\n");
 
@@ -42,7 +82,7 @@ int main(int argc, array(string) argv)
   write("FinServe loading application " + project + " using configuration " + config_name + "\n");
   load_application();
 
-  if(argc>1 && argv[1] == "hilfe")
+  if(hilfe_mode)
   {
     write("Starting interactive interpreter...\n");
     add_constant("application", app);

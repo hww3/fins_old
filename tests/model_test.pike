@@ -4,7 +4,7 @@ object repo;
 
 int main()
 {
-   object s = Sql.Sql("mysql://hww3:f00bar@localhost/hww3");
+   object s = Sql.Sql("mysql://hww3:jabberw0@localhost/hww3");
    object d = Fins.Model.DataModelContext(); 
 
    d->sql = s;

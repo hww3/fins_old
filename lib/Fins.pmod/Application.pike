@@ -217,7 +217,7 @@ array get_event(.Request request)
     response->not_found(request->not_query);
     return response;
   }
-  
+
   if(request->request_headers["if-modified-since"] && 
       Protocols.HTTP.Server.http_decode_date(request->request_headers["if-modified-since"]) 
         > stat->mtime) 
@@ -226,7 +226,7 @@ array get_event(.Request request)
     return response;
   }
 
-  response->set_header("Cache-Control", "max-age=3600");
+  response->set_header("Cache-Control", "max-age=7200");
   response->set_type(Protocols.HTTP.Server.filename_to_type(basename(fn)));
   response->set_file(Stdio.File(fn));
 

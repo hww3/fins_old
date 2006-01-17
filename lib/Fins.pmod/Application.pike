@@ -1,3 +1,5 @@
+import Tools.Logging;
+
 //! this is the base application class.
 
 //!
@@ -75,6 +77,8 @@ public mixed handle_request(.Request request)
   function event;
 
   request->fins_app = this;
+
+  Log.info("SESSION INFO: %O", request->misc->session_variables);
 
   // we have to short circuit this one...
   if(request->not_query == "/favicon.ico")

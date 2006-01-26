@@ -49,26 +49,26 @@ static void load_cache()
 
 static void load_view()
 {
-  string viewclass = config->get_value("view", "class");
+  string viewclass = (config["view"] ? config["view"]["class"] :0);
   if(viewclass)
     view = ((program)viewclass)(this);
-  else werror("No view defined!\n");
+  else Log.debug("No view defined!");
 }
 
 static void load_controller()
 {
-  string conclass = config->get_value("controller", "class");
+  string conclass = (config["controller"]? config["controller"]["class"] :0);
   if(conclass)
     controller = ((program)conclass)(this);
-  else werror("No controller defined!\n");
+  else Log.debug("No controller defined!");
 }
 
 static void load_model()
 {
-  string modclass = config->get_value("model", "class");
+  string modclass = (config["model"] ? config["model"]["class"] : 0);
   if(modclass)
     model = ((program)modclass)(this);
-  else werror("No model defined!\n");
+  else Log.debug("No model defined!");
 }
 
 //!

@@ -21,7 +21,6 @@ Protocols.HTTP.Server.Port port;
 #if constant(_Protocols_DNS_SD)
 Protocols.DNS_SD.Service bonjour;
 #endif
-
 int hilfe_mode = 0;
 string project = "default";
 string config_name = "dev";
@@ -84,6 +83,8 @@ int main(int argc, array(string) argv)
   Log.info("FinServe loading application " + project + " using configuration " + config_name);
   load_application();
 
+  app->__fin_serve = this;
+
   if(hilfe_mode)
   {
     write("Starting interactive interpreter...\n");
@@ -137,7 +138,7 @@ void session_startup()
 
 void handle_request(Protocols.HTTP.Server.Request request)
 {
-  Log.debug("got request: %O", request);
+  Log.debug("Received %O", request);
   mixed r;
 
   // Do we have either the session cookie or the PSESSIONID var?
@@ -150,27 +151,6 @@ void handle_request(Protocols.HTTP.Server.Request request)
     request->misc->session_id = sess->id;
     request->misc->session_variables = sess->data;
   }
-  // if we don't have the session identifier set, we should set one.
-  else
-  {
-    Fins.Response response = Fins.Response(request);
-
-    string ssid=session_manager->new_sessionid();
-    response->set_cookie(session_cookie_name,
-                           ssid, time() + session_timeout);
-
-    string req=request->not_query;
-    req += "?PSESSIONID="+ssid;
-    if( sizeof(request->query) )
-    {
-      req += "&"+request->query;
-    }
-    response->redirect(req);
-
-    Log.debug( "Created new session sid='%s' host='%s'",ssid,request->remoteaddr);
-    request->response_and_finish(response->get_response());
-    return;
-  }
 
   mixed e = catch {
     r = app->handle_request(request);
@@ -178,7 +158,8 @@ void handle_request(Protocols.HTTP.Server.Request request)
 
   if(e)
   {
-    Log.exception("Error occurred while handling request!", e);
+describe_backtrace(e);
+//    Log.exception("Error occurred while handling request!", e);
     mapping response = ([]);
     response->error=500;
     response->type="text/html";
@@ -264,4 +245,23 @@ class FinsHilfe
               " / Hilfe v3.5 (Incremental Pike Frontend)\n");
    }
 }
+
+  void new_session(object request, object response, mixed ... args)
+  {
+    string ssid=session_manager->new_sessionid();
+    response->set_cookie(session_cookie_name,
+                           ssid, time() + session_timeout);
+
+    string req=request->not_query;
+    req += "?PSESSIONID="+ssid;
+    if( sizeof(request->query) )
+    {
+      req += "&"+request->query;
+    }
+    response->redirect(req);
+
+    Log.debug( "Created new session sid='%s' host='%s'",ssid,request->remoteaddr);
+  }
+
+
 

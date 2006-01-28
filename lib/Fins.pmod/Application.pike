@@ -2,6 +2,8 @@ import Tools.Logging;
 
 //! this is the base application class.
 
+object __fin_serve;
+
 //!
 .FinsController controller;
 
@@ -78,7 +80,7 @@ public mixed handle_request(.Request request)
 
   request->fins_app = this;
 
-  Log.info("SESSION INFO: %O", request->misc->session_variables);
+//  Log.info("SESSION INFO: %O", request->misc->session_variables);
 
   // we have to short circuit this one...
   if(request->not_query == "/favicon.ico")
@@ -201,6 +203,11 @@ array get_event(.Request request)
     {
       response->redirect(request->not_query + "/");
     };
+  }
+
+  if(cc->__uses_session && !request->misc->session_variables && __fin_serve)
+  {
+    return ({__fin_serve->new_session});
   }
 
   if(sizeof(args))

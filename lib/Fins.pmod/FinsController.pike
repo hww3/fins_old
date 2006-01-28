@@ -7,6 +7,9 @@ import Protocols.HTTP.Server;
 //!            mixed ... args);
 //!
 
+//! set this to zero to avoid session redirects
+int __uses_session = 1;
+
 //!
 static void create(.Application a)
 {  

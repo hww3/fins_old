@@ -266,6 +266,11 @@ mixed get(string field, .DataObjectInstance i)
      return fields[field]->decode(objs[i->get_id()][1][field], i);
    }     
 
+   else if(i->is_new_object())
+   {
+     return i->object_data[field];
+   }
+
    string query = sprintf(single_select_query, fields[field]->field_name, table_name, 
      primary_key->field_name, primary_key->encode(i->get_id()), i);
 

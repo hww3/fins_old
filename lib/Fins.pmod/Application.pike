@@ -67,9 +67,13 @@ static void load_controller()
 
 static void load_model()
 {
+werror("LOAD_MODEL()\n");
   string modclass = (config["model"] ? config["model"]["class"] : 0);
   if(modclass)
+  {
+    werror("loading model from " + modclass + "\n");
     model = ((program)modclass)(this);
+  }
   else Log.debug("No model defined!");
 }
 

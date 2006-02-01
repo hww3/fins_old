@@ -11,6 +11,8 @@ Version 0.1
 - added Configuration()->app_name
 - Template.Simple macro functionality is slightly optimized
 - added command line options for fin_serve, including a daemon mode
+- added FastCGI and SCGI runners in fcgi/
+- added -p portnum option to (f|s)cgi/runners
 - reorganized FinsBase, got rid of methods for app, model, view; added cache
 - moved macros to FinsView
 - moved Fins.Template functionality to FinsView

@@ -12,6 +12,8 @@ mapping (string:mixed) misc = ([ ]);
 string query, not_query, rest_query;
 static string data;
 
+mapping request_headers = ([]);
+
 static object fast_cgi_request;
 
 multiset   (string) prestate     = (< >);
@@ -222,7 +224,7 @@ void create(object fcgir)
   if(stringp(contents) && strlen(contents))
     pragma |= aggregate_multiset(@replace(contents, " ", "")/ ",");
 
-  not_query = http_decode_string(replace(getenv("REQUEST_URI"), "+", " "));
+  not_query = http_decode_string(replace(getenv("PATH_INFO"), "+", " "));
   int q = search(not_query, "?");
   if(q!=-1)
      not_query = not_query[..q-1];     
@@ -239,12 +241,11 @@ void create(object fcgir)
       misc[lower_case(s)] = contents;
     }
   
-  foreach(({ "HTTP_ACCEPT", "HTTP_ACCEPT_CHARSET", "HTTP_ACCEPT_LANGUAGE",
-	       "HTTP_ACCEPT_ENCODING", }), string header)
+  foreach(glob("HTTP_*", indices(fast_cgi_request->env)), string header)
     if(contents = getenv(header)) {
       header = replace(lower_case(header),
 		       ({"http_", "_"}), ({"", "-"}));
-      misc[header] = (contents-" ") / ",";
+      request_headers[header] = (contents-" ") / ",";
     }
   
   

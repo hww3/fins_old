@@ -67,7 +67,6 @@ static void load_controller()
 
 static void load_model()
 {
-werror("LOAD_MODEL()\n");
   string modclass = (config["model"] ? config["model"]["class"] : 0);
   if(modclass)
   {
@@ -123,7 +122,7 @@ array get_event(.Request request)
   .FinsController cc = controller;
   function event;
   array args = ({});
-
+  array not_args = ({});
   array r = request->not_query/"/";
 
   // first, let's find the right function to call.
@@ -142,6 +141,7 @@ array get_event(.Request request)
          }
          else if(cc && cc["index"])
          {
+           not_args += ({"index"});
            event = cc["index"];
          }
          else
@@ -169,25 +169,29 @@ array get_event(.Request request)
       }
       else if(cc && cc[comp] && functionp(cc[comp]))
       {
+        not_args += ({comp});
         event = cc[comp];
       }
       else if(cc && cc[comp] && objectp(cc[comp]))
       {
         if(Program.implements(object_program(cc[comp]), Fins.Helpers.Runner))
         {
+          not_args += ({comp});
           event = cc[comp];
         }    
         else if(Program.implements(object_program(cc[comp]), Fins.FinsController))
-        {
+        { 
+          not_args += ({comp});
           cc = cc[comp];
-        }    
+        }
         else
         {
           throw(Error.Generic("Component " + comp + " is not a Controller.\n"));
         }
       }
       else if(cc && cc["index"])
-      {
+      { 
+         not_args += ({"index"});
          event = cc["index"];
          args += ({comp});
       }
@@ -213,6 +217,8 @@ array get_event(.Request request)
   {
     return ({__fin_serve->new_session});
   }
+
+  request->not_args = not_args * "/";
 
   if(sizeof(args))
     return ({event, @args});

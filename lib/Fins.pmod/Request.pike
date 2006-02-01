@@ -1,5 +1,7 @@
 object fins_app;
 
+string not_args;
+
 //! returns a 3 letter iso 639 language code based on accept-language headers
 //!
 //! @todo

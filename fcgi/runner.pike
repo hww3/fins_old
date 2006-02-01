@@ -23,7 +23,7 @@ string config_name = "dev";
 
 void print_help(string v)
 {
-        werror("Help:  %s [-p portnum|--port=portnum]\n", v);
+        werror("Help:  %s [-p portnum|--port=portnum] [-c configname|--config=configname] [-a appdir|--appdir=appdir]\n", v);
 }
 
 int main(int argc, array(string) argv)
@@ -32,6 +32,8 @@ int main(int argc, array(string) argv)
 
   foreach(Getopt.find_all_options(argv,aggregate(
     ({"port",Getopt.HAS_ARG,({"-p", "--port"}) }),
+    ({"appdir",Getopt.HAS_ARG,({"-a", "--appdir"}) }),
+    ({"config",Getopt.HAS_ARG,({"-c", "--config"}) }),
     ({"help",Getopt.NO_ARG,({"--help"}) }),
     )),array opt)
     {
@@ -44,6 +46,14 @@ int main(int argc, array(string) argv)
 
               case "port":
                 my_port = opt[1];
+                break;
+
+              case "appdir":
+                project_dir = opt[1];
+                break;
+
+              case "config":
+                config_name = opt[1];
                 break;
 
       }

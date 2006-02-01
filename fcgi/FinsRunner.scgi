@@ -12,8 +12,8 @@ string logfile_path = "/tmp/finsrunner.log";
 string session_cookie_name = "PSESSIONID";
 int session_timeout = 3600;
 
-string project_dir = "/export/home/hww3/Fins/FinScribe";
-string config_name = "dev";
+string project_dir = "";
+string config_name = "";
 int my_port = 9999;
 
 Stdio.Port port;

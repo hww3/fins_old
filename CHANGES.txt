@@ -14,9 +14,11 @@ Version 0.1
 - reorganized FinsBase, got rid of methods for app, model, view; added cache
 - moved macros to FinsView
 - moved Fins.Template functionality to FinsView
+- added XMLRPCController
 - created Fins.Template.View as a wrapper around a Template and TemplateData
 - added FinsView->get_view("templatename"), all template getting methods will 
   automatically add the apropriate template extension, so don't provide the 
   .phtml or .xml extensions.
 - added Response->set_view(Template.View);
-
+- added Request()->not_args
+- added DocController

@@ -14,19 +14,18 @@ int session_timeout = 3600;
 
 string project_dir = "/export/home/hww3/Fins/FinScribe";
 string config_name = "dev";
-int listen_port = 9999;
+int my_port = 9999;
 
 Stdio.Port port;
 
-int start_listener()
+int start_listener(int port)
 {
-  port = Stdio.Port(listen_port, answer_call);
+  this->port = Stdio.Port(port, answer_call);
   return -1;
 }  
 
 void answer_call(int sock, int id)
 {
-  werror("answer call!\n");
   Stdio.File fd = port->accept();
 
   requests ++;

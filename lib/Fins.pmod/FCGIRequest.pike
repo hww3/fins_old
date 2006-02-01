@@ -16,6 +16,8 @@ mapping request_headers = ([]);
 
 static object fast_cgi_request;
 
+static string not_query_field = "REQUEST_URI";
+
 multiset   (string) prestate     = (< >);
 multiset   (string) config       = (< >);
 multiset   (string) supports     = (< >);
@@ -31,6 +33,11 @@ mapping (string:string) cookies = ([ ]);
 
 string prot;
 string method;
+
+static string _sprintf(mixed ... args)
+{
+  return "FCGIRequest(" + method + " " + not_query + query + ")";
+}
 
 void response_write_and_finish(mixed ... args)
 {
@@ -224,7 +231,7 @@ void create(object fcgir)
   if(stringp(contents) && strlen(contents))
     pragma |= aggregate_multiset(@replace(contents, " ", "")/ ",");
 
-  not_query = http_decode_string(replace(getenv("PATH_INFO"), "+", " "));
+  not_query = http_decode_string(replace(getenv(not_query_field), "+", " "));
   int q = search(not_query, "?");
   if(q!=-1)
      not_query = not_query[..q-1];     

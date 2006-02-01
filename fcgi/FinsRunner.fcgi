@@ -15,18 +15,26 @@ string logfile_path = "/tmp/finsrunner.log";
 string session_cookie_name = "PSESSIONID";
 int session_timeout = 3600;
 
-int start_listener()
+int start_listener(int port)
 {
+    int sock;
 
-    f = Stdio.stdin.dup();
-
+    if(!port)
+    {
+      f = Stdio.stdin.dup();
+      sock = f->query_fd();
+    }
+    else
+    {
+      sock = Public.Web.FCGI.open_socket(":" + port, 128);
+    }
   #ifdef RUN_THREADED
   	for (int i = 0; i < 8; i++) {
-  		Thread.Thread(request_loop, f->query_fd(), i);
+  		Thread.Thread(request_loop, sock, i);
   	}
   	return (-1);
   #else 
-  	request_loop(f->query_fd(),0);
+  	request_loop(sock, 0);
         return 0;
   #endif
 }
@@ -48,8 +56,9 @@ void request_loop(int sock, int id)
 		request->accept();
                 requests ++;
                 object request_id;
+                mixed e;
 
-                if(catch(request_id = Fins.FCGIRequest(request)))
+                if(e = catch(request_id = Fins.FCGIRequest(request)))
                 {
 #ifdef RUN_THREADED
                   key = lock->lock();
@@ -58,6 +67,7 @@ void request_loop(int sock, int id)
                   request->write("Content-type: text/html\r\n\r\n");
                   request->write("<h1>Error 500: Internal Server Error</h1>");
                   request->write("The server was unable to parse your request.\n");
+                  request->write("<p>" + describe_backtrace(e));                  
                   request->finish();
 #ifdef RUN_THREADED
                   key = 0;

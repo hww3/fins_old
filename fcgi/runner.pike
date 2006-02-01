@@ -10,6 +10,7 @@ int session_timeout = 3600;
 
 Session.SessionManager session_manager;
 
+int my_port;
 Fins.Application app;
 Stdio.File f;
 int shutdown = 0;
@@ -19,9 +20,34 @@ int requests = 0;
 string project_dir = "";
 string config_name = "dev";
 
+
+void print_help(string v)
+{
+        werror("Help:  %s [-p portnum|--port=portnum]\n", v);
+}
+
 int main(int argc, array(string) argv)
 {
   int sock;
+
+  foreach(Getopt.find_all_options(argv,aggregate(
+    ({"port",Getopt.HAS_ARG,({"-p", "--port"}) }),
+    ({"help",Getopt.NO_ARG,({"--help"}) }),
+    )),array opt)
+    {
+      switch(opt[0])
+      {
+              case "help":
+                print_help(argv[0]);
+                exit(1);
+                break;
+
+              case "port":
+                my_port = opt[1];
+                break;
+
+      }
+    }
   
   write("Starting Session Manager...\n");
   session_startup();
@@ -29,11 +55,11 @@ int main(int argc, array(string) argv)
   write("FinsRunner loading application " + project_dir + " using configuration " + config_name + "\n");
   load_application();
 
-   return start_listener();
+   return start_listener(my_port);
 
 }
 
-int start_listener()
+int start_listener(int port)
 {
   return 0;
 }
@@ -83,7 +109,8 @@ void handle_request(object request_id)
 
                   // the moment of truth!
                   mixed response;
-                  
+    
+                  Log.debug("Got Request: %O", request_id);
                   e = catch {
                     response = app->handle_request(request_id);
                   };

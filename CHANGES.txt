@@ -16,11 +16,19 @@ Version 0.1
 - reorganized FinsBase, got rid of methods for app, model, view; added cache
 - moved macros to FinsView
 - moved Fins.Template functionality to FinsView
-- added XMLRPCController
+- added XMLRPCController, a FinsController variant which allows methods in 
+  a controller to be called via an XMLRPC call to the controller "mount" 
+  point. All public functions will be made available via XMLRPC, and each 
+  receives the Request object as the first argument.
 - created Fins.Template.View as a wrapper around a Template and TemplateData
 - added FinsView->get_view("templatename"), all template getting methods will 
   automatically add the apropriate template extension, so don't provide the 
   .phtml or .xml extensions.
 - added Response->set_view(Template.View);
-- added Request()->not_args
-- added DocController
+- added Request()->not_args, the part of the request path that triggered 
+  the event being called.
+- added DocController, a FinsController variant which will pass a 
+  preselected template to the event function, based on the event's 
+  location within the request tree.
+- added config option view/reload that can be used to reload page 
+  templates when they are changed. useful for development purposes.

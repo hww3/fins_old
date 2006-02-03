@@ -90,7 +90,11 @@ import Tools.JSON;
 			x->back();
 			while (1) 
 			{
-				myArrayList+=({x->nextObject()});
+                                mixed obj = x->nextObject();
+                                if(objectp(obj) && obj->toNative)
+  				  myArrayList+=({obj->toNative()});
+				else
+                                  myArrayList+=({obj});
 				switch (x->nextClean()) 
 				{
 					case ',':
@@ -568,3 +572,8 @@ static mixed cast(string to)
 		{
 			return "["+ join(",") + "]";
 		}
+
+public array toNative()
+{
+  return (array)this;
+}

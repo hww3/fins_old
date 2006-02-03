@@ -161,7 +161,10 @@ import Tools.JSON;
 					throw(Error.Generic("Expected a ':' after a key"));
 				}
 				object obj = x->nextObject();
-				myHashMap[key] = obj;
+                                if(objectp(obj) && obj->toNative)
+  				  myHashMap[key] = obj->toNative();
+                                else
+  				  myHashMap[key] = obj;
 				myKeyIndexList+=({key});
 				switch (x->nextClean()) 
 				{
@@ -747,3 +750,8 @@ static mixed cast(string to)
 			sb+=("}");
 			return sb->get();
 		}
+
+mapping toNative()
+{
+  return (mapping)this;
+}

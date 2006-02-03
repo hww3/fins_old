@@ -2,18 +2,25 @@
 constant __version = "1.0";
 constant __author = "Bill Welliver <bill@welliver.org>";
 
-string serialize(mixed data)
+//!
+//! serialize an object as a JSON string
+//!
+string serialize(mapping data)
 {
   if(mappingp(data))
   {
     return (string).JSONObject(data);
   }
-  else if(arrayp(data))
-  {
-    return (string).JSONArray(data);
-  }
   else throw(Error.Generic("invalid dataset to serialize.\n"));
 
+}
+
+//!
+//! deserialize a JSON string into native datatypes (arrays, mappings, etc)
+//!
+mixed deserialize(string json)
+{
+  return (mapping).JSONObject(json);
 }
 
 object Null = null();

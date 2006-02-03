@@ -14,6 +14,9 @@ int max_includes = 100;
 
 static .TemplateContext context;
 
+int auto_reload;
+int last_update;
+
 string script;
 string templatename;
 array contents = ({});
@@ -26,14 +29,23 @@ static void create(string _templatename, .TemplateContext|void context_obj)
 
    context->type = object_program(this);
 
+   auto_reload = (int)(context->application->config["view"]["reload"]);
    templatename = _templatename + ".phtml";
+
+   reload_template();
+}
+
+static void reload_template()
+{
+   last_update = time();
 
    string template = load_template(templatename);
    string psp = parse_psp(template, templatename);
-   script = psp;   
-mixed x = gauge{
-   compiled_template = compile_string(template, templatename);
-};
+   script = psp;
+
+   mixed x = gauge{
+     compiled_template = compile_string(template, templatename);
+   };
 
 }
 
@@ -41,6 +53,11 @@ mixed x = gauge{
 public string render(.TemplateData d)
 {
    String.Buffer buf = String.Buffer();
+
+   if(auto_reload && template_updated(templatename, last_update))
+   {
+     reload_template();
+   }
 
     object t = compiled_template(context);
     t->render(buf, d);

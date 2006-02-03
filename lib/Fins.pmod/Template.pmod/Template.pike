@@ -7,6 +7,20 @@ static void create(string template, .TemplateContext c);
 //!
 public string render(.TemplateData d);
 
+static int template_updated(string templatename, int last_update)
+{
+   string template =
+                          combine_path(context->application->config->app_dir, 
+                                       "templates/" + templatename);
+
+   object s = file_stat(template);
+
+   if(s && s->mtime > last_update)
+     return 1;
+
+   else return 0;
+}
+
 //! we should really do more here...
 static string load_template(string templatename)
 {

@@ -1,4 +1,4 @@
-import Public.Parser.JSON;
+import Tools.JSON;
 
   /// <summary>
   /// <para>
@@ -306,6 +306,11 @@ import Public.Parser.JSON;
                                 else if(arrayp(obj))
                                 {
                                   sb+=((string)JSONArray(obj));
+                                }
+                                else if(mappingp(obj))
+                                {
+
+                                  sb+=((string)JSONObject(obj));
                                 }
 				else
 				{

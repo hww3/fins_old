@@ -76,6 +76,26 @@ static void load_model()
   else Log.debug("No model defined!");
 }
 
+int controller_updated(object controller, object container, string cn)
+{
+  string filename = master()->programs_reverse_lookup(object_program(controller));
+  werror("filename: %O program: %O\n", filename, object_program(controller));
+  object stat = file_stat(filename);
+  if(stat && stat->mtime > controller->__last_load)
+  {
+     string key = search(master()->programs, object_program(controller));
+     werror("key is " + key + "\n");
+//     m_delete(master()->programs, key);
+     
+     Log.debug("Reloading controllers...");
+     load_controller();
+
+     return 1;
+  }
+
+  return 0;
+}
+
 //!
 public mixed handle_request(.Request request)
 {
@@ -119,7 +139,14 @@ public mixed handle_request(.Request request)
 //!
 array get_event(.Request request)
 {
-  .FinsController cc = controller;
+  .FinsController cc;
+
+  if((int)(config["controller"]["reload"]))
+  {
+    controller_updated(controller, this, "controller");
+  }
+  cc = controller;
+
   function event;
   array args = ({});
   array not_args = ({});
@@ -182,6 +209,11 @@ array get_event(.Request request)
         else if(Program.implements(object_program(cc[comp]), Fins.FinsController))
         { 
           not_args += ({comp});
+          if((int)config["controller"]["reload"])
+          {            
+            controller_updated(cc[comp], cc, comp);
+          }
+
           cc = cc[comp];
         }
         else

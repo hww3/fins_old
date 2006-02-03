@@ -9,10 +9,12 @@ import Protocols.HTTP.Server;
 
 //! set this to zero to avoid session redirects
 constant __uses_session = 1;
+int __last_load;
 
 //!
 static void create(.Application a)
 {  
+  __last_load = time();
   ::create(a);
 
   if(functionp(start))

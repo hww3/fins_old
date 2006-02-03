@@ -4,8 +4,13 @@ inherit FinsBase : base;
 inherit Fins.Helpers.Macros.JavaScript;
 inherit Fins.Helpers.Macros.Basic;
 
+//!
 program default_template = Fins.Template.Simple;
+
+//!
 program default_data = Fins.Template.TemplateData;
+
+//!
 program default_context = Fins.Template.TemplateContext;
 
 static mapping templates = ([]);
@@ -13,6 +18,7 @@ static mapping simple_macros = ([]);
 
 //! the base View class
 
+//!
 static void create(object app)
 {
 	base::create(app);

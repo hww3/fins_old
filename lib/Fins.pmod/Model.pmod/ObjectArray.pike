@@ -33,6 +33,22 @@ Iterator _get_iterator()
   return Array.Iterator(contents);
 }
 
+static array _values()
+{
+  if(changed)
+    get_contents();
+
+    return contents;
+}
+
+static array _indices()
+{
+  if(changed)
+    get_contents();
+
+    return indices(contents);
+}
+
 int _sizeof()
 {
   if(changed)

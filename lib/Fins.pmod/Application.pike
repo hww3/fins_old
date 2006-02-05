@@ -44,7 +44,7 @@ void start()
 
 static void load_cache()
 {
-  werror("Starting Cache...\n");
+  Log.info("Starting Cache...\n");
 
   cache = .FinsCache();
 }
@@ -70,7 +70,7 @@ static void load_model()
   string modclass = (config["model"] ? config["model"]["class"] : 0);
   if(modclass)
   {
-    werror("loading model from " + modclass + "\n");
+    Log.info("loading model from " + modclass + "\n");
     model = ((program)modclass)(this);
   }
   else Log.debug("No model defined!");
@@ -79,12 +79,12 @@ static void load_model()
 int controller_updated(object controller, object container, string cn)
 {
   string filename = master()->programs_reverse_lookup(object_program(controller));
-  werror("filename: %O program: %O\n", filename, object_program(controller));
+//  werror("filename: %O program: %O\n", filename, object_program(controller));
   object stat = file_stat(filename);
   if(stat && stat->mtime > controller->__last_load)
   {
      string key = search(master()->programs, object_program(controller));
-     werror("key is " + key + "\n");
+     // werror("key is " + key + "\n");
 //     m_delete(master()->programs, key);
      
      Log.debug("Reloading controllers...");
@@ -164,7 +164,7 @@ array get_event(.Request request)
       {
          if(event)
          {
-           werror("undefined situation! we have to fix this.\n");
+           Log.error("undefined situation! we have to fix this.\n");
          }
          else if(cc && cc["index"])
          {
@@ -173,7 +173,7 @@ array get_event(.Request request)
          }
          else
          {
-            werror("cc: %O\n", cc);
+            Log.info("cc: %O\n", cc);
          }
          break;
       }

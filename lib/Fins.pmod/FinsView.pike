@@ -50,28 +50,30 @@ public function get_simple_macro(string name)
 }
 
 //!
-public string render_partial(string view, mapping data, string|void collection_name, array|void collection)
+public string render_partial(string view, mapping data, 
+                                 string|void collection_name, mixed|void collection)
 {
 	string result = "";
 	object v = get_view(view);
-	
+
 	if(collection_name)
 	{
-		foreach(collection;; mixed c)
+		foreach(collection;mixed i; mixed c)
 		{
 			mapping d = data + ([]);
 			d[collection_name] = c;
-			
+                        d->id = i;
+
 			v->data->set_data(d);
 			result += v->render();
 		}
 	}
-    else
+        else
 	{
 		v->data->set_data(data);
 		result += v->render();
 	}	
-	
+
 	return result;
 }
 

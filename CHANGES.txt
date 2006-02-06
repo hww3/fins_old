@@ -32,3 +32,5 @@ Version 0.1
   location within the request tree.
 - added config option view/reload that can be used to reload page 
   templates when they are changed. useful for development purposes.
+- added Model.BinaryStringField, and support for encoding and decoding
+  binary strings.

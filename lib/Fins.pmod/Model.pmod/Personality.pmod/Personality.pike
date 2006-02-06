@@ -1,6 +1,9 @@
 object sql;
 object context;
 
+int use_datadir;
+string datadir;
+
 static void create(object s, object c)
 {
   sql = s;

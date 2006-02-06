@@ -97,7 +97,7 @@ int main(int argc, array(string) argv)
   else
   {
 
-    port = Protocols.HTTP.Server.Port(handle_request, my_port);  
+    port = Protocols.HTTP.Server.Port(handle_request, (int)my_port);  
     port->request_program = Fins.HTTPRequest;
 
 #if constant(_Protocols_DNS_SD)

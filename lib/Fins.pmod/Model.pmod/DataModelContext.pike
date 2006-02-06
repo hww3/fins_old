@@ -26,6 +26,16 @@ string quote(string s)
    return sql->quote(s);
 }
 
+string quote_binary(string s)
+{
+  return personality->quote_binary(s);
+}
+
+string unquote_binary(string s)
+{
+  return personality->unquote_binary(s);
+}
+
 string type()
 {
   return (sprintf("%O", object_program(sql->master_sql))/".")[-1];
@@ -43,7 +53,7 @@ int initialize()
   program p = get_personality();
   if(!p) throw(Error.Generic("Unknown database type. No personality.\n"));
 
-  personality = p(sql);
+  personality = p(sql, this);
 
   personality->initialize();
 }

@@ -108,7 +108,7 @@ import Tools.JSON;
 		/// </summary>
 
 		//!  Construct a JSONObject, either empty, from a JSON datastream, or a pike mapping.
-		static void create(void|string|Public.Parser.JSON.JSONTokener|mapping x)
+		static void create(void|string|Tools.JSON.JSONTokener|mapping x)
 		{ 
 			myHashMap      = ([]);
 			myKeyIndexList = ({});

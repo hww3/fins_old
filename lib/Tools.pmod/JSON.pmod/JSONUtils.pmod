@@ -1,4 +1,4 @@
-import Public.Parser.JSON;
+import Tools.JSON;
 
                 /// <summary>
                 /// Produce a string from a number.

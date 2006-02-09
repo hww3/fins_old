@@ -96,13 +96,16 @@
   }
   
   //!
-  public void redirect(string to)
+  public void redirect(string to, int|void temp)
   {
-    response->error = 302;
+    if(temp)
+      response->error = 302;
+    else
+      response->error = 301;
     response->extra_heads->location = to;
   }
 
-  //!
+  //! using this method will clear any template set.
   public void set_data(string data, mixed ... args)
   {
     if(args && sizeof(args))
@@ -110,6 +113,7 @@
     else  
       response->data = data;
     if(!response->error) response->error = 200;
+    template = 0;
   }
 
   //!

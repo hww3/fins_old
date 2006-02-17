@@ -19,20 +19,20 @@ string simple_macro_sizeof(Fins.Template.TemplateData data, mapping|void args)
 }
 
 //! args: var, splice, final
-string simple_macro_splice(Fins.Template.TemplateData data, mapping|void args)
+string simple_macro_implode(Fins.Template.TemplateData data, mapping|void args)
 {
   mixed v = get_var_value(args->var, data->get_data());
+
+werror("val: %O\n", v);
 
   if(!arrayp(v))
     return "invalid type for " + args->var;
 
   string retval = "";
 
-  if(args->final)
+  if(args->nice)
   {
-    if(sizeof(v)>1)
-      retval = (v[0..(sizeof(v)-2)]* args->splice);
-    retval+=(args->final + v[-1]);
+    retval = String.implode_nicely(v, args->nice);
   }
   else
   {

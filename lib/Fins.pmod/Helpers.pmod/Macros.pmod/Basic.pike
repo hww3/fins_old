@@ -23,8 +23,6 @@ string simple_macro_implode(Fins.Template.TemplateData data, mapping|void args)
 {
   mixed v = get_var_value(args->var, data->get_data());
 
-werror("val: %O\n", v);
-
   if(!arrayp(v))
     return "invalid type for " + args->var;
 

@@ -14,7 +14,7 @@ void parse_request()
 {
   ::parse_request();
 
-  remoteaddr = (my_fd->query_address()/":")[0];
+  remoteaddr = ((my_fd->query_address()||"")/":")[0];
   string n_not_query = Protocols.HTTP.Server.http_decode_string(not_query);
   if(n_not_query != not_query)
   catch{

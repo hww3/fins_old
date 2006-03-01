@@ -401,6 +401,12 @@ int delete(int|void force, .DataObjectInstance i)
          }
        }
      }
+
+     else if(Program.inherits(object_program(r), .MultiKeyReference))
+     {
+       foreach(get(n, i);; object mem)
+         i[n]-=mem;
+     }
    }
    
 //   return 0;

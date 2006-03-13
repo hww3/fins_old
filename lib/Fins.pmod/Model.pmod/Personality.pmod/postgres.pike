@@ -17,3 +17,11 @@ string get_last_insert_id(object field, object i)
 
    return a[0]["currval"];
 }
+
+
+string get_limit_clause(int limit, int|void start)
+{
+  return "LIMIT " + limit + (start?(" OFFSET " + start):"");
+}
+
+

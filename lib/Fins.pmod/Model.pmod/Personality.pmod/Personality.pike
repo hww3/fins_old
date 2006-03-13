@@ -20,6 +20,12 @@ string get_serial_insert_value()
 	return "NULL";
 }
 
+// there's little agreement here, so we'll have to override this everwhere.
+// start is the starting point from which to begin the limit, where the first record is record 1.
+string get_limit_clause(int limit, int|void start)
+{
+  return "";
+}
 
 string make_fn(string s)
 {

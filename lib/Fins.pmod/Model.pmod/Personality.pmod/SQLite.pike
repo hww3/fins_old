@@ -15,3 +15,11 @@ int initialize()
 
   return 1;
 }
+
+
+string get_limit_clause(int limit, int|void start)
+{
+  return "LIMIT " + limit + (start?(" OFFSET " + start):"");
+}
+
+

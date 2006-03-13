@@ -122,16 +122,16 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
   {
      if(objectp(q) && Program.implements(object_program(q), .Criteria))
      {
-         _where += ({ q->get(name, q) });
-			if(q->get_table)
-			  _tables += ({q->get_table(name, q)});
+         _where += ({ q->get(name, this) });
+	if(q->get_table)
+	  _tables += ({q->get_table(this)});
      }
-	  else if(objectp(name) && Program.implements(object_program(name), .MultiKeyReference))
-	  {
-		  _where += ({ name->get(q, i) });
-			if(name->get_table)
-			  _tables += ({name->get_table(q, i)});
-	  }
+     else if(objectp(name) && Program.implements(object_program(name), .MultiKeyReference))
+     {
+         _where += ({ name->get(q, i) });
+	 if(name->get_table)
+	   _tables += ({name->get_table(q, i)});
+     }
      else if(!fields[name])
      {
         throw(Error.Generic("Field " + name + " does not exist in object " + instance_name + ".\n"));
@@ -158,7 +158,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   if(criteria)
   {
-     query += " " + criteria->get();
+     query += " " + criteria->get("", this);
   }
 
   if(context->debug) werror("QUERY: %O\n", query);

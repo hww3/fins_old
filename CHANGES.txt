@@ -34,3 +34,4 @@ Version 0.1
   templates when they are changed. useful for development purposes.
 - added Model.BinaryStringField, and support for encoding and decoding
   binary strings.
+- added Model.CompoundCriteria and Model.LimitCriteria

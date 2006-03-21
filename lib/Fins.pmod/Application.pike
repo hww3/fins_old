@@ -128,6 +128,9 @@ public mixed handle_request(.Request request)
 
   .Response response = .Response(request);
 
+  if(!request->misc->session_variables)
+    request->misc->session_variables = ([]);
+
   if(objectp(event) || functionp(event))
     event(request, response, @args);
 

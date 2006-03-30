@@ -1,5 +1,7 @@
 static mapping data = ([]);
 static mapping flash = ([]);
+static object request;
+
 int debug = 0;
 
 //!
@@ -22,6 +24,12 @@ public void set_data(mapping d)
 }
 
 //!
+public void set_request(object r)
+{
+   request = r;
+}
+
+//!
 public void set_flash(mapping d)
 {
    flash = d;
@@ -31,6 +39,12 @@ public void set_flash(mapping d)
 public mapping get_data()
 {
    return data;
+}
+
+//!
+public object get_request()
+{
+   return request;
 }
 
 //!

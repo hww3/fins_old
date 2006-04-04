@@ -265,8 +265,18 @@ array get_event(.Request request)
 //!
 .Response static_request(.Request request)
 {
-  .Response response = .Response();
   string fn = Stdio.append_path(static_dir, request->not_query[7..]);
+
+  .Response response = .Response();
+
+  low_static_request(request, response, fn);
+
+  return response;
+}
+
+.Response low_static_request(.Request request, .Response response, 
+    string fn)
+{
   Stdio.Stat stat = file_stat(fn);
   if(!stat || stat->isdir)
   {

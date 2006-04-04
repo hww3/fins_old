@@ -22,7 +22,7 @@ static int template_updated(string templatename, int last_update)
 }
 
 //! we should really do more here...
-static string load_template(string templatename)
+static string load_template(string templatename, void|object compilecontext)
 {
 //   werror("loading template " + templatename + " from " + context->application->config->app_dir + "\n");
    string template = Stdio.read_file(

@@ -22,6 +22,12 @@ string templatename;
 array contents = ({});
 program compiled_template;
 multiset macros_used = (<>);
+
+string _sprintf(mixed ... args)
+{
+  return "SimpleTemplate(" + templatename + ")";
+}
+
 //!
 static void create(string _templatename, .TemplateContext|void context_obj)
 {
@@ -66,15 +72,15 @@ public string render(.TemplateData d)
 
 }
 
-program compile_string(string code, string realfile)
+program compile_string(string code, string realfile, object|void compilecontext)
 {
-  string psp = parse_psp(code, realfile);
+  string psp = parse_psp(code, realfile, compilecontext);
 //werror("PSP: %O\n", psp);
   return predef::compile_string(psp, realfile);
 }
 
 
-array(Block) psp_to_blocks(string file, string realfile)
+array(Block) psp_to_blocks(string file, string realfile, void|object compilecontext)
 {
   int file_len = strlen(file);
   int in_tag = 0;
@@ -130,7 +136,7 @@ array(Block) psp_to_blocks(string file, string realfile)
       {
         in_tag = 0;
         string s = file[sp..end];
-        Block b = PikeBlock(s, realfile);
+        Block b = PikeBlock(s, realfile, compilecontext);
         int l = sizeof(s) - sizeof(s-"\n");
         b->start = start_line;
         b->end = (start_line+=l);
@@ -146,17 +152,17 @@ array(Block) psp_to_blocks(string file, string realfile)
   return contents;
 }
 
-string parse_psp(string file, string realname)
+string parse_psp(string file, string realname, object|void compilecontext)
 {
   // now, let's render some pike!
   string pikescript = "";
   string header = "";
   string initialization = "";
 
-  array(Block) contents = psp_to_blocks(file, realname);
+  array(Block) contents = psp_to_blocks(file, realname, compilecontext);
   string ps, h;
  
-  [ps, h] = render_psp(contents, "", "");
+  [ps, h] = render_psp(contents, "", "", compilecontext);
 
 
   foreach(macros_used; string macroname ;)
@@ -172,20 +178,20 @@ string parse_psp(string file, string realname)
   return header + "\n\n" + pikescript + "}";
 }
 
-array render_psp(array(Block) contents, string pikescript, string header)
+array render_psp(array(Block) contents, string pikescript, string header, object|void compilecontext)
 {
   foreach(contents, object e)
   {
     if(e->get_type() == TYPE_DECLARATION)
-      header += e->render();
+      header += e->render(compilecontext);
     else if(e->get_type() == TYPE_DIRECTIVE)
     {
-      mixed ren = e->render();
+      mixed ren = e->render(compilecontext);
       if(arrayp(ren))
-        [pikescript, header] = render_psp(ren, pikescript, header);
+        [pikescript, header] = render_psp(ren, pikescript, header, compilecontext);
     }
     else
-      pikescript += e->render();
+      pikescript += e->render(compilecontext);
   }
 
   return ({pikescript, header});
@@ -233,7 +239,7 @@ werror("returning: %O\n", ret);
   return ret;
 }
 
-class Block(string contents, string filename)
+class Block(string contents, string filename, object|void compilecontext)
 {
   int start;
   int end;
@@ -248,7 +254,7 @@ class Block(string contents, string filename)
     return "Block(" + contents + ")";
   }
 
-  array(Block) | string render();
+  array(Block) | string render(object|void compilecontext);
 }
 
 class TextBlock
@@ -259,7 +265,7 @@ class TextBlock
 
  array out = ({"\\\\", "\\\"", "\\n"});
 
- string render()
+ string render(object|void compilecontext)
  {
    return "{\n" + escape_string(contents)  + "}\n";
  }
@@ -315,7 +321,7 @@ class PikeBlock
     else return TYPE_SCRIPTLET;
   }
 
-  array(Block) | string render()
+  array(Block) | string render(object|void compilecontext)
   {
     if(has_prefix(contents, "<%!"))
     {
@@ -326,7 +332,7 @@ class PikeBlock
     else if(has_prefix(contents, "<%@"))
     {
       string expr = contents[3..strlen(contents)-3];
-      return parse_directive(expr);
+      return parse_directive(expr, compilecontext);
     }
 
     else if(has_prefix(contents, "<%$"))
@@ -465,7 +471,7 @@ class PikeBlock
    return rv;
  }
 
- string|array(Block) parse_directive(string exp)
+ string|array(Block) parse_directive(string exp, object|void compilecontext)
  {
    exp = String.trim_all_whites(exp);
  
@@ -481,7 +487,7 @@ class PikeBlock
    switch(keyword)
    {
      case "include":
-       return process_include(exp);
+       return process_include(exp, compilecontext);
        break;
 
      default:
@@ -491,7 +497,7 @@ class PikeBlock
  }
 
  // we don't handle absolute includes yet.
- array(Block) process_include(string exp)
+ array(Block) process_include(string exp, object|void compilecontext)
  {
    string file;
    string contents;
@@ -505,13 +511,13 @@ class PikeBlock
    if(r != 3) 
      throw(Error.Generic("PSP format error: unknown include format in " + templatename + ".\n"));
 
-   contents = load_template(file);
+   contents = load_template(file, compilecontext);
  
  //werror("contents: %O\n", contents);
  
    if(contents)
    {
-     array x = psp_to_blocks(contents, file);
+     array x = psp_to_blocks(contents, file, compilecontext);
      //werror("blocks: %O\n", x);
      return x;
    }

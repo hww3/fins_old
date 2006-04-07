@@ -286,13 +286,14 @@ array get_event(.Request request)
 
   if(request->request_headers["if-modified-since"] && 
       Protocols.HTTP.Server.http_decode_date(request->request_headers["if-modified-since"]) 
-        > stat->mtime) 
+        >= stat->mtime) 
   {
     response->not_modified();
     return response;
   }
 
-  response->set_header("Cache-Control", "max-age=7200");
+  response->set_header("Cache-Control", "max-age=" + (3600*12));
+  response->set_header("Expires", (Calendar.Second() + (3600*12))->format_http());
   response->set_type(Protocols.HTTP.Server.filename_to_type(basename(fn)));
   response->set_file(Stdio.File(fn));
 

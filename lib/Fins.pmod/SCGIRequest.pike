@@ -40,7 +40,7 @@ static void create(Stdio.File myfd)
 }
 
 
-//! @todo
+//! @note
 //!   we should be doing nonblocking io here.
 class SCGIConn
 {

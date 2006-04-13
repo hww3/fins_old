@@ -741,6 +741,10 @@ static mixed cast(string to)
                                         {
                                            sb+=((string)JSONArray(obj));
                                         }
+                                        else if(mappingp(obj))
+                                        {
+                                           sb+=((string)JSONObject(obj));
+                                        }
 					else
 					{
 						sb+=((string)obj);

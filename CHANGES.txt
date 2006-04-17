@@ -35,3 +35,5 @@ Version 0.1
 - added Model.BinaryStringField, and support for encoding and decoding
   binary strings.
 - added Model.CompoundCriteria and Model.LimitCriteria
+- added macro: format_time
+

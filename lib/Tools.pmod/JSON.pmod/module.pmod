@@ -14,6 +14,7 @@ string serialize(mapping data)
   else throw(Error.Generic("invalid dataset to serialize.\n"));
 
 }
+function serialise = serialize;
 
 //!
 //! deserialize a JSON string into native datatypes (arrays, mappings, etc)
@@ -22,6 +23,7 @@ mixed deserialize(string json)
 {
   return (mapping).JSONObject(json);
 }
+function deserialise = deserialize;
 
 object Null = null();
 

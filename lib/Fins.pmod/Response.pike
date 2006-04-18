@@ -26,6 +26,8 @@
                               "extra_heads": ([])
                               ]);
 
+  static mapping cookies = ([ "__expiration__" : 0 ]);
+
   //!
   public void set_type(string mimetype)
   {
@@ -73,10 +75,10 @@
   //!
   public void set_cookie(string name, string value, int expiration)
   {
-     response->extra_heads["set-cookie"] = 
-                Protocols.HTTP.http_encode_cookie(name)+
-                "="+Protocols.HTTP.http_encode_cookie( value )+
-                "; expires="+Protocols.HTTP.Server.http_date(expiration)+"; path=/";
+    cookies[name] = value;
+    // Take a punt and set the expiration to the lowest of the expiry values.
+    if ((cookies["__expiration__"] == 0) || (expiration < cookies["__expiration__"]))
+      cookies["__expiration__"] = expiration;
   }
 
   //!
@@ -129,6 +131,17 @@
   public mapping get_response()
   {
      if(!response->error) return 0;
+     if (sizeof(cookies) > 1) 
+     {
+       array _cookies = ({});
+       foreach(indices(cookies), string name)
+	 if (name != "__expiration__")
+	   _cookies += ({ sprintf("%s=%s;", Protocols.HTTP.http_encode_cookie(name), Protocols.HTTP.http_encode_cookie(cookies[name])) });
+        _cookies += ({ "path=/;" });
+	if (cookies["__expiration__"])
+	  ({ sprintf("expires=%s", Protocols.HTTP.Server.http_date(cookies["__expiration__"])) });
+       response->extra_heads["set-cookie"] = _cookies * " ";
+     }
      if(template)
      {
        mapping f = ([]);

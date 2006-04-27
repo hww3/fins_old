@@ -22,4 +22,11 @@ void load_model()
    d->initialize();
 
    context = d;
+
+   register_types();
+}
+
+void register_types()
+{
+
 }

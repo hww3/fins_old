@@ -1,8 +1,8 @@
 string simple_macro_javascript_includes(Fins.Template.TemplateData data, mapping|void args)
 {
   return 
-#" <script src=\"/static/javascripts/prototype.js\" type=\"text/javascript\"></script> 
-<script src=\"/static/javascripts/scriptaculous.js\" type=\"text/javascript\"></script>
+#" 
+<script src=\"/static/javascripts/dojo.js\" type=\"text/javascript\"></script> 
 ";
 }
 
@@ -22,77 +22,81 @@ string simple_macro_javascript_includes(Fins.Template.TemplateData data, mapping
 string simple_macro_remote_form(Fins.Template.TemplateData data, mapping|void arguments)
 {
 
-  if(arguments["updatesuccess"] || arguments["updatefailure"])
-  {
-    arguments["update"] = ([]);
 
-    if(arguments["updatefailure"]);
-      arguments["update"]["failure"] = arguments["updatefailure"];
-    if(arguments["updatesuccess"]);
-      arguments["update"]["success"] = arguments["updatesuccess"];
-  }  
-
-  return "<form onsubmit=\"" + remote_function(arguments) + "; return false;\"" 
-//action=\"" 
-//     + arguments["action"] 
-+ "\" method=\"" + (arguments["method"]||"post")
-     + "\">";
-}
-
-string options_for_ajax(mapping options)
-{
-  string result = "";
-  array kvp = ({});
-
-  foreach(options; string name; string value)
-  {
-    if(has_prefix(name, "on")) name = "on" + String.capitalize(name[2..]);
-    kvp += ({ name + ": " + value});
-  }
-
-  result = "{" + kvp*", " + "}";
-
-  return result;
+  return "<form " + (arguments->id?"id=\"" + arguments->id + "\" ":"") + "onsubmit=\"" + 
+     remote_function(arguments) + "\"" 
+     ">";
 }
 
 
 string remote_function(mapping options)
 {
-  string javascript_options = options_for_ajax(options);
- 
-  string update = "";
+  string f = "";
+  array u = ({});
 
-  if(options->update && mappingp(options->update))
+  string loadFunc = "";
+  string errorFunc = "";
+
+  if(!options->load)
   {
-    array u = ({});
 
-    if(options->update->success)
-      u += ({"success: '" + options->update->success + "'"});
-    if(options->update->failure)
-      u += ({"failure: '" + options->update->failure + "'"});
-    update = "{" + (u*", ") + "}";
+    if(options->success)
+    {
+      loadFunc += options->success;
+    }
+
+    if(options->update)
+    {
+      loadFunc += "var d = document.getElementById(" + stringify(options->update) + ");"
+                "if(d) d.innerHTML = data.toString();";
+    }
+  
+    if(options->complete)
+    {
+      loadFunc += options->complete;
+    }
   }
   else
-  {
-    update = options->update;
+  {  
+    loadFunc = options->load;
   }
 
-  string func = ((!options->update)?
-           "new Ajax.Request(":
-           ("new Ajax.Updater(" + options->update )) + ", ";
+  if(options->error)
+  {
+    errorFunc += options->error;
+  }
+
+  u += ({ "load: function(type, data, event){ " + loadFunc + "}" });
+  u += ({ "error: function(type, data, event){ " + errorFunc + "}" });
+
+  foreach(({"method", "mimetype", "url", "transport"});; string o)
+  {
+    if(options[o]) u += ({ o + ": " + stringify(options[o]) });
+  }
  
-         func += options->url;
-         func += ", " + javascript_options;
+  f = "var bindArgs = { " + (u * ",") + "};";
 
+  
 
-  if(options->before)
-    func = options->before + "; " + func;
-  if(options->after)
-    func = func + "; " + options->after;
-  if(options->condition)
-    func = "if(" + options->condition + ") { " + func + "; }";
+  if(options->id)
+  {
+    f += "var form = document.getElementById(" + stringify(options->id) + ");"
+         "if(form) bindArgs.formNode = form;";
+  }
 
-  // we need to provide "confirm option handling.
-  func+=")"; 
-  return func;
+  if(options->begin)
+  {
+    f += options->begin;
+  }
+
+  f += "var requestObj = dojo.io.bind(bindArgs);";
+
+  f += "return false;";
+
+  return "return function ()  { " + f + "}();";
+}
+
+string stringify(string s)
+{
+  return "'" + replace(s, "\"", "\\\"") + "'";
 }

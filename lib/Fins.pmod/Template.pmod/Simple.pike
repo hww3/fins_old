@@ -364,21 +364,27 @@ class PikeBlock
    string cmd = "";
    string arg = "";
 
-   if(!(<"else", "end", "endif">)[expr])
+  array a = array_sscanf(expr, "%[a-zA-Z0-9_] %s");
+
+  if(sizeof(a)>1) 
+    arg = String.trim_all_whites(a[1]);
+   cmd = a[0];
+
+
+   if((<"if", "elseif", "foreach">)[expr])
    {
-     array a = array_sscanf(expr, "%[a-zA-Z0-9_] %s");
      if(sizeof(a) !=2)
      {
        throw(Error.Generic(sprintf("PSP format error: invalid command format in %s at line %d.\n", templatename, start)));
      }
 
-     arg = String.trim_all_whites(a[1]);
-     cmd = a[0];
    }
+/*
    else 
    {
      cmd = expr;
    }
+*/
    switch(cmd)
    {
      case "if":
@@ -426,10 +432,6 @@ class PikeBlock
 
        return ("{catch{ "
               " buf->add(__macro_" + cmd + "(__d, " + argify(arg) + "));};}");
-//       macros_used[cmd] = 1;
-//       return " buf->add(Fins.Template.get_simple_macro(\"" + cmd + "\")(__d, " + argify(arg) + "));";
-//       return "werror(\"" + cmd + "\\n\"); (Fins.Template.get_simple_macro(\"" + cmd + "\");//(__d, "
-//               + argify(arg) + "));";
        break;
    }
 
@@ -437,18 +439,20 @@ class PikeBlock
 
  string argify(string arg)
  {
+
    array rv = ({});
    int keepgoing = 0;
    do{
     keepgoing = 0;
     string key, value;
-    int r = sscanf(arg,  "%*[ ]%[a-zA-Z0-9_]=\"%s\"%s", key, value, arg);
+    int r = sscanf(arg,  "%*[ \n\t]%[a-zA-Z0-9_]=\"%s\"%s", key, value, arg);
     if(r>2) keepgoing=1;
-    if(r<2) break;
+    if(r<=2) break;
 
     if(key && strlen(key))
+    {
       rv += ({"\"" + lower_case(key) + "\":\"" + value + "\"" });
-
+     }
    }while(keepgoing);
    return "([" + rv*", " + "])";
  }
@@ -460,7 +464,7 @@ class PikeBlock
    do{
     keepgoing = 0;
     string key, value;
-    int r = sscanf(arg,  "%*[ ]%[a-zA-Z0-9_]=\"%s\"%s", key, value, arg);
+    int r = sscanf(arg,  "%*[ \n\t]%[a-zA-Z0-9_]=\"%s\"%s", key, value, arg);
     if(r>2) keepgoing=1;
     if(r<2) break;
 

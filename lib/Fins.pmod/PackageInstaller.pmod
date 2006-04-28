@@ -42,6 +42,7 @@ int install_package(string package) {
   mixed err = catch(p = compile_string(package));
   if (stringp(ee->get()) && sizeof(ee->get())) {
     Log.critical("Error.  Package file corrupt.");
+    werror(ee->get());
     return 1;
   }
   else if (err) {

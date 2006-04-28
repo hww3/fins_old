@@ -4,6 +4,7 @@ import Tools.Logging;
 
 constant default_port = 8080;
 constant my_version = "0.1";
+int my_port;
 
 string session_storagetype = "ram";
 //string session_storagetype = "file";
@@ -68,6 +69,13 @@ int main(int argc, array(string) argv)
 
   if(argc>=2) project = argv[1];
   if(argc>=3) config_name = argv[2];
+
+  return do_startup();
+
+}
+
+int do_startup()
+{
 
   if(!hilfe_mode && go_background && fork())
 	{

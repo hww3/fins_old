@@ -26,10 +26,11 @@ int main() {
       1
     );
   string appdir = prompt("First enter the directory to install the application in\n", PROMPT_DIR, getcwd());
-  if (Stdio.exist(Stdio.append_path(appdir, NAME))) {
-    string skip = prompt("Target directory exists, skip installation?", PROMPT_ENUM, "Y", ({ "Y", "N" }));
+  string fdir = Stdio.append_path(appdir, NAME);
+  if (Stdio.exist(fdir)) {
+    string skip = prompt("Target directory (" + fdir + ") exists, skip installation?", PROMPT_ENUM, "Y", ({ "Y", "N" }));
     if (skip == "N") {
-      r->write("Please wait, installing application...", 1);
+      r->write(sprintf("Please wait, installing application in %s...\n", fdir));
       if (DEBUG)
 	r->newline();
       string data = Gz.File(Stdio.FakeFile(MIME.decode_base64(SOURCE)))->read();
@@ -38,23 +39,24 @@ int main() {
     }
   }
   else {
-    r->write("Please wait, installing application...", 1);
+    r->write(sprintf("Please wait, installing application in %s...\n", fdir));
     if (DEBUG)
       r->newline();
     string data = Gz.File(Stdio.FakeFile(MIME.decode_base64(SOURCE)))->read();
     int c = untar(data, appdir);
     r->write(sprintf(" done (%d files).\n", c));
   }
+
   string s = prompt("Would you like me to start the application using the built in standalone server?\n", PROMPT_ENUM, "Y", ({ "Y", "N" }));
   if (s == "Y") {
     // Starting standalone server.
-    int port = prompt("Please enter the port you would like the Fins application to list on for incoming browser connections.\n", PROMPT_INT, PORT);
+    int port = prompt("Please enter the port you would like the Fins application to listen on for incoming browser connections.\n", PROMPT_INT, PORT);
     object server = Standalone();
     // WARNING:
     //   If your app doesn't untar to the same name as the NAME constant in your module 
     //   then you're screwed.
-    return server->main(Stdio.append_path(appdir, NAME));
-    r->write(sprintf("Connect on port %d to this host with your web browser (probably http://localhost:%d/) to view the application.\n", PORT, PORT), 1);
+    return server->main(Stdio.append_path(appdir, NAME), (int)port, CONFIG);
+    r->write(sprintf("Connect on port %d to this host with your web browser (probably http://localhost:%d/) to view the application.\n", port, port), 1);
   }
 }
 
@@ -141,6 +143,8 @@ static mixed prompt(string description, int type, void|mixed defval, void|array 
       int i = (int)r->read(sprintf(_prompt, "integer"));
       if (!i && defval)
 	return defval;
+      else return i;
+      break;	
     case PROMPT_DIR:
       string dir = r->read(sprintf(_prompt, "directory"));
       if (Stdio.exist(dir) && Stdio.is_dir(dir))
@@ -151,6 +155,7 @@ static mixed prompt(string description, int type, void|mixed defval, void|array 
 	r->write(sprintf("%s is not a valid directory.\n", dir), 1);
 	return prompt(description, type, defval, options);
       }
+      break;	
     case PROMPT_FILE:
       string file = r->read(sprintf(_prompt, "filename"));
       if (Stdio.exist(file) && Stdio.is_file(file))
@@ -161,6 +166,7 @@ static mixed prompt(string description, int type, void|mixed defval, void|array 
 	r->write(sprintf("%s is not a valid file.\n", file), 1);
 	return prompt(description, type, defval, options);
       }
+      break;	
     case PROMPT_ENUM:
       if (arrayp(options) && sizeof(options)) {
 	string choice = r->read(sprintf(_prompt, "choice(" + options * "," + ")"));
@@ -176,6 +182,7 @@ static mixed prompt(string description, int type, void|mixed defval, void|array 
       }
       else
 	throw(({"options must be an array of options.", backtrace()}));
+      break;	
     case PROMPT_STRING:
     default:
       string s = r->read(sprintf(_prompt, "string"));
@@ -189,9 +196,13 @@ static mixed prompt(string description, int type, void|mixed defval, void|array 
 static class Standalone {
   inherit Fins.FinServe;
 
-  int main(string appdir) {
-    array argv = ({ sprintf("-p=%d", port), appdir, CONFIG });
-    return ::main(sizeof(argv), argv);
+  int main(string appdir, int port, string config) {
+
+    project = appdir;
+    config_name = config;
+    my_port = port;
+    
+    return do_startup();
   }
   
 }

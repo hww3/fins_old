@@ -1,8 +1,8 @@
-inherit Fins.Demo.Installer;
+inherit Fins.FinsPackage;
 /*
    How to make a new version of this file:
 
-   pike -Mlib/ -e "Fins.Demo.Installer.new_source_file(\"lib/Fins.pmod/Demo.pmod/HelloWorld.pmod\", \"/path/to/helloworld.tar.gz\");
+   pike -Mlib/ -e "Fins.FinsPackage.new_source_file(\"HelloWorld.fins\", \"helloworld.tar.gz\");
 */
 
 constant NAME = "Hello World";

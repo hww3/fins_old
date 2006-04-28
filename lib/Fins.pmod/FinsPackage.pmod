@@ -14,7 +14,7 @@ static object r;
 
 int main() {
   if (!sizeof(SOURCE)) {
-    werror("Don't call Fins.Demo.Installer.main() directly - inherit it, silly!\n\n");
+    werror("Don't call Fins.FinsPackage.main() directly - inherit it, silly!\n\n");
     return 1;
   }
   if (!r)

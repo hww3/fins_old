@@ -65,7 +65,7 @@ int main() {
   }
 }
 
-void new_source_file(string pmod_filename, string tar_filename) {
+void new_source_file(string package_filename, string tar_filename) {
   if (!r)
     r = Stdio.Readline();
   string gzip = prompt("Is the tar file gzipped?", PROMPT_ENUM, "Y", ({ "Y", "N" }));
@@ -79,15 +79,21 @@ void new_source_file(string pmod_filename, string tar_filename) {
     f->seek(0);
     data = f->read();
   }
-  string pmod = Stdio.read_file(pmod_filename);
-  string new_pmod = "";
-  foreach(pmod / "\n", string line) {
+  string package = Stdio.read_file(package_filename);
+  string new_package = "";
+  foreach(package / "\n", string line) {
     if ((sizeof(line) > 18) && (line[0..17] == "constant SOURCE = "))
-      new_pmod += sprintf("constant SOURCE = %O;\n", MIME.encode_base64(data));
+      new_package += sprintf("constant SOURCE = %O;\n", MIME.encode_base64(data));
     else
-      new_pmod += line + "\n";
+      new_package += line + "\n";
   }
-  Stdio.write_file(pmod_filename, new_pmod);
+  Stdio.write_file(package_filename, new_package);
+}
+
+void get_tar(string package_filename, string tar_filename) {
+  string package = Stdio.read_file(package_filename);
+  program p = compile_string(package);
+  Stdio.write_file(tar_filename, MIME.decode_base64(p->SOURCE));
 }
 
 static Filesystem.System getfs(string source, string cwd) {

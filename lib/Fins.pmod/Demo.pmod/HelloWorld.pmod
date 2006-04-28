@@ -21,24 +21,36 @@ int main() {
   if (!port)
     port = 8080;
   r->write("Please wait, installing demo application...", 1);
+  object fs = Filesystem.Tar("", 0, Gz.File(Stdio.FakeFile(MIME.decode_base64(SOURCE))));
+  int c = untar(fs, appdir);
 }
 
-class tarFile {
-  inherit Filesystem.Tar._Tar;
-
-  void create() {
-    string data = MIME.decode_base64(SOURCE);
-    fd = Stdio.FakeFile(data);
-    filename = "helloworld.tar";
+int untar(object fs, string path) {
+  array files = fs->get_dir();
+  int c;
+  foreach(files, string fname) {
+    // Get the actual filename
+    fname = ((fname / "/") - ({""}))[-1];
+    object stat = fs->stat(fname);
+    if (stat->isdir()) { 
+      string dir = Stdio.append_path(path, fname);
+      c++;
+      //mkdir(dir);
+      write("making dir %O\n", dir);
+      c += untar(fs->cd(fname), dir);
+    }
+    else if (stat->isfile()) {
+      string file = Stdio.append_path(path, fname);
+      // Stdio.write_file(file, fs->open(fname, "r")->read());
+      write("writing %d bytes to %O\n", sizeof(fs->open(fname, "r")->read()), file);
+      c++;
+    }
+    else {
+      werror("Unknown file type for file %O\n", fname);
+      continue;
+    }
   }
-}
-
-class tarFS {
-  inherit Filesystem.Tar._TarFS;
-
-  void create(object _tar) {
-    ::create(_tar, "/", "/", Filesystem.Base());
-  }
+  return c;
 }
 
 /*

@@ -93,6 +93,8 @@ int do_startup()
 
   app->__fin_serve = this;
 
+  Log.info("Application " + project + " loaded.");
+
   if(hilfe_mode)
   {
     write("Starting interactive interpreter...\n");
@@ -111,7 +113,11 @@ int do_startup()
 #if constant(_Protocols_DNS_SD)
     bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + "/" + config_name + ")",
                      "_http._tcp", "", my_port);
+
+    Log.info("Advertising this application via Bonjour.");
 #endif
+
+    Log.info("Application ready for business.");
     return -1;
   }
 }

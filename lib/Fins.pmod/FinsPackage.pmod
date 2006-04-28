@@ -10,6 +10,7 @@ constant PROMPT_DIR = 3;
 constant PROMPT_FILE = 4;
 constant PROMPT_ENUM = 5;
 
+int cc = 0;
 static object r;
 
 int main() {
@@ -47,7 +48,7 @@ int main() {
     r->write(sprintf(" done (%d files).\n", c));
   }
 
-  string s = prompt("Would you like me to start the application using the built in standalone server?\n", PROMPT_ENUM, "Y", ({ "Y", "N" }));
+  string s = prompt("Would you like me to start the application using the built in standalone server?\n", PROMPT_ENUM, 0, ({ "Y", "N" }));
   if (s == "Y") {
     // Starting standalone server.
     int port = prompt("Please enter the port you would like the Fins application to listen on for incoming browser connections.\n", PROMPT_INT, PORT);
@@ -55,8 +56,12 @@ int main() {
     // WARNING:
     //   If your app doesn't untar to the same name as the NAME constant in your module 
     //   then you're screwed.
-    return server->main(Stdio.append_path(appdir, NAME), (int)port, CONFIG);
-    r->write(sprintf("Connect on port %d to this host with your web browser (probably http://localhost:%d/) to view the application.\n", port, port), 1);
+    int retcode = server->main(Stdio.append_path(appdir, NAME), (int)port, CONFIG);
+    
+    if(retcode < 0)
+      r->write(sprintf("Connect on port %d to this host with your web browser (probably http://localhost:%d/) to view the application.\n", port, port), 1);
+
+    return retcode;
   }
 }
 
@@ -94,17 +99,20 @@ static Filesystem.System getfs(string source, string cwd) {
 int untar(string source, string path, void|string cwd) {
   if (!cwd)
     cwd = "/";
-  array files = getfs(source, cwd)->get_dir();
+  object t = getfs(source, cwd);
+  array files = t->get_dir();
   int c;
   foreach(sort(files), string fname) {
     // Get the actual filename
     fname = ((fname / "/") - ({""}))[-1];
-    object stat = getfs(source, cwd)->stat(fname);
+    object stat = t->cd(cwd)->stat(fname);
     if (stat->isdir()) { 
       string dir = Stdio.append_path(path, fname);
       c++;
+      cc++;
       if (DEBUG)
-	write("%O [dir]\n", dir);
+	write(sprintf("%O [dir]\n", dir));
+      else if(!(cc%10)) r->write(".");
       mkdir(dir);
       c += untar(source, dir, Stdio.append_path(cwd, fname));
     }
@@ -114,12 +122,15 @@ int untar(string source, string path, void|string cwd) {
       if (mixed err = catch{
 	if (DEBUG)
 	  write("%O [file %d bytes]\n", file, stat->size);
-	Stdio.write_file(file, getfs(source, cwd)->open(fname, "r")->read());
+        else if(!(cc%10))
+          r->write(".");
+	Stdio.write_file(file, t->cd(cwd)->open(fname, "r")->read());
       }) {
 	werror("%O [error in tarfile!]\n\n", file);
 	throw(err);
       } 
       c++;
+      cc++;
     }
     else {
       werror("Unknown file type for file %O\n", fname);

@@ -33,7 +33,7 @@ void print_help()
 
 int main(int argc, array(string) argv)
 {
-  int my_port = default_port;
+  my_port = default_port;
 
   foreach(Getopt.find_all_options(argv,aggregate(
     ({"port",Getopt.HAS_ARG,({"-p", "--port"}) }),

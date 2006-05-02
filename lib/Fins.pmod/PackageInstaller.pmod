@@ -3,6 +3,12 @@
 import Tools.Logging;
 
 int main(int argc, array argv) {
+#if !constant(Public.Tools.ConfigFiles)
+  werror("Fins requires Public.Tools.ConfigFiles to be installed.\n");
+  werror("You can install it from Monger using the following command (as root):\n");
+  werror("\tpike -x monger --install Public.Tools.ConfigFiles\n\n");
+  return 1;
+#endif
   if (sizeof(argv) < 2)
     return usage(argv);
   string package = argv[1];

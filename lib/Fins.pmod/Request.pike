@@ -2,6 +2,19 @@ object fins_app;
 
 string not_args;
 
+//! allows you to override the detected language.
+void set_lang(string lang) {
+  if (sizeof(lang) == 2) {
+    if (iso639_2[lang])
+      this->misc->session_variables->__lang == lang;
+  }
+  else if (sizeof(lang) == 3) {
+    mapping backwards = mkmapping(values(iso639_2), indices(iso639_2));
+    if (backwards[lang])
+      this->misc->session_variables->__lang == backwards[lang];
+  }
+}
+
 //! returns a 3 letter iso 639 language code based on accept-language headers
 //!
 //! @note
@@ -12,7 +25,7 @@ string get_lang()
     return this->misc->session_variables->__lang;
 
   // we need to figure out the language.
-//  else
+  //  else
   {
     string lang = "eng";
     string lh;
@@ -29,10 +42,10 @@ string get_lang()
       lang = String.trim_all_whites(l[0]);
       if(sizeof(l)>1)
       {
-        l[1] = String.trim_all_whites(l[1]);
-        if(has_prefix(l[1], "q="))
-          q = (float)l[1][2..];
-        else q = 1.0;
+	l[1] = String.trim_all_whites(l[1]);
+	if(has_prefix(l[1], "q="))
+	  q = (float)l[1][2..];
+	else q = 1.0;
       }
       al += ({lang});
       aq += ({q});
@@ -51,73 +64,73 @@ string get_lang()
     foreach(al;;string desired)
       if(search(available, desired) != -1)
       {
-        lang = desired;
-		       break;
-		      }
-		#ifdef DEBUG
-		     werror("SELECTED LANGUAGE: %O\n", lang);
-		#endif
-		    this->misc->session_variables->__lang = lang;
-		    return lang;
-		  }
-		}
+	lang = desired;
+	break;
+      }
+#ifdef DEBUG
+    werror("SELECTED LANGUAGE: %O\n", lang);
+#endif
+    this->misc->session_variables->__lang = lang;
+    return lang;
+  }
+}
 
-		//! the purpose of this method is to convert an iso language code
-		//! to one familiar with the pike locale system.
-		array map_languages(array languages)
-		{
-		  array out = ({}); 
+//! the purpose of this method is to convert an iso language code
+//! to one familiar with the pike locale system.
+array map_languages(array languages)
+{
+  array out = ({}); 
 
-		  foreach(languages;;string l)
-		    if(iso639_2[l])
-		      out += ({iso639_2[l]});
-		    else if(sizeof(l)>2 && iso639_2[l[0..1]])
-		      out += ({iso639_2[l[0..1]]});
+  foreach(languages;;string l)
+    if(iso639_2[l])
+      out += ({iso639_2[l]});
+    else if(sizeof(l)>2 && iso639_2[l[0..1]])
+      out += ({iso639_2[l[0..1]]});
 
-		  return out;
-		}
+  return out;
+}
 
-		mapping iso639_2 =   
-		([
-		   "ab": "abk",
-		   "aa": "aar",
-		   "af": "afr",
-		   "sq": "alb",
-		   "am": "amh",
-		   "ar": "ara",
-		   "hy": "arm",   
-		   "as": "asm",
-		   "ay": "aym",
-		   "az": "aze",  
-		   "ba": "bak",
-		   "eu": "baq",
-		   "bn": "ben",
-		   "bh": "bih",
-		   "bi": "bis",
-		   "be": "bre",
-		   "bg": "bul",
-		   "my": "bur",
-		   "be": "bel",
-		   "ca": "cat",
-		   "zh": "chi",
-		   "co": "cos",
-		   "hr": "cro", // we made this one up :)
-		   "cs": "ces",
-		   "da": "dan",
-		   "nl": "dut",
-		   "dz": "dzo",
-		   "en": "eng",
-		   "eo": "epo",
-		   "et": "est", 
-		   "fo": "fao",
-		   "fj": "fij",
-		   "fi": "fin",
-		   "fr": "fra",
-		   "fy": "fry",
-		   "gl": "glg",
-		   "ka": "geo",
-		   "de": "deu",
-		   "el": "ell",
-		   "kl": "kal",
-		   "sv": "swe",
-		]);
+mapping iso639_2 =   
+([
+ "ab": "abk",
+ "aa": "aar",
+ "af": "afr",
+ "sq": "alb",
+ "am": "amh",
+ "ar": "ara",
+ "hy": "arm",   
+ "as": "asm",
+ "ay": "aym",
+ "az": "aze",  
+ "ba": "bak",
+ "eu": "baq",
+ "bn": "ben",
+ "bh": "bih",
+ "bi": "bis",
+ "be": "bre",
+ "bg": "bul",
+ "my": "bur",
+ "be": "bel",
+ "ca": "cat",
+ "zh": "chi",
+ "co": "cos",
+ "hr": "cro", // we made this one up :)
+ "cs": "ces",
+ "da": "dan",
+ "nl": "dut",
+ "dz": "dzo",
+ "en": "eng",
+ "eo": "epo",
+ "et": "est", 
+ "fo": "fao",
+ "fj": "fij",
+ "fi": "fin",
+ "fr": "fra",
+ "fy": "fry",
+ "gl": "glg",
+ "ka": "geo",
+ "de": "deu",
+ "el": "ell",
+ "kl": "kal",
+ "sv": "swe",
+ ]);

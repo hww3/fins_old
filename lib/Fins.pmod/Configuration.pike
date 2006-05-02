@@ -6,15 +6,15 @@ static mapping values;
 //!
 static void create(string appdir, string _config_file)
 {
-        app_dir = appdir;
-        app_name = (appdir/"/")[-1];
-        config_file = _config_file;
-	string fc = Stdio.read_file(config_file);
-	
-	// the "spec" says that the file is utf-8 encoded.
-	fc=utf8_to_string(fc);
-	
-	values = Public.Tools.ConfigFiles.Config.read(fc);
+  app_dir = appdir;
+  app_name = (appdir/"/")[-1];
+  config_file = _config_file;
+  string fc = Stdio.read_file(config_file);
+
+  // the "spec" says that the file is utf-8 encoded.
+  fc=utf8_to_string(fc);
+
+  values = Public.Tools.ConfigFiles.Config.read(fc);
 }
 
 void set_value(string section, string item, mixed value)
@@ -47,7 +47,7 @@ string get_value(string section, string item)
   {
     return values[section][item][0];
   }
-  
+
   else return values[section][item];
 }
 
@@ -72,18 +72,18 @@ array get_value_array(string section, string item)
   {
     values[section][item];
   }
-  
+
   else return ({ values[section][item] }); 
 }
 
 //!
 mixed `[](string arg)
 {
-//      werror("GOT %O\n", arg);
+  //      werror("GOT %O\n", arg);
   return values[arg];
 
 }
- 
+
 int(0..1) _is_type(string t)
 {
   int v=0;
@@ -92,7 +92,7 @@ int(0..1) _is_type(string t)
   {
     case "mapping":
       v = 1;
-      break;
+    break;
   }
 
   return v;

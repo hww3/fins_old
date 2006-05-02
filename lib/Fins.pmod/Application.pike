@@ -25,21 +25,21 @@ string static_dir;
 //!
 static void create(.Configuration _config)
 {
-   config = _config;
-   static_dir = Stdio.append_path(config->app_dir, "static");
-   
-   load_cache();
-   load_model();
-   load_view();
-   load_controller();
+  config = _config;
+  static_dir = Stdio.append_path(config->app_dir, "static");
 
-   start();
+  load_cache();
+  load_model();
+  load_view();
+  load_controller();
+
+  start();
 }
 
 //!
 void start()
 {
-	
+
 }
 
 static void load_cache()
@@ -79,18 +79,18 @@ static void load_model()
 int controller_updated(object controller, object container, string cn)
 {
   string filename = master()->programs_reverse_lookup(object_program(controller));
-//  werror("filename: %O program: %O\n", filename, object_program(controller));
+  //  werror("filename: %O program: %O\n", filename, object_program(controller));
   object stat = file_stat(filename);
   if(stat && stat->mtime > controller->__last_load)
   {
-     string key = search(master()->programs, object_program(controller));
-     // werror("key is " + key + "\n");
-//     m_delete(master()->programs, key);
-     
-     Log.debug("Reloading controllers...");
-     load_controller();
+    string key = search(master()->programs, object_program(controller));
+    // werror("key is " + key + "\n");
+    //     m_delete(master()->programs, key);
 
-     return 1;
+    Log.debug("Reloading controllers...");
+    load_controller();
+
+    return 1;
   }
 
   return 0;
@@ -103,7 +103,7 @@ public mixed handle_request(.Request request)
 
   request->fins_app = this;
 
-//  Log.info("SESSION INFO: %O", request->misc->session_variables);
+  //  Log.info("SESSION INFO: %O", request->misc->session_variables);
 
   // we have to short circuit this one...
   if(request->not_query == "/favicon.ico")
@@ -124,7 +124,7 @@ public mixed handle_request(.Request request)
   array args = ({});
 
   if(sizeof(x)>1)
-   args = x[1..];
+    args = x[1..];
 
   .Response response = .Response(request);
 
@@ -165,28 +165,28 @@ array get_event(.Request request)
       // the current controller.
       if((i+1) == sizeof(r))
       {
-         if(event)
-         {
-           Log.error("undefined situation! we have to fix this.\n");
-         }
-         else if(cc && cc["index"])
-         {
-           not_args += ({"index"});
-           event = cc["index"];
-         }
-         else
-         {
-            Log.info("cc: %O\n", cc);
-         }
-         break;
+	if(event)
+	{
+	  Log.error("undefined situation! we have to fix this.\n");
+	}
+	else if(cc && cc["index"])
+	{
+	  not_args += ({"index"});
+	  event = cc["index"];
+	}
+	else
+	{
+	  Log.info("cc: %O\n", cc);
+	}
+	break;
       }
       else
       {
-        // what should we do?
-        if(event)
-        {
-          args+=({comp});
-        }
+	// what should we do?
+	if(event)
+	{
+	  args+=({comp});
+	}
       }
     }
 
@@ -195,49 +195,49 @@ array get_event(.Request request)
     {
       if(event)
       {
-        args+=({comp});
+	args+=({comp});
       }
       else if(cc && cc[comp] && functionp(cc[comp]))
       {
-        not_args += ({comp});
-        event = cc[comp];
+	not_args += ({comp});
+	event = cc[comp];
       }
       else if(cc && cc[comp] && objectp(cc[comp]))
       {
-        if(Program.implements(object_program(cc[comp]), Fins.Helpers.Runner))
-        {
-          not_args += ({comp});
-          event = cc[comp];
-        }    
-        else if(Program.implements(object_program(cc[comp]), Fins.FinsController))
-        { 
-          not_args += ({comp});
-          if((int)config["controller"]["reload"])
-          {            
-            controller_updated(cc[comp], cc, comp);
-          }
+	if(Program.implements(object_program(cc[comp]), Fins.Helpers.Runner))
+	{
+	  not_args += ({comp});
+	  event = cc[comp];
+	}    
+	else if(Program.implements(object_program(cc[comp]), Fins.FinsController))
+	{ 
+	  not_args += ({comp});
+	  if((int)config["controller"]["reload"])
+	  {            
+	    controller_updated(cc[comp], cc, comp);
+	  }
 
-          cc = cc[comp];
-        }
-        else
-        {
-          throw(Error.Generic("Component " + comp + " is not a Controller.\n"));
-        }
+	  cc = cc[comp];
+	}
+	else
+	{
+	  throw(Error.Generic("Component " + comp + " is not a Controller.\n"));
+	}
       }
       else if(cc && cc["index"])
       { 
-         not_args += ({"index"});
-         event = cc["index"];
-         args += ({comp});
+	not_args += ({"index"});
+	event = cc["index"];
+	args += ({comp});
       }
       else
       {
-        throw(Error.Generic("Component " + comp + " does not exist.\n"));
+	throw(Error.Generic("Component " + comp + " does not exist.\n"));
       }
     }
   }
 
-//  werror("got to end of path; current controller: %O, event: %O, args: %O\n", cc, event, args);
+  //  werror("got to end of path; current controller: %O, event: %O, args: %O\n", cc, event, args);
 
   // we got all this way without an event.
   if(!event && r[-1] != "")
@@ -257,7 +257,7 @@ array get_event(.Request request)
 
   if(sizeof(args))
     return ({event, @args});
- 
+
   else return ({event});
 
 }
@@ -286,7 +286,7 @@ array get_event(.Request request)
 
   if(request->request_headers["if-modified-since"] && 
       Protocols.HTTP.Server.http_decode_date(request->request_headers["if-modified-since"]) 
-        >= stat->mtime) 
+      >= stat->mtime) 
   {
     response->not_modified();
     return response;

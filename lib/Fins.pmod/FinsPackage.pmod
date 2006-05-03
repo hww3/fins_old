@@ -99,7 +99,7 @@ void get_tar(string package_filename, string tar_filename) {
 static Filesystem.System getfs(string source, string cwd) {
   // This is really nasty - we apprently need to reopen the tar file every time
   // we read from it or it randomly closes it's Fd and throws errors everywhere.
-  return Filesystem.Tar(sprintf("%s.tar", NAME), 0, Stdio.FakeFile(source))->cd(cwd);
+  return Tools.Tar(sprintf("%s.tar", NAME), 0, Stdio.FakeFile(source))->cd(cwd);
 }
 
 int untar(string source, string path, void|string cwd) {

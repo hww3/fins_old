@@ -43,28 +43,31 @@ private class JSONRPCRunner(object obj, function indexer)
         if(off<=0) error("invalid request format.\n");
 
         object X;
-
-        if(catch(X=Tools.JSON.RPC.decode_call(request->raw[(off+4) 
-..])))
+        if(catch(X=Tools.JSON.RPC.decode_jsonrpc(request->raw[(off+4) ..])))
         {
                 error("Error decoding the JSONRPC Call. Are you not speaking JSONRPC?\n");
         }
         mixed resp;
 
+        if(object_program(X) != Tools.JSON.RPC.Request)
+        {
+                error("We received something other than a JSONRPC request. We're sort of limited that way.\n");
+        }
+
         mixed err = catch {
-          mixed z = indexer(X->method_name, 2);
+          mixed z = indexer(X->json->method, 2);
           if(!functionp(z))
             throw(Error.Generic("Invalid method request: not a function.\n"));
-          resp = z(request, @X->params);
+          resp = z(request, @X->json->params);
         };
 
   if(err)
   {
-    response->set_data(Tools.JSON.RPC.encode_response_fault(1, err[0]));
+    response->set_data(Tools.JSON.RPC.encode_error(X->json->id, err[0]));
   }
   else
   {
-    response->set_data(Tools.JSON.RPC.encode_response(({resp})));
+    response->set_data(Tools.JSON.RPC.encode_response(resp));
   }
    response->set_type("text/json");
 

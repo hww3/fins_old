@@ -1,5 +1,5 @@
 
-
+//!
 string encode_call(string method, mixed id, mixed ... params)
 {
   mapping request = ([]);
@@ -11,6 +11,7 @@ string encode_call(string method, mixed id, mixed ... params)
   return (string).JSONObject(request);
 }
 
+//!
 string encode_response(mixed id, mixed result)
 {
   mapping request = ([]);
@@ -21,16 +22,18 @@ string encode_response(mixed id, mixed result)
   return (string).JSONObject(request);
 }
 
+//!
 string encode_error(mixed id, mixed error)
 {
   mapping request = ([]);
 
   request->id = id;
-  request->error = error;
+  request->error = (["message": error]);
 
   return (string).JSONObject(request);
 }
 
+//!
 string encode_notification(string method, mixed ... params)
 {
   mapping request = ([]);
@@ -42,7 +45,8 @@ string encode_notification(string method, mixed ... params)
   return (string).JSONObject(request);
 }
 
-array decode_jsonrpc(string json)
+//!
+Message decode_jsonrpc(string json)
 {
   mapping r = .JSONObject(json);
 
@@ -75,26 +79,36 @@ array decode_jsonrpc(string json)
   }
 }
 
+//!
+class Message(mapping json)
+{
+  constant type = "";
+}
 
+//!
 class Request
 {
+  inherit Message;
   constant type = "request";
 }
 
+//!
 class Response
 {
+  inherit Message;
   constant type = "response";
-
 }
 
+//!
 class Error
 {
+  inherit Message;
   constant type = "error";
-
 }
 
+//!
 class Notification
 {
+  inherit Message;
   constant type = "notification";
-
 }

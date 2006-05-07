@@ -1,4 +1,4 @@
-#!/usr/local/bin/pike -Mlib/
+#!/usr/local/bin/pike
 
 int main(int argc, array argv) {
   string cmd_dir = dirname(argv[0]);

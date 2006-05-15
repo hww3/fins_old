@@ -36,7 +36,8 @@ static void create(.Configuration _config)
   start();
 }
 
-//!
+//! this method will be called after the cache, model, view and 
+//! controller have been loaded.
 void start()
 {
 
@@ -139,7 +140,12 @@ public mixed handle_request(.Request request)
   return response->get_response();
 }
 
+//! Given a request object, this method will find the appropriate event method
+//! to call.
 //!
+//! @returns
+//!   an array containing the appropriate event as its first argument and
+//!   any remaining arguments as the second through final elements.
 array get_event(.Request request)
 {
   .FinsController cc;

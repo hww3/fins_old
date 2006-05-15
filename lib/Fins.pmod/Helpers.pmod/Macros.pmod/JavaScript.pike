@@ -1,3 +1,6 @@
+//!
+//! returns a script reference to a locally stalled copy of Dojo.
+//!
 string simple_macro_javascript_includes(Fins.Template.TemplateData data, mapping|void args)
 {
   return 

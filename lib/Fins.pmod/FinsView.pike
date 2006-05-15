@@ -4,13 +4,13 @@ inherit FinsBase : base;
 inherit Fins.Helpers.Macros.JavaScript;
 inherit Fins.Helpers.Macros.Basic;
 
-//!
+//! the default class to be used for templates in this application
 program default_template = Fins.Template.Simple;
 
-//!
+//! the default template data object class for use in this application
 program default_data = Fins.Template.TemplateData;
 
-//!
+//! the default template context class to be used in this application
 program default_context = Fins.Template.TemplateContext;
 
 static mapping templates = ([]);

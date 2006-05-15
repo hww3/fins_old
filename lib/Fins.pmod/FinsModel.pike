@@ -1,7 +1,11 @@
 import Fins;
 inherit FinsBase;
 
+//!
 object context;
+
+//! an object that provides Model repository service, by default
+//! this will be @[Fins.Model].
 object repository = Fins.Model;
 
 static void create(Fins.Application a)
@@ -26,6 +30,7 @@ void load_model()
    register_types();
 }
 
+//!
 void register_types()
 {
 

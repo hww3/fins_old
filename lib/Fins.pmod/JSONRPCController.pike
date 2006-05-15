@@ -1,5 +1,10 @@
 inherit .FinsController;
 
+//! makes methods in this object available via JSONRPC.
+//! all methods receive the request object as their first
+//! argument. Any following arguments will be provided as 
+//! subsequent arguments.
+
 public object index = JSONRPCRunner(this, ::`[]);
 
 static mixed `[](mixed a)

@@ -1,5 +1,15 @@
 inherit .FinsController;
 
+//!
+//! Impliments a controller which provides access to
+//! the functions in the class via XMLRPC.
+//!
+//! all public methods are made available via XMLRPC
+//! at the mountpoint for the controller. these methods
+//! will receive the Request object as the first argument,
+//! any other arguments will be passed from the XMLRPC request
+//! to the called method.
+
 public object index = XMLRPCRunner(this, ::`[]);
 
 static mixed `[](mixed a)

@@ -1,12 +1,21 @@
+//!
 constant DEBUG = 1;
+
+//!
 constant INFO = 2;
+
+//!
 constant WARN = 4;
+
+//!
 constant ERROR = 8;
+
+//!
 constant CRITICAL = 16;
 
+//!
 object stderr = Stdio.stderr;
 
-// we start with a full log.
 int loglevel = DEBUG|INFO|WARN|ERROR|CRITICAL;
 
 mapping log_strs = ([
@@ -30,6 +39,7 @@ static void do_msg(int level, string m, mixed|void ... extras)
   stderr->write(log_strs[level] + ": " + m + "\n");
 }
 
+//!
 void exception(string msg, object|array exception)
 {
   msg = msg + "\n%s";
@@ -72,7 +82,8 @@ void critical(string msg, mixed|void ... extras)
   do_msg(CRITICAL, msg, @extras); 
 }
 
-//!
+//! by default, we start with full logging. use this method to 
+//! modify the log level.
 void set_level(int level)
 {
   loglevel = level;

@@ -1,6 +1,7 @@
 //! retrieves a value from a mapping given a dot separated variable name. 
 //! 
-//! @returns the variable (or zero if not present)
+//! @returns 
+//!  the variable (or zero if not present)
 mixed get_var_value(string varname, mixed var)
 {
   mixed myvar = var;

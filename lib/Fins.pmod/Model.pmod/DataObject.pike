@@ -1,14 +1,27 @@
+//! This is an object that defines a model-domain data type.
+//! This class is singleton for a given data type. Use a
+//! DataObjectInstance object to retrieve data for a given
+//! data type.
 
+//!
 .Field primary_key;
+
+//!
 .Field alternate_key;
 
+
+//!
 .DataModelContext context;
 
 object my_undef = .Undefined;
 
+//!
 mapping objs = ([]);
 
+//!
 mapping fields = ([]);
+
+//!
 mapping relationships = ([]);
 
 string single_select_query = "SELECT %s FROM %s WHERE %s=%s";
@@ -25,6 +38,7 @@ string instance_name = "";
 string table_name = "";
 mapping new_object_data = ([]);
 
+//!
 void create(.DataModelContext c)
 {
    context = c;
@@ -71,16 +85,19 @@ void generate_from_schema(string table)
    }
 }
 
+//!
 void set_instance_name(string _name)
 {
   instance_name = _name;
 }
 
+//!
 void set_table_name(string _name)
 {
   table_name = _name;
 }
 
+//!
 void set_primary_key(string _key)
 {
   if(!fields[_key])
@@ -89,6 +106,7 @@ void set_primary_key(string _key)
   else primary_key = fields[_key];
 }
 
+//!
 void add_field(.Field f)
 {
    f->set_context(context);

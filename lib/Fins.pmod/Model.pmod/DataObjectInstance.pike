@@ -1,5 +1,8 @@
 .DataObject master_object;
 
+//! this is an actual instance containing model-domain data
+//! 
+
 string object_type;
 multiset fields_set = (<>);
 mapping object_data = ([]);

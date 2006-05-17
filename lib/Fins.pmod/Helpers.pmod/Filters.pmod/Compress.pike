@@ -1,6 +1,15 @@
 import Tools.Logging;
 import Fins;
 
+//! a Controller filter suitable for use with Fins.FinsController.after_filter()
+//! that enables compression of data sent to the client.
+//!
+//! @example
+//! // we're in our FinsController
+//! static void start() {
+//!   after_filter(Fins.Helpers.Filters.Compress());
+//! }
+
 string real_deflate(string _data, string _name)
 {
   int level = 9;
@@ -37,6 +46,7 @@ string gzip(string data, object id)
   return data;
 }
 
+//!
 int filter(object request, object response, mixed ... args)
 { 
   string type = request->get_compress_encoding(); // does the browser support it ?

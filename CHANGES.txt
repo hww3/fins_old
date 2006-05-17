@@ -36,4 +36,5 @@ Version 0.1
   binary strings.
 - added Model.CompoundCriteria and Model.LimitCriteria
 - added macro: format_time
-
+- added before_filter() and after_filter() to controller
+- added JSONController

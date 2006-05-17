@@ -333,20 +333,36 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
 
   void run(Fins.Request request, Fins.Response response, mixed ... args)
   {
-    foreach(before_filters;; function filter)
+    foreach(before_filters;; function|object filter)
     {
-      if(!filter(request, response, @args))
-        return;
+      if(objectp(filter))
+      { 
+        if(!filter->filter(request, response, @args))
+          return;
+      }
+      else if(functionp(filter))
+      {
+        if(!filter(request, response, @args))
+          return;
+      }
     }
 
     event(request, response, @args);
 
     response->render();
 
-    foreach(after_filters;; function filter)
+    foreach(after_filters;; function|object filter)
     {
-      if(!filter(request, response, @args))
-        return;
+      if(objectp(filter))
+      { 
+        if(!filter->filter(request, response, @args))
+          return;
+      }
+      else if(functionp(filter))
+      {
+        if(!filter(request, response, @args))
+          return;
+      }
     }
 
   }

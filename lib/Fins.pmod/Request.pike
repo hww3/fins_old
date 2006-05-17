@@ -2,6 +2,60 @@ object fins_app;
 
 string not_args;
 
+//!
+string get_compress_encoding()
+{
+
+  if(this->misc->session_variables->__encode)
+    return this->misc->session_variables->__encode;
+
+  array available = ({"deflate", "gzip"});
+
+  // we need to figure out the encoding supported.
+  //  else
+  {
+    string encode = 0;
+    string eh;
+    array ae = ({});
+    array aq = ({});
+
+    if(this->request_headers["accept-encoding"])
+      eh = this->request_headers["accept-encoding"];
+
+    foreach(eh/",";;string encode)
+    {
+      array e = encode/";";
+      float q = 1.0;
+      encode = String.trim_all_whites(e[0]);
+      if(sizeof(e)>1)
+      {
+        e[1] = String.trim_all_whites(e[1]);
+        if(has_prefix(e[1], "q="))
+          q = (float)e[1][2..];
+        else q = 1.0;
+      }
+      ae += ({encode});
+      aq += ({q});
+    }
+
+    sort(aq, ae);
+    ae = reverse(ae);
+
+    foreach(ae;;string desired)
+      if(search(available, desired) != -1)
+      {
+        encode = desired;
+        break;
+      }
+#ifdef DEBUG
+    werror("SELECTED ENCODING: %O\n", encode);
+#endif
+    this->misc->session_variables->__encode = encode;
+    return encode;
+  }
+
+}
+
 //! allows you to override the detected language.
 void set_lang(string lang) {
   if (sizeof(lang) == 2) {

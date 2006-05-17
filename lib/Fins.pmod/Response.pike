@@ -72,7 +72,7 @@
   //!
   public void set_header(string header, string value)
   {
-     response->extra_heads[header] = value;
+     response->extra_heads[lower_case(header)] = value;
   }
 
   //!
@@ -149,10 +149,17 @@
 
   }
 
+  //!
   public string get_data()
   {
     if(!__rendered) render();
     return response->data;
+  }
+
+  //!
+  public string|array get_header(string headername)
+  {
+    return response->extra_heads[headername];
   }
 
   //!

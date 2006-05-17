@@ -15,13 +15,13 @@ array __before_filters = ({});
 array __after_filters = ({});
 
 //!
-static void before_filter(function filter)
+static void before_filter(function|object filter)
 {
   __before_filters += ({ filter });
 }
 
 //!
-static void after_filter(function filter)
+static void after_filter(function|object filter)
 {
   __after_filters += ({ filter });
 }

@@ -32,7 +32,7 @@ private class DocRunner(mixed req)
 
   static mixed `()(Fins.Request request, Fins.Response response, mixed ... args) 
   {
-    run(request, response, args);
+    run(request, response, @args);
     return 0;
   }
 

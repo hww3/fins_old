@@ -33,7 +33,7 @@ private class XMLRPCRunner(object obj, function indexer)
 
   static mixed `()(Fins.Request request, Fins.Response response, mixed ... args) 
   {
-    run(request, response, args);
+    run(request, response, @args);
     return 0;
   }
 

@@ -3,6 +3,8 @@
 
   static Fins.Request request;  
 
+  static int __rendered = 0;
+
 //!
   static void create(Fins.Request|void r)
   {
@@ -55,6 +57,7 @@
   //!
   public void set_template(Fins.Template.Template t, Fins.Template.TemplateData d)
   {
+
      template = t;
      template_data = d;
      if(!response->error) response->error = 200;
@@ -127,21 +130,8 @@
     response->data = 0;
   }
 
-  //!
-  public mapping get_response()
+  public void render()
   {
-     if(!response->error) return 0;
-     if (sizeof(cookies) > 1) 
-     {
-       array _cookies = ({});
-       foreach(indices(cookies), string name)
-	 if (name != "__expiration__")
-	   _cookies += ({ sprintf("%s=%s;", Protocols.HTTP.http_encode_cookie(name), Protocols.HTTP.http_encode_cookie(cookies[name])) });
-        _cookies += ({ "path=/;" });
-	if (cookies["__expiration__"])
-	  ({ sprintf("expires=%s", Protocols.HTTP.Server.http_date(cookies["__expiration__"])) });
-       response->extra_heads["set-cookie"] = _cookies * " ";
-     }
      if(template)
      {
        mapping f = ([]);
@@ -154,6 +144,34 @@
         response->data = template->render(template_data);
         response["extra_heads"]["content-type"] = template->get_type();
         response->file = 0;
+        __rendered = 1;
      }
+
+  }
+
+  public string get_data()
+  {
+    if(!__rendered) render();
+    return response->data;
+  }
+
+  //!
+  public mapping get_response()
+  {
+     if(!__rendered) render();
+
+     if(!response->error) return 0;
+     if (sizeof(cookies) > 1) 
+     {
+       array _cookies = ({});
+       foreach(indices(cookies), string name)
+	 if (name != "__expiration__")
+	   _cookies += ({ sprintf("%s=%s;", Protocols.HTTP.http_encode_cookie(name), Protocols.HTTP.http_encode_cookie(cookies[name])) });
+        _cookies += ({ "path=/;" });
+	if (cookies["__expiration__"])
+	  ({ sprintf("expires=%s", Protocols.HTTP.Server.http_date(cookies["__expiration__"])) });
+       response->extra_heads["set-cookie"] = _cookies * " ";
+     }
+
     return response;
   }

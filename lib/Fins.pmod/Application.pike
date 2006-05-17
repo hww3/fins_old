@@ -1,3 +1,4 @@
+
 import Tools.Logging;
 
 
@@ -254,18 +255,17 @@ array get_event(.Request request)
       response->redirect(request->not_query + "/");
     };
   }
-
-  if(cc->__uses_session && !request->misc->session_variables && __fin_serve)
+  else if(cc->__uses_session && !request->misc->session_variables && __fin_serve)
   {
     return ({__fin_serve->new_session});
+  }
+  else if(sizeof(cc->__before_filters) || sizeof(cc->__after_filters))
+  {
+     event = FilterRunner(event, cc->__before_filters, cc->__after_filters);
   }
 
   request->not_args = not_args * "/";
 
-  if(sizeof(cc->__before_filters) || sizeof(cc->__after_filters))
-  {
-    event = FilterRunner(event, cc->__before_filters, cc->__after_filters);
-  }
 
   if(sizeof(args))
     return ({event, @args});
@@ -319,7 +319,7 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
 
   static mixed `()(Fins.Request request, Fins.Response response, mixed ... args)
   {
-    run(request, response, args);
+    run(request, response, @args);
     return 0;
   }
 
@@ -335,15 +335,17 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
   {
     foreach(before_filters;; function filter)
     {
-      if(!filter(request, response, args))
+      if(!filter(request, response, @args))
         return;
     }
 
-    event(request, response, args);
+    event(request, response, @args);
+
+    response->render();
 
     foreach(after_filters;; function filter)
     {
-      if(!filter(request, response, args))
+      if(!filter(request, response, @args))
         return;
     }
 

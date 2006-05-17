@@ -11,6 +11,21 @@ import Protocols.HTTP.Server;
 constant __uses_session = 1;
 int __last_load;
 
+array __before_filters = ({});
+array __after_filters = ({});
+
+//!
+static void before_filter(function filter)
+{
+  __before_filters += ({ filter });
+}
+
+//!
+static void after_filter(function filter)
+{
+  __after_filters += ({ filter });
+}
+
 //!
 static void create(.Application a)
 {  
@@ -25,4 +40,3 @@ static void create(.Application a)
 static void start()
 {
 }
-

@@ -1,5 +1,6 @@
 import Tools.Logging;
 
+
 //! this is the base application class.
 
 object __fin_serve;
@@ -261,6 +262,11 @@ array get_event(.Request request)
 
   request->not_args = not_args * "/";
 
+  if(sizeof(cc->__before_filters) || sizeof(cc->__after_filters))
+  {
+    event = FilterRunner(event, cc->__before_filters, cc->__after_filters);
+  }
+
   if(sizeof(args))
     return ({event, @args});
 
@@ -304,4 +310,43 @@ array get_event(.Request request)
   response->set_file(Stdio.File(fn));
 
   return response;
+}
+
+
+private class FilterRunner(mixed event, array before_filters, array after_filters)
+{
+  inherit .Helpers.Runner;
+
+  static mixed `()(Fins.Request request, Fins.Response response, mixed ... args)
+  {
+    run(request, response, args);
+    return 0;
+  }
+
+  static int(0..1) _is_type(string bt)
+  {
+    if(bt=="function")
+      return 1;
+    else
+      return 0;
+  }
+
+  void run(Fins.Request request, Fins.Response response, mixed ... args)
+  {
+    foreach(before_filters;; function filter)
+    {
+      if(!filter(request, response, args))
+        return;
+    }
+
+    event(request, response, args);
+
+    foreach(after_filters;; function filter)
+    {
+      if(!filter(request, response, args))
+        return;
+    }
+
+  }
+
 }

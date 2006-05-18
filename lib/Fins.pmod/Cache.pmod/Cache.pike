@@ -20,10 +20,10 @@ int clear(string key)
 }
 
 //!
-int set(string key, mixed value, int|void timeout, int type)
+int set(string key, mixed value, int|void timeout, int sliding)
 {
   
-  values[key] = ({timeout + time(), value, type, timeout});
+  values[key] = ({timeout + time(), value, sliding, timeout});
   return 1;
 }
 
@@ -34,7 +34,7 @@ mixed get(string key)
   {
      if(values[key][0] > time()) 
      {
-       if(values[key][2])
+       if(values[key][2]) // sliding rule
          values[key][0] = values[key][3] + time();  
        return values[key][1];
      }

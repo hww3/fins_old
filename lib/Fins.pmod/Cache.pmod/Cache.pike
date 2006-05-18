@@ -20,9 +20,10 @@ int clear(string key)
 }
 
 //!
-int set(string key, mixed value, int|void timeout)
+int set(string key, mixed value, int|void timeout, int type)
 {
-  values[key] = ({timeout + time(), value});
+  
+  values[key] = ({timeout + time(), value, type, timeout});
   return 1;
 }
 
@@ -31,8 +32,12 @@ mixed get(string key)
 {
   if(values[key])
   {
-     if(values[key][0] > time()) return values[key][1];
-
+     if(values[key][0] > time()) 
+     {
+       if(values[key][2])
+         values[key][0] = values[key][3] + time();  
+       return values[key][1];
+     }
      else
      {
        m_delete(values, key);

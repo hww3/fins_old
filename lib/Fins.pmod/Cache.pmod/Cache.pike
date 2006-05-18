@@ -8,7 +8,12 @@ static void create()
   call_out(cleanup, 60);
 }
 
+//! remove a cache entry
 //!
+//! @param key
+//!   key of the item we wish to remove
+//! @returns
+//!   1 on succeful delte of the item, 0 otherwise.
 int clear(string key)
 {
   if(values[key] || !zero_type(values[key]))
@@ -19,7 +24,18 @@ int clear(string key)
   else return 0;
 }
 
-//!
+//! add an item in the cache.
+//! @param key
+//!   the key to identify this cache item by. if an entry identified by key already
+//!   exists, we will replace it with this new value.
+//! @param value
+//!   the value to save in the cache
+//! @param timeout
+//!   the number of seconds in the future to save the item. If zero, we assume an
+//!   infinte lifetime, subject to overall caching strategies.
+//! @param sliding
+//!   if set, we will keep moving the expiration ahead each time the entry is accessed
+//!   via the get() method.
 int set(string key, mixed value, int|void timeout, int sliding)
 {
   
@@ -27,7 +43,12 @@ int set(string key, mixed value, int|void timeout, int sliding)
   return 1;
 }
 
-//!
+//! gets a value from the cache
+//! 
+//! @param key
+//!   the identification key for the value we wish to retrieve
+//! @returns
+//!   the value, if it existed in the cache, otherwise UNDEFINED.
 mixed get(string key)
 {
   if(values[key])

@@ -22,6 +22,8 @@ string get_compress_encoding()
     if(this->request_headers["accept-encoding"])
       eh = this->request_headers["accept-encoding"];
 
+    if(!eh || !sizeof(eh)) return 0;
+
     foreach(eh/",";;string encode)
     {
       array e = encode/";";

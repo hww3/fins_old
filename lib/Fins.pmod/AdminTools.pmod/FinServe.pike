@@ -1,5 +1,6 @@
 #!/usr/local/bin/pike -Mlib -DLOCALE_DEBUG
 
+import Fins;
 import Tools.Logging;
 
 constant default_port = 8080;
@@ -19,6 +20,7 @@ Session.SessionManager session_manager;
 
 Fins.Application app;
 Protocols.HTTP.Server.Port port;
+
 #if constant(_Protocols_DNS_SD)
 Protocols.DNS_SD.Service bonjour;
 #endif
@@ -247,19 +249,6 @@ void load_application()
   app = application;
 
 }
-
-
-class FinsHilfe
-{
-  inherit Tools.Hilfe.StdinHilfe;
-
-   void print_version()
-   {
-     safe_write("Fins " + my_version + " running " + version() +
-              " / Hilfe v3.5 (Incremental Pike Frontend)\n");
-   }
-}
-
   void new_session(object request, object response, mixed ... args)
   {
     string ssid=session_manager->new_sessionid();
@@ -276,6 +265,5 @@ class FinsHilfe
 
     Log.debug( "Created new session sid='%s' host='%s'",ssid,request->remoteaddr);
   }
-
 
 

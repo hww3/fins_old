@@ -1,6 +1,5 @@
-
+import Fins;
 import Tools.Logging;
-
 
 //! this is the base application class.
 
@@ -24,12 +23,32 @@ string static_dir;
 //!
 .Configuration config;
 
+
+
+
+// breakpointing support
+Stdio.Port breakpoint_port;
+int breakpoint_port_no = 3333;
+Stdio.File breakpoint_client;
+object bp_key;
+object breakpoint_cond;
+object bp_lock = Thread.Mutex();
+object breakpoint_hilfe;
+object bpbe = Pike.Backend();
+object bpbet = Thread.Thread(lambda(){ do { catch(bpbe()); } while (1); });
+
+
+
+
 //!
 static void create(.Configuration _config)
 {
+  
+
   config = _config;
   static_dir = Stdio.append_path(config->app_dir, "static");
 
+  load_breakpoint();
   load_cache();
   load_model();
   load_view();
@@ -43,6 +62,18 @@ static void create(.Configuration _config)
 void start()
 {
 
+}
+
+static void load_breakpoint()
+{
+  if(config["app"] && config["app"]["breakpoint"])
+  {
+    if((int)config["app"]["breakpoint_port"]) breakpoint_port_no = 
+                                             (int)config["app"]["breakpoint_port"];
+    Log.info("Starting Breakpoint Server on port %d.", breakpoint_port_no);
+    breakpoint_port = Stdio.Port(breakpoint_port_no, handle_breakpoint_client);
+    breakpoint_port->set_backend(bpbe);
+  }
 }
 
 static void load_cache()
@@ -312,6 +343,126 @@ array get_event(.Request request)
   return response;
 }
 
+public void breakpoint(string desc, mapping state)
+{
+  if(config["app"] && config["app"]["breakpoint"])
+  {
+    do_breakpoint(desc, state);
+    return;
+  }
+  else return;
+}
+
+private void do_breakpoint(string desc, mapping state)
+{
+  if(!breakpoint_client) return;
+   object key = bp_lock->lock();
+  breakpoint_cond = Thread.Condition();
+  bpbe->call_out(lambda(){breakpoint_hilfe = BreakpointHilfe(breakpoint_client, this, state, desc);}, 0);
+  Log.info("Hilfe started for Breakpoint on %s.\n", desc);
+  breakpoint_cond->wait(key);
+  key = 0;
+  // now, we must wait for the hilfe session to end.
+}
+
+
+private void handle_breakpoint_client(int id)
+{
+  if(breakpoint_client) {
+    breakpoint_port->accept()->close();
+  }
+  else breakpoint_client = breakpoint_port->accept();
+  breakpoint_client->write("Welcome to Fins Breakpoint Service.\n");
+  breakpoint_client->set_backend(bpbe);
+  breakpoint_client->set_nonblocking(breakpoint_read, breakpoint_write, breakpoint_close);
+
+}
+
+class BreakpointHilfe
+{
+  inherit Tools.Hilfe.GenericAsyncHilfe;
+
+  Stdio.File client;
+  object app;
+  mapping request_state;
+  object lock;
+
+  void print_version()
+  {
+  }
+
+  class CommandGo
+  {
+    inherit Tools.Hilfe.Command;
+    string help(string what) { return "Resume request."; }
+
+    void exec(Tools.Hilfe.Evaluator e, string line, array(string) words,
+            array(string) tokens) {
+    e->safe_write("Resuming.\n");
+    
+    destruct(e);
+  }
+
+    
+  }
+
+  void read_callback(mixed id, string s)
+  {
+    s = replace(s, "\r\n", "\n");
+    inbuffer+=s;
+    if(has_suffix(inbuffer, "\n")) inbuffer = inbuffer[0.. sizeof(inbuffer)-2];
+    foreach(inbuffer/"\n",string s)
+    {
+      inbuffer = inbuffer[sizeof(s)+1..];
+      add_input_line(s);
+      write(state->finishedp() ? "> " : ">> ");
+    }
+  }
+
+
+
+  static void create(Stdio.File client, object app, mapping state, string desc)
+  {
+    this->app = app;
+    this->request_state = state;
+    this->client = client;
+
+    client->write("Breakpoint on " + desc + "\n");
+    ::create(client, client);
+    variables["id"] = state->id;
+    types["id"] = "object";
+
+    variables["response"] = state->response;
+    types["response"] = "object";
+
+    m_delete(commands, "exit");
+    m_delete(commands, "quit");
+    commands->go = CommandGo();
+  }
+
+static void destroy()
+{
+  object key = app->bp_lock->lock();
+  Stdio.stdout.write("Hilfe dying\n");
+  app->breakpoint_cond->signal();
+  key = 0;
+}
+
+}
+
+private void breakpoint_close()
+{
+  breakpoint_hilfe = 0;
+  breakpoint_client = 0;
+}
+
+private void breakpoint_write(int id)
+{
+}
+
+private void breakpoint_read(int id, string data)
+{
+}
 
 private class FilterRunner(mixed event, array before_filters, array after_filters)
 {
@@ -368,3 +519,4 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
   }
 
 }
+

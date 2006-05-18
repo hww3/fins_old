@@ -1,4 +1,6 @@
+//!
 //! a simple memory cache object
+//!
 //!
 
 static mapping(string:array) values = ([]);

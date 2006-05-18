@@ -38,7 +38,7 @@ int clear(string key)
 //! @param sliding
 //!   if set, we will keep moving the expiration ahead each time the entry is accessed
 //!   via the get() method.
-int set(string key, mixed value, int|void timeout, int sliding)
+int set(string key, mixed value, int|void timeout, int|void sliding)
 {
   
   values[key] = ({timeout + time(), value, sliding, timeout});

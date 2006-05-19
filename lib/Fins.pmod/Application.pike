@@ -347,19 +347,19 @@ public void breakpoint(string desc, mapping state)
 {
   if(config["app"] && config["app"]["breakpoint"])
   {
-    do_breakpoint(desc, state);
+    do_breakpoint(desc, state, backtrace());
     return;
   }
   else return;
 }
 
-private void do_breakpoint(string desc, mapping state)
+private void do_breakpoint(string desc, mapping state, array bt)
 {
   if(!breakpoint_client) return;
    object key = bp_lock->lock();
   breakpoint_cond = Thread.Condition();
-  bpbe->call_out(lambda(){breakpoint_hilfe = BreakpointHilfe(breakpoint_client, this, state, desc);}, 0);
-  Log.info("Hilfe started for Breakpoint on %s.\n", desc);
+  bpbe->call_out(lambda(){breakpoint_hilfe = BreakpointHilfe(breakpoint_client, this, state, desc, bt);}, 0);
+  Log.info("Hilfe started for Breakpoint on %s.", desc);
   breakpoint_cond->wait(key);
   key = 0;
   // now, we must wait for the hilfe session to end.
@@ -386,6 +386,7 @@ class BreakpointHilfe
   object app;
   mapping request_state;
   object lock;
+  array backtrace;
 
   void print_version()
   {
@@ -401,8 +402,18 @@ class BreakpointHilfe
     e->safe_write("Resuming.\n");
     
     destruct(e);
+    }
   }
 
+  class CommandBackTrace
+  {
+    inherit Tools.Hilfe.Command;
+    string help(string what) { return "Display a backtrace that got us here."; }
+
+    void exec(Tools.Hilfe.Evaluator e, string line, array(string) words,
+            array(string) tokens) {
+    e->safe_write(describe_backtrace(e->backtrace[1..]));
+    }
     
   }
 
@@ -421,29 +432,33 @@ class BreakpointHilfe
 
 
 
-  static void create(Stdio.File client, object app, mapping state, string desc)
+  static void create(Stdio.File client, object app, mapping state, string desc, array bt)
   {
     this->app = app;
     this->request_state = state;
     this->client = client;
+    this->backtrace = bt;
 
     client->write("Breakpoint on " + desc + "\n");
     ::create(client, client);
-    variables["id"] = state->id;
-    types["id"] = "object";
 
-    variables["response"] = state->response;
-    types["response"] = "object";
+    foreach(state; string h; mixed v)
+    { 
+      variables[h] = v;
+      types[h] = sprintf("%t", v);
+
+    }
 
     m_delete(commands, "exit");
     m_delete(commands, "quit");
     commands->go = CommandGo();
+    commands->bt = CommandBackTrace();
+    commands->backtrace = commands->bt;
   }
 
 static void destroy()
 {
   object key = app->bp_lock->lock();
-  Stdio.stdout.write("Hilfe dying\n");
   app->breakpoint_cond->signal();
   key = 0;
 }

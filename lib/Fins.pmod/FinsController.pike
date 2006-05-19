@@ -40,3 +40,12 @@ static void create(.Application a)
 static void start()
 {
 }
+
+//!
+static void breakpoint(string desc, object id, object response, 
+                           void|mapping args)
+{
+  app->breakpoint(desc, (["app": app, "cache": cache, "model": model, 
+      "view": view, "controller": this, "id": id, "response": response]) + 
+              (args?args:([])));
+}

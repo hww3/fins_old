@@ -1,5 +1,6 @@
 inherit Fins.FinsBase;
 import Protocols.HTTP.Server;
+import Tools.Logging;
 
 //! methods have this signature:
 //!
@@ -11,8 +12,47 @@ import Protocols.HTTP.Server;
 constant __uses_session = 1;
 int __last_load;
 
+string __controller_source;
+
 array __before_filters = ({});
 array __after_filters = ({});
+
+static object load_controller(string controller_name)
+{
+  program c;
+  string cn;
+  string f;
+
+  cn = controller_name;
+
+  if(!has_suffix(cn, ".pike"))
+    cn = cn + ".pike";
+
+  foreach( ({""}) + master()->pike_program_path;; string p)
+  {
+    f = Stdio.append_path(p, cn);
+    object stat = file_stat(f);
+     
+    if(stat && stat->isreg)
+    {
+      break;
+    }
+    else f = 0;
+  }
+
+  if(f)
+  {
+    c = compile_string(Stdio.read_file(f), f);
+  }
+  else return 0;
+
+  if(!c) Log.error("Unable to load controller %s", controller_name);
+
+  
+  object o = c(app);
+  o->__controller_source = f;
+  return o;
+}
 
 //!
 static void before_filter(function|object filter)

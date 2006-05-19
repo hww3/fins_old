@@ -97,6 +97,7 @@ static void load_controller()
   if(conclass)
     controller = ((program)conclass)(this);
   else Log.debug("No controller defined!");
+  controller->__controller_source = conclass;
 }
 
 static void load_model()
@@ -112,18 +113,11 @@ static void load_model()
 
 int controller_updated(object controller, object container, string cn)
 {
-  string filename = master()->programs_reverse_lookup(object_program(controller));
-  //  werror("filename: %O program: %O\n", filename, object_program(controller));
-  object stat = file_stat(filename);
+  object stat = file_stat(controller->__controller_source);
   if(stat && stat->mtime > controller->__last_load)
   {
-    string key = search(master()->programs, object_program(controller));
-    // werror("key is " + key + "\n");
-    //     m_delete(master()->programs, key);
-
     Log.debug("Reloading controllers...");
-    load_controller();
-
+    container->start();
     return 1;
   }
 

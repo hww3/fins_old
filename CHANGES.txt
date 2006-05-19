@@ -36,5 +36,9 @@ Version 0.1
   binary strings.
 - added Model.CompoundCriteria and Model.LimitCriteria
 - added macro: format_time
-- added before_filter() and after_filter() to controller
 - added JSONController
+- added before_filter() and after_filter() to controller
+- added Helpers.Filters.Compress for server->client compression of data.
+- added sliding expiration to cache, moved cache to Fins.Cache.Cache; 
+  leaving a placeholder behind.
+- added "bt" and "backtrace" commands to the breakpoint hilfe.

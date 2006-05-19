@@ -1,8 +1,6 @@
 import Fins;
 import Tools.Logging;
 
-class BreakpointHilfe
-{
   inherit Tools.Hilfe.GenericAsyncHilfe;
 
   Stdio.File client;
@@ -86,5 +84,4 @@ static void destroy()
   key = 0;
 }
 
-}
 

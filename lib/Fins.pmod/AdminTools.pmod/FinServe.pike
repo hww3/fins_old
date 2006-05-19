@@ -103,7 +103,7 @@ int do_startup()
     add_constant("application", app);
     object in = Stdio.FILE("stdin");
     object out = Stdio.File("stdout");
-    object o = Fins.Helper.Hilfe.FinsHilfe();
+    object o = Fins.Helpers.Hilfe.FinsHilfe();
     return 0;
   }
   else

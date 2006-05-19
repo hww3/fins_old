@@ -358,7 +358,7 @@ private void do_breakpoint(string desc, mapping state, array bt)
   if(!breakpoint_client) return;
    object key = bp_lock->lock();
   breakpoint_cond = Thread.Condition();
-  bpbe->call_out(lambda(){breakpoint_hilfe = BreakpointHilfe(breakpoint_client, this, state, desc, bt);}, 0);
+  bpbe->call_out(lambda(){breakpoint_hilfe = Helpers.Hilfe.BreakpointHilfe(breakpoint_client, this, state, desc, bt);}, 0);
   Log.info("Hilfe started for Breakpoint on %s.", desc);
   breakpoint_cond->wait(key);
   key = 0;

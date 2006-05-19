@@ -17,6 +17,16 @@ string __controller_source;
 array __before_filters = ({});
 array __after_filters = ({});
 
+//! loads the controller, providing support for auto-reload of
+//! updated controller classes.
+//!
+//! @example
+//!  Fins.FinsController foo;
+//!
+//!  void start()
+//!  {
+//!    foo = load_controller("foo_controller");
+//!  } 
 static object load_controller(string controller_name)
 {
   program c;
@@ -66,7 +76,8 @@ static void after_filter(function|object filter)
   __after_filters += ({ filter });
 }
 
-//!
+//! it is not recommended that you override this method. use the start()
+//!  method to load up your controllers.
 static void create(.Application a)
 {  
   __last_load = time();
@@ -76,7 +87,7 @@ static void create(.Application a)
     start();
 }
 
-//!
+//! the preferred method from which controllers are loaded.
 static void start()
 {
 }

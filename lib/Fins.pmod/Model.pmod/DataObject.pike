@@ -3,6 +3,8 @@
 //! DataObjectInstance object to retrieve data for a given
 //! data type.
 
+mapping default_values = ([]);
+
 //!
 .Field primary_key;
 
@@ -104,6 +106,15 @@ void set_primary_key(string _key)
     throw(Error.Generic("Primary key field " + _key + " does not exist.\n"));
 
   else primary_key = fields[_key];
+}
+
+//! 
+void add_default_value_object(string field, string objecttype, mapping criteria, int unique)
+{
+   if(unique)
+     default_values[field] = lambda(){ return context->repository->find(objecttype, criteria)[0];};
+   else
+     default_values[field] = lambda(){ return context->repository->find(objecttype, criteria);};
 }
 
 //!
@@ -455,6 +466,11 @@ static int commit_changes(multiset fields_set, mapping object_data, mixed update
          {
             // we can skip the primary key for existing objects.
          }
+         else if(!fields_set[f->name] && default_values[f->name])
+         {
+            qfields += ({f->field_name});
+            qvalues += ({f->encode(default_values[f->name]())});
+         }
          // have we set nothing, and are allowed to?
          // if we're updating, it's not required.
          else if((!fields_set[f->name] && f->null) || 
@@ -501,6 +517,7 @@ static int commit_changes(multiset fields_set, mapping object_data, mixed update
 
 int save(.DataObjectInstance i)
 {   
+
    if(i->is_new_object())
    {
       commit_changes(i->fields_set, i->object_data, 0);

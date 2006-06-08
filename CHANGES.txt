@@ -42,3 +42,9 @@ Version 0.1
 - added sliding expiration to cache, moved cache to Fins.Cache.Cache; 
   leaving a placeholder behind.
 - added "bt" and "backtrace" commands to the breakpoint hilfe.
+- added load_controller(controllername) to FinsController. You must use this
+  method to load controllers now.
+- controllers and view can be set to auto-reload for speedier development
+- added DataObject->add_default_data_object() to allow specification of
+  default objects on new object attributes.
+

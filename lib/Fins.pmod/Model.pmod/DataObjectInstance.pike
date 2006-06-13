@@ -217,6 +217,14 @@ array _values()
   return a;
 }
 
+//!
+int `==(mixed a)
+{
+  if(objectp(a) && (object_program(this) == object_program(a)) && (a->get_id() == this->get_id()) && (a->get_type() == this->get_type()))
+    return 1;
+  else return 0;
+}
+
 static void destroy()
 {
   if(master_object) 

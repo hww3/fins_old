@@ -113,7 +113,7 @@ static void load_model()
 
 int controller_updated(object controller, object container, string cn)
 {
-  object stat = file_stat(controller->__controller_source);
+  object stat = file_stat(controller->__controller_source||"");
   if(stat && stat->mtime > controller->__last_load)
   {
     Log.debug("Reloading controllers...");

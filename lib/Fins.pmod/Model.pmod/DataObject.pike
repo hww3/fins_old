@@ -44,6 +44,27 @@ mapping new_object_data = ([]);
 void create(.DataModelContext c)
 {
    context = c;
+
+   if(define && functionp(define))
+   {
+     define();
+   }
+}
+
+//! define the object's fields and relationships
+void define();
+
+void reflect_definition()
+{
+  string instance = lower_case(
+             (replace(master()->describe_program(), ".", "/")/"/")[0]
+           );
+
+  if(!get_table_name())
+  {
+    string table = Tools.Language.Inflect.pluralize(instance);
+    set_table_name(table);
+  }
 }
 
 void add_ref(.DataObjectInstance o)
@@ -91,6 +112,11 @@ void generate_from_schema(string table)
 void set_instance_name(string _name)
 {
   instance_name = _name;
+}
+
+string get_table_name()
+{
+  return table_name;
 }
 
 //!

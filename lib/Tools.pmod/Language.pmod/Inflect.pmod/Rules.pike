@@ -1,5 +1,13 @@
 array rules = ({});
 
+mapping irregular_nouns_local = ([
+  "quiz": "quizzes",
+  "move": "moves",
+  "sex": "sexes",
+  "person": "people",
+  "bus": "busses"  
+]);
+
 mapping irregular_nouns_table_a1 = ([
   "beef": "beefs",
   "brother": "brothers",
@@ -17,6 +25,7 @@ mapping irregular_nouns_table_a1 = ([
 ]);
 
 multiset invariant_nouns_table_a2 = (<
+"equipment", "information", "rice",
 "bison", "flounder", "pliers",
 "bream", "gallows", "proceedings",
 "breeches", "graffiti", "rabies",
@@ -196,6 +205,7 @@ multiset classical_nouns_table_a25 = (<
 void create()
 {
   // rules for which there is a defined one to one mapping
+  add_rule(MappingRule(irregular_nouns_local));
 
   // rules for which the pluralized form is invariant
   add_rule(SuffixReplaceRule("fish", "fish"));

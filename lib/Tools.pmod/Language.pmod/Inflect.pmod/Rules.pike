@@ -266,6 +266,7 @@ void create()
 
   add_rule(RegexRule("[aeiou]y$", "y", "ys"));
   add_rule(RegexRule("[A-Z].*y$", "y", "ys"));
+//  add_rule(RegexRule("[A-Z].*es$", "es", "es"));
   add_rule(SuffixReplaceRule("y", "ies"));
 
   add_rule(CategoryRule(classical_nouns_table_a17 + classical_nouns_table_a18, "o", "os"));

@@ -1,6 +1,6 @@
 array rules = ({});
 
-multiset irregular_nouns_table_a1 = ([
+mapping irregular_nouns_table_a1 = ([
   "beef": "beefs",
   "brother": "brothers",
   "child" : "children",
@@ -52,7 +52,7 @@ multiset classical_nouns_table_a10 = (<
   "vertebra"
 >);
 
-multiset classical_nouns_table_a14 = ([
+multiset classical_nouns_table_a14 = (<
   "codex",
   "murex",
   "silex"
@@ -127,21 +127,32 @@ multiset classical_nouns_table_a13 = (<
   "stamen", "foramen", "lumen"
 >);
 
-mapping classical_nouns_table_a15 = (<
+multiset classical_nouns_table_a15 = (<
   "apex", "latex", "vertex", "cortex",
   "pontifex", "vortex", "index", "simplex"
 >);
 
-mapping classical_nouns_table_a16 = (<
+multiset classical_nouns_table_a16 = (<
   "iris", "clitoris"
 >);
 
-mapping classical_nouns_table_a18 = (<
+multiset classical_nouns_table_a17 = (<
+  "albino", "generalissimo", "manifesto",
+  "archipelago", "ghetto", "medico",
+  "armadillo", "guano", "octavo",
+  "commando", "inferno", "photo",
+  "ditto", "jumbo", "pro",
+  "dynamo", "lingo", "quarto",
+  "embryo", "lumbago", "rhino",
+  "fiasco", "magneto", "stylo"
+>);
+
+multiset classical_nouns_table_a18 = (<
   "alto", "contralto", "soprano", "basso",
   "crescendo", "tempo", "canto", "solo"
 >);
 
-mapping classical_nouns_table_a21 = (<
+multiset classical_nouns_table_a21 = (<
   "aquarium", "interregnum", "quantum",
   "compendium", "lustrum", "rostrum",
   "consortium", "maximum", "spectrum",
@@ -154,24 +165,24 @@ mapping classical_nouns_table_a21 = (<
   "honorarium", "phylum"
 >);
 
-mapping classical_nouns_table_a22 = (<
+multiset classical_nouns_table_a22 = (<
   "focus", "nimbus", "succubus",
   "fungus", "nucleolus", "torus",
   "genius", "radius", "umbilicus",
   "incubus", "stylus", "uterus"
 >);
 
-mapping classical_nouns_table_a23 = (<
+multiset classical_nouns_table_a23 = (<
   "apparatus", "impetus", "prospectus",
   "cantus", "nexus", "sinus",
   "coitus", "plexus", "status", "hiatus"
->)
+>);
 
-mapping classical_nouns_table_a24 = (<
+multiset classical_nouns_table_a24 = (<
  "afreet", "aftrit", "efreet"
 >);
 
-mapping classical_nouns_table_a25 = (<
+multiset classical_nouns_table_a25 = (<
   "cherub", "goy", "seraph"
 >);
 
@@ -194,7 +205,7 @@ void create()
   add_rule(SuffixReplaceRule("pox", "pox"));
   add_rule(SuffixReplaceRule("itis", "itis"));
   add_rule(RegexRule("[a-z]ese$", "ese", "ese"));
-  add_rule(InvariantRule(invariant_nouns_table_a3 + invariant_nouns_table_a2);
+  add_rule(InvariantRule(invariant_nouns_table_a3 + invariant_nouns_table_a2));
   
   // pronouns
 
@@ -217,9 +228,9 @@ void create()
   add_rule(CategoryRule(classical_nouns_table_a20, "um", "a"));
 
   // classical variants of modern inflections
-  add_rule(SuffixReplaceRule("trix", "trices");
-  add_rule(SuffixReplaceRule("eau", "eaux");
-  add_rule(SuffixReplaceRule("ieu", "ieux");
+  add_rule(SuffixReplaceRule("trix", "trices"));
+  add_rule(SuffixReplaceRule("eau", "eaux"));
+  add_rule(SuffixReplaceRule("ieu", "ieux"));
   add_rule(RegexRule("[iay]nx$", "nx", "nges"));
   add_rule(CategoryRule(classical_nouns_table_a11, "a", "as"));
   add_rule(CategoryRule(classical_nouns_table_a12, "a", "as"));
@@ -237,8 +248,20 @@ void create()
   add_rule(RegexRule("[cs]h$", "h", "hes"));
   add_rule(SuffixReplaceRule("ss", "sses"));
 
-  add_rule(RegexRule("[bcdfghjklmnpqrstvwxyz]y$", "y", "ies"));
-//  add_rule(SuffixReplaceRule("y", "ies"));
+  // certain words ending in f or fe
+  add_rule(RegexRule("[aeo]lf$", "f", "ves"));
+  add_rule(RegexRule("[^d]eaf$", "f", "ves"));
+  add_rule(RegexRule("arf$", "f", "ves"));
+  add_rule(RegexRule("[nlw]ife$", "fe", "ves"));
+
+  add_rule(RegexRule("[aeiou]y$", "y", "ys"));
+  add_rule(RegexRule("[A-Z].*y$", "y", "ys"));
+  add_rule(SuffixReplaceRule("y", "ies"));
+
+  add_rule(CategoryRule(classical_nouns_table_a17 + classical_nouns_table_a18, "o", "os"));
+  add_rule(RegexRule("[aeiou]o$", "o", "os"));
+  add_rule(SuffixReplaceRule("o", "oes"));
+  
   add_rule(DefaultRule());
 }
 

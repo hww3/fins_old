@@ -47,7 +47,7 @@ void exception(string msg, object|array exception)
 
   if(objectp(exception))
     e = exception->describe();
-  else e = describe_backtrace(e);
+  else e = describe_backtrace(exception);
   stderr->write(sprintf("An exception occurred : " + msg + "\n", e));  
 }
 

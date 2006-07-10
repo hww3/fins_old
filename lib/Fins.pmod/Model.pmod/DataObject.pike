@@ -69,19 +69,33 @@ void define();
 
 void reflect_definition()
 {
-  string instance = lower_case(
-             (replace(master()->describe_program(object_program(this)), ".", "/")/"/")[-1]
-           );
+  string instance =
+             (replace(master()->describe_program(object_program(this)), ".", "/")/"/")[-1];
 
   if(!get_table_name() || !sizeof(get_table_name()))
   {
-    string table = Tools.Language.Inflect.pluralize(instance);
+    string table = Tools.Language.Inflect.pluralize(lower_case(instance));
 	Log.info("reflect_definition: table name for %s is %s.", instance, table);
     set_table_name(table);
+    set_instance_name(instance);
     foreach(context->sql->list_fields(table);; mapping t)
     {
-		Log.info("reflect_definition: looking at field %s.", t->name);
-	}
+      mapping field = context->personality->map_field(t);
+
+      Log.info("reflect_definition: looking at field %s: %O.", field->name, field);
+
+      if(field->primary_key || (!primary_key && field->name =="id"))
+      {
+        Log.info("reflect_definition: have a primary key.");  
+        add_field(.PrimaryKeyField(field->name));        
+        set_primary_key(field->name);
+      }
+
+      if(field->type == "string")
+      {
+        add_field(.StringField(field->name, field->length, !field->not_null, field->default));
+      }
+    }
   }
 }
 
@@ -108,22 +122,6 @@ void sub_ref(.DataObjectInstance o)
   {
     m_delete(objs, o->get_id());
   }
-}
-
-void generate_from_schema(string table)
-{
-   foreach(context->sql->list_fields(table);;mapping fieldspec)
-   {
-      switch(fieldspec->type)
-      {
-         case "string":
-            break;
-         case "long":
-            break;
-         default:
-            throw(Error.Generic("Unknown type " + fieldspec->type +" for field " + fieldspec->name + ".\n"));
-      }
-   }
 }
 
 //!

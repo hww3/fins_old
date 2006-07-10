@@ -1,3 +1,5 @@
+import Tools.Logging;
+
 object sql;
 object context;
 
@@ -56,4 +58,40 @@ string unquote_binary(string s)
   }
 }
 
+mapping map_field(mapping t)
+{
+  Log.debug("mapping field %O.", t);
+  mapping field = ([]);
 
+  field->name = t->name;
+  field->primary_key = t->flags->primary_key;
+
+  switch(t->type)
+  {
+    case "string":
+    case "char":
+    case "varchar":
+    case "text":
+      if(t->default && sizeof(t->default)) field->default = t->default;
+      field->type = "string";
+      field->length = t->length;
+      break;
+    case "datetime":
+      field->type = "datetime";
+      break;
+    case "integer":
+    case "long":
+      if(t->default) field->default = (int)t->default;
+      field->type = "integer";
+      break;
+    case "blob":
+      field->type = "binary_string";
+      break;
+    default:
+      throw(Error.Generic("unknown field type " + t->type + ".\n"));
+  }
+
+  field->not_null = t->flags->not_null;
+
+  return field;
+}

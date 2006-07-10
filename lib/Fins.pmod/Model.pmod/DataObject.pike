@@ -166,6 +166,16 @@ void set_primary_key(string _key)
   else primary_key = fields[_key];
 }
 
+
+//!
+void set_alternate_key(string _key)
+{
+  if(!fields[_key])
+    throw(Error.Generic("Primary key field " + _key + " does not exist.\n"));
+
+  else alternate_key = fields[_key];
+}
+
 //! 
 void add_default_value_object(string field, string objecttype, mapping criteria, int unique)
 {

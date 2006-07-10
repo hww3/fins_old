@@ -56,4 +56,41 @@ void initialize_links()
       }
     }
   }
+
+  array table_components = ({});
+    
+
+  foreach(context->repository->object_definitions; string on; object od)
+  {
+    table_components += ({ (["tn": lower_case(Tools.Language.Inflect.pluralize(on)), "od": od ]) });  
+  }
+    
+  multiset available_tables = (multiset)context->sql->list_tables();
+    
+  foreach(table_components;; mapping o)
+  {
+    Log.debug("looking for multi link reference for %s.", o->tn);
+
+    foreach(table_components;; mapping q)
+    {
+      if(q->tn == o->tn) continue;  // skip self-self relationships :)
+
+      if(available_tables[o->tn + "_" + q->tn])
+      {
+        Log.debug("have a mlr on %s", o->tn + "_" + q->tn);
+          o->od->add_field(Model.MultiKeyReference(o->od, Tools.Language.Inflect.pluralize(q->od->instance_name),
+            o->tn + "_" + q->tn, 
+            lower_case(o->od->instance_name + "_" + o->od->primary_key->field_name), 
+            lower_case(q->od->instance_name + "_" + q->od->primary_key->field_name),
+             q->od->instance_name, q->od->primary_key->name));
+
+          q->od->add_field(Model.MultiKeyReference(q->od, Tools.Language.Inflect.pluralize(o->od->instance_name),
+            o->tn + "_" + q->tn, 
+            lower_case(q->od->instance_name + "_" + q->od->primary_key->field_name), 
+            lower_case(o->od->instance_name + "_" + o->od->primary_key->field_name),
+             o->od->instance_name, o->od->primary_key->name));
+
+      }
+    }
+  }
 }

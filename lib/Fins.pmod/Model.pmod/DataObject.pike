@@ -67,7 +67,12 @@ void reflect_definition()
   if(!get_table_name())
   {
     string table = Tools.Language.Inflect.pluralize(instance);
+	Log.info("reflect_definition: table name for %s is %s.", instance, table);
     set_table_name(table);
+    foreach(context->sql->list_table(table);; mapping t)
+    {
+		Log.info("reflect_definition: looking at field %s.", t->name);
+	}
   }
 }
 

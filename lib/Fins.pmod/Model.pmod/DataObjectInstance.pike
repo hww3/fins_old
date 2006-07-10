@@ -13,7 +13,12 @@ int initialized;
 
 string _sprintf(mixed ... args)
 {
-  return object_type + "(" + key_value + ")";
+  return object_type + "(" + get_descriptor() + ")";
+}
+
+string get_descriptor()
+{
+   return master_object->describe(this);
 }
 
 int _is_type(string type)

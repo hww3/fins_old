@@ -57,6 +57,13 @@ void create(.DataModelContext c)
    }
 }
 
+string describe(object i)
+{
+  if(alternate_key)
+    return (alternate_key->name + "=" + (string)i[alternate_key->name]);
+  return (primary_key->name + "=" + i[primary_key->name]);
+}
+
 //! define the object's fields and relationships
 void define();
 

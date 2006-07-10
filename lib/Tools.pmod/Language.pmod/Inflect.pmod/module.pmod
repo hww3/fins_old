@@ -6,7 +6,7 @@ string pluralize(string word)
     {
 #if INFLECTION_DEBUG
       werror("INFLECTION: %s matched rule %O.\n", word, r);
-#if INFLECTION_DEBUG
+#endif INFLECTION_DEBUG
       return r->apply(word);
     }
   }

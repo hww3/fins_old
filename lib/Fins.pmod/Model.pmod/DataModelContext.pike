@@ -1,6 +1,8 @@
 //!
 int debug = 0;
 
+mapping builder = ([ "possible_links" : ({}) ]);
+
 //!
 object repository;
 

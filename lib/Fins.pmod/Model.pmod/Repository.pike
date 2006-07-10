@@ -14,7 +14,6 @@ class objects(object repository)
   }
 }
 
-
 .DataObject get_object(string name)
 {
    return object_definitions[name];

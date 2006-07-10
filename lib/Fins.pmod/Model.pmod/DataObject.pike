@@ -95,6 +95,12 @@ void reflect_definition()
       {
         add_field(.StringField(field->name, field->length, !field->not_null, field->default));
       }
+
+      if(search(field->name, "_") != -1)
+      {
+        Log.info("reflect_definition: have a possible link.");
+        context->builder->possible_links += ({ (["obj": this, "field": field]) });
+      }
     }
   }
 }

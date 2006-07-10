@@ -3,6 +3,8 @@
 //! DataObjectInstance object to retrieve data for a given
 //! data type.
 
+import Tools.Logging;
+
 mapping default_values = ([]);
 
 //!

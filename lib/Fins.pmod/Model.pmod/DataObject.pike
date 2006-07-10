@@ -96,6 +96,9 @@ void reflect_definition()
 
       if(field->primary_key || (!primary_key && field->name =="id"))
       {
+        // for now, primary keys must be integer.
+        if(field->type!="integer") continue;
+
         Log.info("reflect_definition: have a primary key.");  
         add_field(.PrimaryKeyField(field->name));        
         set_primary_key(field->name);
@@ -113,6 +116,9 @@ void reflect_definition()
       }
     }
   }
+
+  if(!primary_key) throw(Error.Generic("No primary key defined for " + instance_name + ".\n"));
+
 }
 
 void add_ref(.DataObjectInstance o)

@@ -66,7 +66,7 @@ void reflect_definition()
              (replace(master()->describe_program(object_program(this)), ".", "/")/"/")[0]
            );
 
-  if(!get_table_name())
+  if(!get_table_name() || !sizeof(get_table_name()))
   {
     string table = Tools.Language.Inflect.pluralize(instance);
 	Log.info("reflect_definition: table name for %s is %s.", instance, table);

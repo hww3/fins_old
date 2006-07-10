@@ -63,7 +63,7 @@ void define();
 void reflect_definition()
 {
   string instance = lower_case(
-             (replace(master()->describe_program(this_program()), ".", "/")/"/")[0]
+             (replace(master()->describe_program(object_program(this)), ".", "/")/"/")[0]
            );
 
   if(!get_table_name())

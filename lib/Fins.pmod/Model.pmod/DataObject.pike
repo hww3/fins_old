@@ -49,6 +49,10 @@ void create(.DataModelContext c)
    {
      define();
    }
+   else
+   { 
+     reflect_definition();
+   }
 }
 
 //! define the object's fields and relationships

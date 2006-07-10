@@ -2,6 +2,16 @@ import Fins;
 import Tools.Logging;
 inherit FinsBase;
 
+//! an object whose indices are the (mandatory) data type definitions for your model
+//!
+//! this value is used for automatic type registration.
+object datatype_definition_module = 0;
+
+//! an object whose indices are the (optional) classes that are used for direct data access
+//!
+//! this value is used for automatic type registration.
+object datatype_instance_module = 0;
+
 //!
 object context;
 
@@ -35,7 +45,18 @@ void load_model()
 //!
 void register_types()
 {
+  if(!datatype_definition_module)
+    Log.warn("Using automatic model registration, but no datatype_definition_module set. Skipping.");
 
+  foreach(indices(datatype_definition_module);; string n)
+  {
+    object d = datatype_definition_module[n](context);
+    program di;
+    if(datatype_instance_module && datatype_instance_module[n]) di = datatype_instance_module[n];
+
+    Log.info("Registering data type %s", d->instance_name);
+    repository->add_object_type(d, di);
+  }
 }
 
 void initialize_links()

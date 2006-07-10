@@ -55,6 +55,9 @@ void create(.DataModelContext c)
    { 
      reflect_definition();
    }
+
+   if(post_define && functionp(post_define))
+     post_define();
 }
 
 string describe(object i)
@@ -65,7 +68,14 @@ string describe(object i)
 }
 
 //! define the object's fields and relationships
+//! if not defined, the object will attempt to auto-configure itself
+//! from the table definition. see the Fins automatic model configuration
+//! documentation for details.
 void define();
+
+//! define the objects fields and relationships; useful for adding custom attributes
+//! when also using automatic definition.
+void post_define();
 
 void reflect_definition()
 {

@@ -18,7 +18,9 @@ string _sprintf(mixed ... args)
 
 string get_descriptor()
 {
-   return master_object->describe(this);
+  if(master_object && master_object->describe)
+    return master_object->describe(this);
+  else return ("huh? " + get_id());
 }
 
 int _is_type(string type)

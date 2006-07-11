@@ -55,10 +55,31 @@ void register_types()
     object d = datatype_definition_module[n](context);
     program di;
     if(datatype_instance_module && datatype_instance_module[n]) di = datatype_instance_module[n];
+    else
+    {
+      string dip = "inherit Fins.Model.DirectAccessInstance;\n string type_name = \"" + n + "\";\n"
+                   "object repository = " + get_repo_class() + ";";
 
+      di = compile_string(dip); 
+    }
     Log.info("Registering data type %s", d->instance_name);
     repository->add_object_type(d, di);
   }
+}
+
+string get_repo_class()
+{
+  if(repository == Fins.Model.module) return "Fins.Model.module";
+
+  string s = master()->describe_object(repository);
+
+  if(search(s, "()") != -1) // ok, we probably have a non-module class. providing a 
+                            // program as opposed to a module will result in non-functional 
+                            // model. i have no idea what would happen if you provided a 
+                            // repository made available through add_constant.
+    s = "((program)\"" + master()->describe_program(object_program(repository)) + "\")()";
+
+  return s;
 }
 
 void initialize_links()

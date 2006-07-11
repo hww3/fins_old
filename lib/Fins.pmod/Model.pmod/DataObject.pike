@@ -149,7 +149,8 @@ void reflect_definition()
 }
 
 //! define a one to one relationship in which the local object has a field
-//! which contains the id of instance of another data type.
+//! which contains the id of instance of another data type. the reverse 
+//! relationship can be defined in the other datatype using @[has_many].
 //!
 //! @param other_type
 //!   the data type name (not the table name) of the type the field references.
@@ -182,7 +183,8 @@ void belongs_to(string other_type, string|void my_name, string|void my_field)
 //!   other type.
 //!  @param other_field
 //!   the name of the field in the other datatype (not a database field name) that
-//!   represents the link to this data type.
+//!   represents the link to this data type. If you used @[belongs_to] and specified an alternate
+//!   value for the my_name attribute, you'll need to provide that value to this parameter as well.
 void has_many(string other_type, string|void my_name, string|void other_field)
 {
   context->builder->has_many += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "obj": this]) });  

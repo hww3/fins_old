@@ -33,6 +33,18 @@ void print_help()
 	werror("Help: fin_serve [-p portnum|--port=portnum|--hilfe] [-d]  appname configname\n");
 }
 
+array tool_args;
+
+void create(array args)
+{
+  tool_args = args;
+}
+
+int run()
+{
+  return main(sizeof(tool_args) + 1, ({""}) + tool_args);
+}
+
 int main(int argc, array(string) argv)
 {
   my_port = default_port;

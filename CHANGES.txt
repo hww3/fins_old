@@ -1,5 +1,12 @@
 Version 0.1
 
+- added pike -x fins toolset
+- added pike -x fins create [appname]
+- added pike -x fins start [appname]
+- added automatic registration of datatypes
+- added automatic selection of references from database schema
+- added automatic definition of data types from database schema
+- added plural -> singular noun inflection
 - added singular -> plural noun inflection
 - added macros library: boolean, sizeof, capitalize
 - added javascript macros: remote_form, javascript_includes

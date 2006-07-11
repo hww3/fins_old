@@ -22,7 +22,7 @@ string name;
 //! if either a class or a function is set as default, the 
 //! function will be called or the class will be instantiated
 //! at the time of the query, useful for datestamps.
-void create(string _name, int(0..1) _null, mixed|void _default)
+static void create(string _name, int(0..1) _null, mixed|void _default)
 {
    name = _name;
    null = _null;

@@ -66,9 +66,18 @@ mapping map_field(mapping t)
   field->name = t->name;
   field->primary_key = t->flags->primary_key;
 
+  if(t->type == "unknown" && this->get_field_info)
+  { 
+    mapping x = this->get_field_info(t->table, t->name);
+    t->type = x->type;
+  }
+
+  Log.debug("Field %s.%s is a %s.", t->table, t->name, t->type); 
+
   switch(t->type)
   {
     case "string":
+    case "var string":
     case "char":
     case "varchar":
     case "text":
@@ -76,8 +85,14 @@ mapping map_field(mapping t)
       field->type = "string";
       field->length = t->length;
       break;
+    case "time":
+      field->type = "time";
+      break;
     case "datetime":
       field->type = "datetime";
+      break;
+    case "timestamp":
+      field->type = "timestamp";
       break;
     case "integer":
     case "long":

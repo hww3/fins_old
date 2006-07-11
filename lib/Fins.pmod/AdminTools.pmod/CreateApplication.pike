@@ -61,16 +61,17 @@ inherit Fins.Model.Repository;
 string start_contents =
 #"#!/bin/sh
 
-  if [ x$FINS_HOME = \"x\" ]; then
-    echo \"error: FINS_HOME is not defined.\"
-    exit 1;
+  PIKE_ARGS=""
+
+  if [ x$FINS_HOME != \"x\" ]; then
+    PIKE_ARGS="$PIKE_ARGS -M$FINS_HOME/lib"
   fi
   cd `dirname $0`/../..
-  pike -M$FINS_HOME/lib -x fins start __APPNAME__ $*
+  pike -x fins start __APPNAME__ $*
 
 
   cd ..
-  exec pike -x fins start __APPNAME__ $*
+  exec pike $PIKE_ARGS -x fins start __APPNAME__ $*
 ";
 
 void create(array args)

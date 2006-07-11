@@ -1,7 +1,7 @@
 //!
 int debug = 0;
 
-mapping builder = ([ "possible_links" : ({}) ]);
+mapping builder = ([ "possible_links" : ({}), "belongs_to" : ({}), "has_many": ({}) ]);
 
 //!
 object repository;

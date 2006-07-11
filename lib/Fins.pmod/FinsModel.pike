@@ -17,7 +17,7 @@ object context;
 
 //! an object that provides Model repository service, by default
 //! this will be @[Fins.Model].
-object repository = Fins.Model;
+object repository = Fins.Model.module;
 
 static void create(Fins.Application a)
 {
@@ -46,8 +46,10 @@ void load_model()
 void register_types()
 {
   if(!datatype_definition_module)
+  {
     Log.warn("Using automatic model registration, but no datatype_definition_module set. Skipping.");
-
+    return;
+  }
   foreach(indices(datatype_definition_module);; string n)
   {
     object d = datatype_definition_module[n](context);
@@ -61,6 +63,23 @@ void register_types()
 
 void initialize_links()
 {
+  if(!context->repository->object_definitions || 
+     !sizeof(context->repository->object_definitions)) return;
+
+  foreach(context->builder->belongs_to;; mapping a)
+  {
+    if(!a->my_name) a->my_name = a->other_type;
+    if(!a->my_field) a->my_field = lower_case(a->other_type + "_" + context->repository->get_object(a->other_type)->primary_key->field_name);    
+    a->obj->add_field(Model.KeyReference(a->my_name, a->my_field, a->other_type));
+  }
+
+  foreach(context->builder->has_many;; mapping a)
+  {
+    if(!a->my_name) a->my_name = Tools.Language.Inflect.pluralize(a->other_type);
+    if(!a->other_field) a->other_field = a->obj->instance_name;    
+    a->obj->add_field(Model.InverseForeignKeyReference(a->my_name, a->other_type, a->other_field));
+  }
+
   foreach(context->builder->possible_links;; mapping pl)
   {
     Log.debug("investigating possible link %s.", pl->field->name);

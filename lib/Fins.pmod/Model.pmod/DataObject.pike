@@ -62,6 +62,7 @@ void create(.DataModelContext c)
 
 string describe(object i)
 {
+  if(!i[primary_key->name]) return ("unidentified");
   if(alternate_key)
     return (alternate_key->name + "=" + (string)i[alternate_key->name]);
   return (primary_key->name + "=" + i[primary_key->name]);
@@ -145,6 +146,21 @@ void reflect_definition()
 
   if(!primary_key) throw(Error.Generic("No primary key defined for " + instance_name + ".\n"));
 
+}
+
+void belongs_to(string other_type, string|void my_name, string|void my_field)
+{
+  context->builder->belongs_to += ({ (["my_name": my_name, "other_type": other_type, "my_field": my_field, "obj": this]) });
+
+/*
+  add_field(Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(pl->obj->instance_name), pl->obj->instance_name, od->instance_name));
+  */
+}
+
+
+void has_many(string other_type, string|void my_name, string|void other_field)
+{
+  context->builder->has_many += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "obj": this]) });  
 }
 
 void add_ref(.DataObjectInstance o)

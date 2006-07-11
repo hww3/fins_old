@@ -61,10 +61,10 @@ inherit Fins.Model.Repository;
 string start_contents =
 #"#!/bin/sh
 
-  PIKE_ARGS=""
+  PIKE_ARGS=\"\"
 
   if [ x$FINS_HOME != \"x\" ]; then
-    PIKE_ARGS="$PIKE_ARGS -M$FINS_HOME/lib"
+    PIKE_ARGS=\"$PIKE_ARGS -M$FINS_HOME/lib\"
   fi
   cd `dirname $0`/../..
   pike -x fins start __APPNAME__ $*

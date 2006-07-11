@@ -36,7 +36,12 @@ static void do_msg(int level, string m, mixed|void ... extras)
     m = sprintf(m, @extras);
   }
 
-  stderr->write(log_strs[level] + ": " + m + "\n");
+  mapping lt = localtime(time());
+
+  stderr->write("%02d:%02d:%02d %s - %s\n", lt->hour, lt->min, lt->sec, log_strs[level], m);
+
+//  stderr->write("%02d:%02d:%02d %s %s - %s\n", lt->hour, lt->min, lt->sec, log_strs[level], 
+//                      function_name(backtrace()[-3][2]), m);
 }
 
 //!

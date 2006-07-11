@@ -78,7 +78,7 @@ static void load_breakpoint()
 
 static void load_cache()
 {
-  Log.info("Starting Cache...\n");
+  Log.info("Starting Cache.");
 
   cache = .FinsCache();
 }
@@ -105,7 +105,7 @@ static void load_model()
   string modclass = (config["model"] ? config["model"]["class"] : 0);
   if(modclass)
   {
-    Log.info("loading model from " + modclass + "\n");
+    Log.info("loading model from " + modclass);
     model = ((program)modclass)(this);
   }
   else Log.debug("No model defined!");
@@ -116,7 +116,7 @@ int controller_updated(object controller, object container, string cn)
   object stat = file_stat(controller->__controller_source||"");
   if(stat && stat->mtime > controller->__last_load)
   {
-    Log.debug("Reloading controllers...");
+    Log.debug("Reloading controllers.");
     container->start();
     return 1;
   }
@@ -209,7 +209,7 @@ array get_event(.Request request)
 	}
 	else
 	{
-	  Log.info("cc: %O\n", cc);
+	  Log.info("cc: %O", cc);
 	}
 	break;
       }

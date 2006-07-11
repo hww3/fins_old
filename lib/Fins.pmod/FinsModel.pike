@@ -75,9 +75,9 @@ void initialize_links()
 
   foreach(context->builder->has_many;; mapping a)
   {
-    if(!a->my_name) a->my_name = Tools.Language.Inflect.pluralize(a->other_type);
+    if(!a->my_name) a->my_name = a->other_type;
     if(!a->other_field) a->other_field = a->obj->instance_name;    
-    a->obj->add_field(Model.InverseForeignKeyReference(a->my_name, a->other_type, a->other_field));
+    a->obj->add_field(Model.InverseForeignKeyReference(a->my_name, Tools.Language.Inflect.singularize(a->other_type), a->other_field));
   }
 
   foreach(context->builder->possible_links;; mapping pl)

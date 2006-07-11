@@ -74,7 +74,7 @@ string describe(object i)
 //! documentation for details.
 void define();
 
-//! define the objects fields and relationships; useful for adding custom attributes
+//! define the object's fields and relationships; useful for adding custom attributes
 //! when also using automatic definition.
 void post_define();
 
@@ -148,16 +148,41 @@ void reflect_definition()
 
 }
 
+//! define a one to one relationship in which the local object has a field
+//! which contains the id of instance of another data type.
+//!
+//! @param other_type
+//!   the data type name (not the table name) of the type the field references.
+//! @param my_name
+//!   an optional attribute used to specify the name the object will be available
+//!   as in the current object. The default, if not specified, is the name of the
+//!   other type.
+//! @param my_field
+//!   an optional attribute that specifies the field in the table of the local
+//!   datatype. if not specified, this defaults to the singular inflection of the
+//!   other datatype, and the database field name of the other data type's primary
+//!   key, separated by an underscore.
 void belongs_to(string other_type, string|void my_name, string|void my_field)
 {
   context->builder->belongs_to += ({ (["my_name": my_name, "other_type": other_type, "my_field": my_field, "obj": this]) });
-
-/*
-  add_field(Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(pl->obj->instance_name), pl->obj->instance_name, od->instance_name));
-  */
 }
 
-
+//! define a one to many relationship in which the local object is referred to
+//! by one or more objects of another datatype. this method defines the reverse of
+//! @[belongs_to]. note that a datatype that uses this method won't have a field
+//! in the corresponding "local" database table that contains the reference 
+//! information. as a result, the parameters in this method don't use database
+//! field names at all, unlink @[belongs_to].
+//!
+//! @param other_type
+//!   pluralized version of the data type name (not the table name) of the type the field references.
+//! @param my_name
+//!   an optional attribute used to specify the name the object will be available
+//!   as in the current object. The default, if not specified, is the pluralized name of the
+//!   other type.
+//!  @param other_field
+//!   the name of the field in the other datatype (not a database field name) that
+//!   represents the link to this data type.
 void has_many(string other_type, string|void my_name, string|void other_field)
 {
   context->builder->has_many += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "obj": this]) });  

@@ -45,12 +45,12 @@ inherit Fins.Application;
 string controller_contents =
 #"
 inherit Fins.FinsController;
-
+/*
 void index(object id, object response, mixed ... args)
 {
   response->set_data(\"welcome to __APPNAME__.\");
 }
-
+*/
 ";
 
 string repo_contents =

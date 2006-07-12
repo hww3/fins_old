@@ -160,11 +160,100 @@ public mixed handle_request(.Request request)
     request->misc->session_variables = ([]);
 
   if(objectp(event) || functionp(event))
-    event(request, response, @args);
+  {
+    mixed er = catch(event(request, response, @args));
 
+    if(er && objectp(er))
+    {
+      switch(er->error_type)
+      {
+        case "template":
+          response->set_data(generate_template_error(er));
+          break;
+        default:
+          response->set_data(generate_error(er));
+          break;
+      }
+    }
+
+  }
   else response->set_data("Unknown event: %O\n", request->not_query);
 
   return response->get_response();
+}
+
+string generate_template_error(object er)
+{
+
+  string t = "Fins: Template Error";
+  string b = "<h1>Template Error</h1>\n"
+             "An error occurred while processing your requst:<p>"
+             + er->message() +
+             "<p>";
+             
+
+  string ret = "<html><head><title>" + t + "</title></head><body>" 
+    + b + 
+    "</body></html>";
+
+  return ret;
+}
+
+string generate_error(object er)
+{
+
+  string et = String.capitalize(er->error_type);
+  string t = "Fins: " + et + " Error";
+  string b = "<h1>" + et + " Error</h1>\n"
+             "An error occurred while processing your requst:<p>"
+             + html_describe_error(er) +
+             "<p>";
+             
+
+  string ret = "<html><head><title>" + t + "</title></head><body>" 
+    + b + 
+    "</body></html>";
+
+  return ret;
+}
+
+string html_describe_error(object er)
+{
+  string rv = "";
+
+  rv = "<b>" + er->message() + "</b><p>Backtrace:<ol>";
+
+  foreach(reverse(er->backtrace()[2..]);int i; object btf)
+  {
+    rv += sprintf("<li> %s line %d, %O(%s)", (string)btf[0], btf[1], 
+       btf[2], make_btargs(sizeof(btf)>3?btf[3..]:({}))) + "<br>";
+  }
+
+  rv += "</ol>";
+  return rv;
+}
+
+string make_btargs(array args)
+{
+  string a = "";
+  array b = ({});
+  foreach(args;;mixed arg)
+  {
+    string s = "";
+    mixed e = catch(s = sprintf("%O", arg) );
+    if(e)
+      s = "UNKNOWN";
+
+    if(stringp(arg) && sizeof(arg) > 30)
+    {
+      s = s[0..29] + ("\" <i> + " + (sizeof(arg) - 30) + " chars</i>");
+    }
+
+    b+=({s});
+  }
+
+  a = b*", ";
+  return a;
 }
 
 //! Given a request object, this method will find the appropriate event method

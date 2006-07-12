@@ -2,7 +2,7 @@ inherit "module";
 inherit "caudiumlib";
 inherit "socket";
 
-constant cvs_version= "$Id: fins_application.pike,v 1.1 2005-11-09 21:38:46 hww3 Exp $";
+constant cvs_version= "$Id: fins_application.pike,v 1.2 2006-07-12 22:24:23 hww3 Exp $";
 constant thread_safe=1;
 
 
@@ -24,7 +24,10 @@ int puts, deletes, mkdirs, moves, chmods, appes;
 
 static int do_stat = 1;
 
-string loaderstub = "Fins.Application load_application(string finsdir, string project, string config_name){  Fins.Application application;  application = Fins.Loader.load_app(combine_path(finsdir, project), config_name); return application;}";
+string loaderstub = "Fins.Application load_application(string finsdir, string project, string config_name){  \n"
+" Fins.Application application;  application = Fins.Loader.load_app(combine_path(finsdir, project), config_name);\n"
+" Tools.Logging.Log.loglevel = INFO|WARN|ERROR|CRITICAL;\n"
+" return application;}";
 
 
 string status()
@@ -73,7 +76,7 @@ int dirperm, fileperm, default_umask;
 
 void start (int cnt, object conf) {
     module_dependencies(conf, ({ "123session" }));
-
+werror("STARTING!\n");
   if(!QUERY(finsdir) || has_prefix(QUERY(finsdir), "NONE"))
   {
     return;
@@ -92,15 +95,26 @@ void start (int cnt, object conf) {
   }
 
   if(QUERY(finsdir))
+{
     add_module_path(combine_path(QUERY(finsdir), "lib"));
+
+  werror("added to module path: %O\n", combine_path(QUERY(finsdir), "lib"));
+}
   else
   {
     report_error("Fins: No Fins directory specified.\n");
     return;
   }
 
+  call_out(low_load_app, 0.1);
+
+}
+
+void low_load_app()
+{
   program loader;
   mixed e;
+ master()->set_inhibit_compile_errors(0);
   e = catch(loader = compile_string(loaderstub));
 
   if(e)
@@ -128,6 +142,7 @@ void start (int cnt, object conf) {
     werror(describe_backtrace(e));
   }
   application = a;
+
 }
 
 string query_location()

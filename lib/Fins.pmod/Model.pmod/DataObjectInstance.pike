@@ -98,6 +98,12 @@ void refresh()
 }
 
 //!
+array(object(.DataObjectInstance)) find_all()
+{
+  return find(([]));
+}
+
+//!
 array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void criteria)
 {
   return master_object->find(qualifiers, criteria, this);

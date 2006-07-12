@@ -31,6 +31,11 @@ void add_object_type(.DataObject t, program i)
    instance_definitions[t->instance_name] = i;
 }
 
+void find_all(string|object ot)
+{
+  find(ot, ([]));
+}
+
 array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
 {
    object o;

@@ -1,5 +1,10 @@
 Version 0.1
 
+- added Fins.Errors for holding special exception types.
+- added more friendly error messages
+- added default event (index) to FinsController.
+- added "internal" templates for things like the default
+    event view (see previous entry).
 - added pike -x fins toolset
 - added pike -x fins create [appname]
 - added pike -x fins start [appname]

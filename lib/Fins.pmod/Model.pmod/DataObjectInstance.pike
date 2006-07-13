@@ -72,6 +72,12 @@ static void create(mixed|void id, object _object_type)
 
 }
 
+//! performs validation on object and returns an error object if any errors occur.
+Fins.Errors.Validation valid()
+{
+  return master_object->valid(this);
+}
+
 //!
 void refresh()
 {
@@ -116,21 +122,21 @@ int delete(void|int force)
 }
 
 //!
-int save()
+int save(int|void no_validation)
 {
-   return master_object->save(this);
+   return master_object->save(no_validation, this);
 }
 
 //!
-int set_atomic(mapping values)
+int set_atomic(mapping values, int|void no_validation)
 {
-   return master_object->set_atomic(values, this);
+   return master_object->set_atomic(values, no_validation, this);
 }
 
 //!
-int set(string name, string value)
+int set(string name, string value, int|void no_validation)
 {
-   return master_object->set(name, value, this);
+   return master_object->set(name, value, no_validation, this);
 }
 
 //!

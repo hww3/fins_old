@@ -506,7 +506,7 @@ mixed get(string field, .DataObjectInstance i)
    }
 }
 
-int set_atomic(mapping values, .DataObjectInstance i)
+int set_atomic(mapping values, int|void no_validation, .DataObjectInstance i)
 {
    mapping object_data = ([]);
    multiset fields_set = (<>);
@@ -531,12 +531,12 @@ int set_atomic(mapping values, .DataObjectInstance i)
        fields_set[field] = 1;      
    }
 
-   commit_changes(fields_set, object_data, i->get_id(), i);
+   commit_changes(fields_set, object_data, no_validation, i->get_id(), i);
    load(i->get_id(), i, 1);
 }
 
 
-int set(string field, mixed value, .DataObjectInstance i)
+int set(string field, mixed value, int|void no_validation, .DataObjectInstance i)
 {
    if(!fields[field])
    {
@@ -563,26 +563,29 @@ int set(string field, mixed value, .DataObjectInstance i)
      string new_value = fields[field]->encode(value);
      string key_value = primary_key->encode(i->get_id());
 
-     Fins.Errors.Validation er;
-
-     // we need to validate against validates and validates_on_update
-     if(validate && functionp(validate))
-     {  
-       if(!er)
-         er = Fins.Errors.Validation("Data Validation Error\n");
-       validate(([field: value]), er, i);
-     }     
-
-     if(validate_on_update && functionp(validate_on_update))
-     {  
-       if(!er)
-         er = Fins.Errors.Validation("Data Validation Error\n");
-       validate_on_update(([field: value]), er, i);
-     }     
-
-     if(er && sizeof(er->validation_errors()))
+     if(!no_validation)
      {
-        throw(er);
+       Fins.Errors.Validation er;
+
+       // we need to validate against validates and validates_on_update
+       if(validate && functionp(validate))
+       {  
+         if(!er)
+           er = Fins.Errors.Validation("Data Validation Error\n");
+         validate(([field: value]), er, i);
+       }     
+ 
+       if(validate_on_update && functionp(validate_on_update))
+       {  
+         if(!er)
+           er = Fins.Errors.Validation("Data Validation Error\n");
+         validate_on_update(([field: value]), er, i);
+       }     
+
+       if(er && sizeof(er->validation_errors()))
+       {
+          throw(er);
+       }
      }
 
      string update_query = sprintf(single_update_query, table_name, fields[field]->field_name, new_value, primary_key->name, key_value);
@@ -669,15 +672,13 @@ static mapping mk_validate_fields(object i, multiset fields_set, mapping object_
   return vf;
 }
 
-static int commit_changes(multiset fields_set, mapping object_data, mixed update_id, object i)
+Fins.Errors.Validation valid(object i)
 {
-   string query;
-   array qfields = ({});
-   array qvalues = ({});
-
-
    Fins.Errors.Validation er;
    mapping validate_fields;
+
+   multiset fields_set = i->fields_set;
+   mapping object_data = i->object_data;
 
    // we need to validate against validates and validates_on_update
    if(validate && functionp(validate))
@@ -689,7 +690,7 @@ static int commit_changes(multiset fields_set, mapping object_data, mixed update
      validate(validate_fields, er, i);
    }     
 
-   if(update_id)
+   if(!i->is_new_object())
      if(validate_on_update && functionp(validate_on_update))
      {  
        if(!er)
@@ -710,7 +711,55 @@ static int commit_changes(multiset fields_set, mapping object_data, mixed update
 
    if(er && sizeof(er->validation_errors()))
    {
-      throw(er);
+     return er;
+   }
+   else return 0;
+}
+
+static int commit_changes(multiset fields_set, mapping object_data, int|void no_validation, mixed update_id, object i)
+{
+   string query;
+   array qfields = ({});
+   array qvalues = ({});
+
+      Fins.Errors.Validation er;
+   mapping validate_fields;
+
+   // we need to validate against validates and validates_on_update
+   if(!no_validation)
+   {
+     if(validate && functionp(validate))
+     {  
+       if(!er)
+         er = Fins.Errors.Validation("Data Validation Error\n");
+       if(!validate_fields)
+         validate_fields = mk_validate_fields(i, fields_set, object_data);
+       validate(validate_fields, er, i);
+     }     
+
+     if(update_id)
+       if(validate_on_update && functionp(validate_on_update))
+       {  
+         if(!er)
+           er = Fins.Errors.Validation("Data Validation Error\n");
+         if(!validate_fields)
+           validate_fields = mk_validate_fields(i, fields_set, object_data);
+         validate_on_update(validate_fields, er, i);
+       }     
+     else
+       if(validate_on_create && functionp(validate_on_create))
+       {  
+         if(!er)
+           er = Fins.Errors.Validation("Data Validation Error\n");
+         if(!validate_fields)
+           validate_fields = mk_validate_fields(i, fields_set, object_data);
+         validate_on_create(validate_fields, er, i);
+       }       
+
+     if(er && sizeof(er->validation_errors()))
+     {
+        throw(er);
+     }
    }
 
       foreach(fields;; .Field f)
@@ -774,12 +823,12 @@ static int commit_changes(multiset fields_set, mapping object_data, mixed update
       context->sql->query(query);
 }
 
-int save(.DataObjectInstance i)
+int save(int|void no_validation, .DataObjectInstance i)
 {   
 
    if(i->is_new_object())
    {
-      commit_changes(i->fields_set, i->object_data, 0, i);
+      commit_changes(i->fields_set, i->object_data, no_validation, 0, i);
       i->set_id(primary_key->get_id(i));
       i->set_new_object(0);
       i->set_saved(1);
@@ -789,7 +838,7 @@ int save(.DataObjectInstance i)
    }
    else if(autosave == 0)
    {
-      commit_changes(i->fields_set, i->object_data, i->get_id(), i);
+      commit_changes(i->fields_set, i->object_data, no_validation, i->get_id(), i);
       i->set_id(primary_key->get_id(i));
       i->set_saved(1);
       i->object_data = ([]);

@@ -1,5 +1,8 @@
 Version 0.1
 
+- added validation callbacks for data model sets
+- added validation override flags to skip validation
+- added special Fins.Errors.Validation error type.
 - added Fins.Errors for holding special exception types.
 - added more friendly error messages
 - added default event (index) to FinsController.

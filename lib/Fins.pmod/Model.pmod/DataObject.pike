@@ -78,7 +78,52 @@ void define();
 //! when also using automatic definition.
 void post_define();
 
-void reflect_definition()
+//! validates the data being set for an object.
+//! runs for each individual or atomic change. all applicable validation methods
+//! will be called, and if any errors have been registered in the @[Fins.Errors.Validation]
+//! object, the error object will be thrown.
+//!
+//! @param changes
+//!  a mapping containing the field-value pairs changed.
+//! @param errors
+//!  a @[Fins.Errors.Validation] object that can be used to aggregate error messages
+//!  by using the add() method.
+//! @param i
+//!  the DataInstanceObject being created or updated.
+//!
+void validate(mapping changes, Fins.Errors.Validation errors, .DataObjectInstance i);
+
+//! validates the data being set for an object.
+//! runs for each individual or atomic change on updates only. all applicable validation methods
+//! will be called, and if any errors have been registered in the @[Fins.Errors.Validation]
+//! object, the error object will be thrown.
+//!
+//! @param changes
+//!  a mapping containing the field-value pairs changed.
+//! @param errors
+//!  a @[Fins.Errors.Validation] object that can be used to aggregate error messages
+//!  by using the add() method.
+//! @param i
+//!  the DataInstanceObject being created or updated.
+//!
+void validate_on_update(mapping changes, Fins.Errors.Validation errors, .DataObjectInstance i);
+
+//! validates the data being set for an object.
+//! runs for atomic changes at object creation time. all applicable validation methods
+//! will be called, and if any errors have been registered in the @[Fins.Errors.Validation]
+//! object, the error object will be thrown.
+//!
+//! @param changes
+//!  a mapping containing the field-value pairs changed.
+//! @param errors
+//!  a @[Fins.Errors.Validation] object that can be used to aggregate error messages
+//!  by using the add() method.
+//! @param i
+//!  the DataInstanceObject being created or updated.
+//!
+void validate_on_create(mapping changes, Fins.Errors.Validation errors, .DataObjectInstance i);
+
+static void reflect_definition()
 {
   string instance =
              (replace(master()->describe_program(object_program(this)), ".", "/")/"/")[-1];
@@ -486,7 +531,7 @@ int set_atomic(mapping values, .DataObjectInstance i)
        fields_set[field] = 1;      
    }
 
-   commit_changes(fields_set, object_data, i->get_id());
+   commit_changes(fields_set, object_data, i->get_id(), i);
    load(i->get_id(), i, 1);
 }
 
@@ -517,7 +562,29 @@ int set(string field, mixed value, .DataObjectInstance i)
    {
      string new_value = fields[field]->encode(value);
      string key_value = primary_key->encode(i->get_id());
-   
+
+     Fins.Errors.Validation er;
+
+     // we need to validate against validates and validates_on_update
+     if(validate && functionp(validate))
+     {  
+       if(!er)
+         er = Fins.Errors.Validation("Data Validation Error\n");
+       validate(([field: value]), er, i);
+     }     
+
+     if(validate_on_update && functionp(validate_on_update))
+     {  
+       if(!er)
+         er = Fins.Errors.Validation("Data Validation Error\n");
+       validate_on_update(([field: value]), er, i);
+     }     
+
+     if(er && sizeof(er->validation_errors()))
+     {
+        throw(er);
+     }
+
      string update_query = sprintf(single_update_query, table_name, fields[field]->field_name, new_value, primary_key->name, key_value);
      i->set_saved(1);
      if(context->debug) werror("QUERY: %O\n", update_query);
@@ -592,11 +659,60 @@ int delete(int|void force, .DataObjectInstance i)
    return 1;
 }
 
-static int commit_changes(multiset fields_set, mapping object_data, mixed update_id)
+static mapping mk_validate_fields(object i, multiset fields_set, mapping object_data)
+{
+  mapping vf = ([]);
+  foreach(fields_set; string f;)
+  { 
+    vf[f] = object_data[f];
+  }
+  return vf;
+}
+
+static int commit_changes(multiset fields_set, mapping object_data, mixed update_id, object i)
 {
    string query;
    array qfields = ({});
    array qvalues = ({});
+
+
+   Fins.Errors.Validation er;
+   mapping validate_fields;
+
+   // we need to validate against validates and validates_on_update
+   if(validate && functionp(validate))
+   {  
+     if(!er)
+       er = Fins.Errors.Validation("Data Validation Error\n");
+     if(!validate_fields)
+       validate_fields = mk_validate_fields(i, fields_set, object_data);
+     validate(validate_fields, er, i);
+   }     
+
+   if(update_id)
+     if(validate_on_update && functionp(validate_on_update))
+     {  
+       if(!er)
+         er = Fins.Errors.Validation("Data Validation Error\n");
+       if(!validate_fields)
+         validate_fields = mk_validate_fields(i, fields_set, object_data);
+       validate_on_update(validate_fields, er, i);
+     }     
+   else
+     if(validate_on_create && functionp(validate_on_create))
+     {  
+       if(!er)
+         er = Fins.Errors.Validation("Data Validation Error\n");
+       if(!validate_fields)
+         validate_fields = mk_validate_fields(i, fields_set, object_data);
+       validate_on_create(validate_fields, er, i);
+     }       
+
+   if(er && sizeof(er->validation_errors()))
+   {
+      throw(er);
+   }
+
       foreach(fields;; .Field f)
       {
          if(f->is_shadow) continue;  // We just skip right over "shadow" fields.
@@ -663,7 +779,7 @@ int save(.DataObjectInstance i)
 
    if(i->is_new_object())
    {
-      commit_changes(i->fields_set, i->object_data, 0);
+      commit_changes(i->fields_set, i->object_data, 0, i);
       i->set_id(primary_key->get_id(i));
       i->set_new_object(0);
       i->set_saved(1);
@@ -673,7 +789,7 @@ int save(.DataObjectInstance i)
    }
    else if(autosave == 0)
    {
-      commit_changes(i->fields_set, i->object_data, i->get_id());
+      commit_changes(i->fields_set, i->object_data, i->get_id(), i);
       i->set_id(primary_key->get_id(i));
       i->set_saved(1);
       i->object_data = ([]);

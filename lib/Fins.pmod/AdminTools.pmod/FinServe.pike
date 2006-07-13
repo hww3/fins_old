@@ -51,7 +51,9 @@ int main(int argc, array(string) argv)
 
   foreach(Getopt.find_all_options(argv,aggregate(
     ({"port",Getopt.HAS_ARG,({"-p", "--port"}) }),
+#if constant(fork)
     ({"daemon",Getopt.NO_ARG,({"-d"}) }),
+#endif /* fork() */
     ({"hilfe",Getopt.NO_ARG,({"--hilfe"}) }),
     ({"help",Getopt.NO_ARG,({"--help"}) }),
     )),array opt)
@@ -91,11 +93,14 @@ int main(int argc, array(string) argv)
 int do_startup()
 {
 
+#if constant(fork)
   if(!hilfe_mode && go_background && fork())
 	{
 		werror("Entered Daemon mode...\n");
 		return 0;
 	}
+
+#endif /* fork() */
 
   Log.info("FinServe starting on port " + my_port);
 

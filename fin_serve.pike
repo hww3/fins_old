@@ -7,6 +7,6 @@ int main(int argc, array argv) {
       (cmd_dir != getcwd()))
     cd(cmd_dir);
   add_module_path("lib");
-  program p = compile_string("inherit Fins.FinServe;");
+  program p = compile_string("inherit Fins.AdminTools.FinServe;");
   return p()->main(argc, argv);
 }

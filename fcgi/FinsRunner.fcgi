@@ -17,65 +17,65 @@ int session_timeout = 3600;
 
 int start_listener(int port)
 {
-    int sock;
+  int sock;
 
-    if(!port)
-    {
-      f = Stdio.stdin.dup();
-      sock = f->query_fd();
-    }
-    else
-    {
-      sock = Public.Web.FCGI.open_socket(":" + port, 128);
-    }
-  #ifdef RUN_THREADED
-  	for (int i = 0; i < 8; i++) {
-  		Thread.Thread(request_loop, sock, i);
-  	}
-  	return (-1);
-  #else 
-  	request_loop(sock, 0);
-        return 0;
-  #endif
+  if(!port)
+  {
+    f = Stdio.stdin.dup();
+    sock = f->query_fd();
+  }
+  else
+  {
+    sock = Public.Web.FCGI.open_socket(":" + port, 128);
+  }
+#ifdef RUN_THREADED
+  for (int i = 0; i < 8; i++) {
+    Thread.Thread(request_loop, sock, i);
+  }
+  return (-1);
+#else 
+  request_loop(sock, 0);
+  return 0;
+#endif
 }
 
 void request_loop(int sock, int id)
 {
 #ifdef RUN_THREADED 
   Thread.Mutex lock;
-	Thread.MutexKey key;
-	lock = Thread.Mutex();  
+  Thread.MutexKey key;
+  lock = Thread.Mutex();  
   key = lock->lock();
 #endif
-	object request = Public.Web.FCGI.FCGI(sock);
+  object request = Public.Web.FCGI.FCGI(sock);
 #ifdef RUN_THREADED
-        key = 0;
+  key = 0;
 #endif
 
-        do{
-		request->accept();
-                requests ++;
-                object request_id;
-                mixed e;
+  do{
+    request->accept();
+    requests ++;
+    object request_id;
+    mixed e;
 
-                if(e = catch(request_id = Fins.FCGIRequest(request)))
-                {
+    if(e = catch(request_id = Fins.FCGIRequest(request)))
+    {
 #ifdef RUN_THREADED
-                  key = lock->lock();
+      key = lock->lock();
 #endif
-                  request->write("Status: 500 Server Error\r\n");
-                  request->write("Content-type: text/html\r\n\r\n");
-                  request->write("<h1>Error 500: Internal Server Error</h1>");
-                  request->write("The server was unable to parse your request.\n");
-                  request->write("<p>" + describe_backtrace(e));                  
-                  request->finish();
+      request->write("Status: 500 Server Error\r\n");
+      request->write("Content-type: text/html\r\n\r\n");
+      request->write("<h1>Error 500: Internal Server Error</h1>");
+      request->write("The server was unable to parse your request.\n");
+      request->write("<p>" + describe_backtrace(e));                  
+      request->finish();
 #ifdef RUN_THREADED
-                  key = 0;
+      key = 0;
 #endif
- 		              continue;
-                }
+      continue;
+    }
 
-          handle_request(request_id);
+    handle_request(request_id);
 
-	} while(!shutdown);
+  } while(!shutdown);
 }

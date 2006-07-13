@@ -40,7 +40,7 @@ int clear(string key)
 //!   via the get() method.
 int set(string key, mixed value, int|void timeout, int|void sliding)
 {
-  
+
   values[key] = ({timeout + time(), value, sliding, timeout});
   return 1;
 }
@@ -55,17 +55,17 @@ mixed get(string key)
 {
   if(values[key])
   {
-     if(values[key][0] > time()) 
-     {
-       if(values[key][2]) // sliding rule
-         values[key][0] = values[key][3] + time();  
-       return values[key][1];
-     }
-     else
-     {
-       m_delete(values, key);
-       return UNDEFINED;
-     }
+    if(values[key][0] > time()) 
+    {
+      if(values[key][2]) // sliding rule
+	values[key][0] = values[key][3] + time();  
+      return values[key][1];
+    }
+    else
+    {
+      m_delete(values, key);
+      return UNDEFINED;
+    }
   }
   else return UNDEFINED;
 }
@@ -77,11 +77,11 @@ void cleanup()
   {
     foreach(values; string key; mixed value)
     {
-       if(value[0]<t)
-       {
-         m_delete(values, key);
-         cleaned ++;
-       }
+      if(value[0]<t)
+      {
+	m_delete(values, key);
+	cleaned ++;
+      }
     }
   }
   if(cleaned)

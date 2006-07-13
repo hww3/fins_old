@@ -41,24 +41,24 @@ static string _sprintf(mixed ... args)
 
 void response_write_and_finish(mixed ... args)
 {
-        Thread.Mutex lock;
-        Thread.MutexKey key;
+  Thread.Mutex lock;
+  Thread.MutexKey key;
 
-        lock = Thread.Mutex();
-        key = lock->lock();
+  lock = Thread.Mutex();
+  key = lock->lock();
 
-        mixed e;
+  mixed e;
 
-   e = catch{
+  e = catch{
 
-        fast_cgi_request->write(@args);
-        fast_cgi_request->finish();
-};
+    fast_cgi_request->write(@args);
+    fast_cgi_request->finish();
+  };
 
-if(e){
-throw(e);
-}
-        key = 0;
+  if(e){
+    throw(e);
+  }
+  key = 0;
 
 }
 
@@ -73,7 +73,7 @@ static private void decode_query() {
     {
       a = http_decode_string(replace(a, "+", " "));
       b = http_decode_string(replace(b, "+", " "));
-      
+
       if(variables[ a ])
 	variables[ a ] +=  "\0" + b;
       else
@@ -83,7 +83,7 @@ static private void decode_query() {
 	rest_query += "&" + http_decode_string( v );
       else
 	rest_query = http_decode_string( v );
-  rest_query=replace(rest_query, "+", "\000"); /* IDIOTIC STUPID STANDARD */
+    rest_query=replace(rest_query, "+", "\000"); /* IDIOTIC STUPID STANDARD */
 }
 
 static private void decode_cookies()
@@ -122,48 +122,48 @@ private void decode_post()
   data = data[..misc->len];
   switch(lower_case(((misc["content-type"]||"")/";")[0]-" "))
   {
-   default: // Normal form data.
-    string v;
-    if(misc->len < 200000)
-    {
-      foreach(replace(data-"\n", "+", " ")/"&", v)
-	if(sscanf(v, "%s=%s", a, b) == 2)
-	{
-	  a = http_decode_string( a );
-	  b = http_decode_string( b );
-	  
-	  if(variables[ a ])
-	    variables[ a ] +=  "\0" + b;
-	  else
-	    variables[ a ] = b;
-	}
-      break;
-    }
-   case "multipart/form-data":
-    object messg = MIME.Message(data, misc);
-    foreach(messg->body_parts||({}), object part) {
-      if(part->disp_params->filename) {
-      	string fname=part->disp_params->filename;
-        if( part->headers["content-disposition"] ) {
-          array fntmp=part->headers["content-disposition"]/";";
-          if( sizeof(fntmp) >= 3 && search(fntmp[2],"=") != -1 ) {
-            fname=((fntmp[2]/"=")[1]);
-            fname=fname[1..(sizeof(fname)-2)];
-          }
-        }
+    default: // Normal form data.
+      string v;
+      if(misc->len < 200000)
+      {
+	foreach(replace(data-"\n", "+", " ")/"&", v)
+	  if(sscanf(v, "%s=%s", a, b) == 2)
+	  {
+	    a = http_decode_string( a );
+	    b = http_decode_string( b );
 
-
-	variables[part->disp_params->name]=part->getdata();
-	variables[part->disp_params->name+".filename"]=fname;
-	if(!misc->files)
-	  misc->files = ({ fname });
-	else
-	  misc->files += ({ fname });
-      } else {
-	variables[part->disp_params->name]=part->getdata();
+	    if(variables[ a ])
+	      variables[ a ] +=  "\0" + b;
+	    else
+	      variables[ a ] = b;
+	  }
+	break;
       }
-    }
-    break;
+      case "multipart/form-data":
+	object messg = MIME.Message(data, misc);
+      foreach(messg->body_parts||({}), object part) {
+	if(part->disp_params->filename) {
+	  string fname=part->disp_params->filename;
+	  if( part->headers["content-disposition"] ) {
+	    array fntmp=part->headers["content-disposition"]/";";
+	    if( sizeof(fntmp) >= 3 && search(fntmp[2],"=") != -1 ) {
+	      fname=((fntmp[2]/"=")[1]);
+	      fname=fname[1..(sizeof(fname)-2)];
+	    }
+	  }
+
+
+	  variables[part->disp_params->name]=part->getdata();
+	  variables[part->disp_params->name+".filename"]=fname;
+	  if(!misc->files)
+	    misc->files = ({ fname });
+	  else
+	    misc->files += ({ fname });
+	} else {
+	  variables[part->disp_params->name]=part->getdata();
+	}
+      }
+      break;
   }
 }
 
@@ -223,9 +223,9 @@ void create(object fcgir)
   contents = getenv("PRESTATES");
   if(stringp(contents) && strlen(contents))
     prestate = mkmultiset(Array.map(contents / " ",
-				    lambda(string s) {
-      return http_decode_string(replace(s, "+", " "));
-    }));
+	  lambda(string s) {
+	  return http_decode_string(replace(s, "+", " "));
+	  }));
 
   contents = getenv("HTTP_PRAGMA");
   if(stringp(contents) && strlen(contents))
@@ -234,31 +234,31 @@ void create(object fcgir)
   not_query = http_decode_string(replace(getenv(not_query_field), "+", " "));
   int q = search(not_query, "?");
   if(q!=-1)
-     not_query = not_query[..q-1];     
+    not_query = not_query[..q-1];     
   query = http_decode_string(replace(getenv("QUERY_STRING"), "+", " "));;
   method = getenv("REQUEST_METHOD") || "GET";
   prot = getenv("SERVER_PROTOCOL");
 
   foreach( ({"DOCUMENT_ROOT", "HOSTTYPE", "GATEWAY_INTERFACE", "PWD",
-	       "SCRIPT_FILENAME", "SCRIPT_NAME", "REQUEST_URI",
-	       "SERVER_SOFTWARE", "SERVER_PORT", "SERVER_NAME",
-	       "SERVER_ADMIN", "REMOTE_PORT", "PATH_INFO",
-	       "PATH_TRANSLATED" }), string s)
+	"SCRIPT_FILENAME", "SCRIPT_NAME", "REQUEST_URI",
+	"SERVER_SOFTWARE", "SERVER_PORT", "SERVER_NAME",
+	"SERVER_ADMIN", "REMOTE_PORT", "PATH_INFO",
+	"PATH_TRANSLATED" }), string s)
     if(contents = getenv(s)) {
       misc[lower_case(s)] = contents;
     }
-  
+
   foreach(glob("HTTP_*", indices(fast_cgi_request->env)), string header)
     if(contents = getenv(header)) {
       header = replace(lower_case(header),
-		       ({"http_", "_"}), ({"", "-"}));
+	  ({"http_", "_"}), ({"", "-"}));
       request_headers[header] = (contents-" ") / ",";
     }
-  
-  
+
+
   if(misc->len)
     data = fast_cgi_request->read(misc->len);
-  
+
   decode_query(); // Decode the query string
 
   if(misc->len && method == "POST")

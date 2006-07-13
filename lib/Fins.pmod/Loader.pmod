@@ -25,13 +25,13 @@ Fins.Application load_app(string app_dir, string config_name)
 
 Fins.Configuration load_configuration(string app_dir, string config_name)
 {
-	string config_file = combine_path(app_dir, "config", config_name+".cfg");
+  string config_file = combine_path(app_dir, "config", config_name+".cfg");
 
-	Log.debug("config file: " + config_file);
+  Log.debug("config file: " + config_file);
 
-   Stdio.Stat stat = file_stat(config_file);
-	if(!stat || stat->isdir)
-		throw(Error.Generic("Unable to load configuration file " + config_file + "\n"));
-		
-  	return Fins.Configuration(app_dir, config_file);
+  Stdio.Stat stat = file_stat(config_file);
+  if(!stat || stat->isdir)
+    throw(Error.Generic("Unable to load configuration file " + config_file + "\n"));
+
+  return Fins.Configuration(app_dir, config_file);
 }

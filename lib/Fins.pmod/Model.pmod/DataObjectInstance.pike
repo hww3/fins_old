@@ -51,6 +51,8 @@ string get_type()
 //!
 static void create(mixed|void id, object _object_type)
 {
+  if(!_object_type)
+    throw(Error.Generic("No Data Object Definition passed to create()\n"));
   if(objectp(_object_type)) 
   {
     master_object = _object_type;

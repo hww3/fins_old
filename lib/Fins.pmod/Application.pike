@@ -175,6 +175,11 @@ public mixed handle_request(.Request request)
           break;
       }
     }
+    else
+    {
+        Log.exception("Exception while handling an event.", er);
+        response->set_data(generate_error(er));
+    }
 
   }
   else response->set_data("Unknown event: %O\n", request->not_query);

@@ -467,7 +467,14 @@ void low_load(mapping row, .DataObjectInstance i, mapping|void fieldnames)
 
 mapping get_atomic(.DataObjectInstance i)
 {
-   return ([]);
+  mapping a = ([]);
+
+  foreach(fields;string n; object f )
+  {
+    a[f->name] = get(f->name, i);
+  }
+
+  return a;
 }
 
 mixed get(string field, .DataObjectInstance i)

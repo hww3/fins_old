@@ -5,7 +5,7 @@
 //! (note that this is not a recommended way, as it's slow and 
 //! the parsing accuracy is not guaranteed.
 
-inherit .DateField;
+inherit .DateTimeField;
 
 constant type = "TimeStamp";
 
@@ -33,7 +33,12 @@ mixed validate(mixed value, void|.DataObjectInstance i)
   throw(Error.Generic("TimeStamp fields cannot be set.\n"));
 }
 
+
 object decode(string value, void|.DataObjectInstance i)
 {
-  werror("decoding " + value + "\n");
+  if(context->personality->decode_timestamp_field)
+    context->personality->decode_timestamp_field(value);  
+  else
+    return ::decode(value, i);  
+
 }

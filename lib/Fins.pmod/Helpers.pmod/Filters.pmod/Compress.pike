@@ -10,6 +10,9 @@ import Fins;
 //!   after_filter(Fins.Helpers.Filters.Compress());
 //! }
 
+//!
+static Thread.Mutex _mutex;
+
 string real_deflate(string _data, string _name)
 {
   int level = 9;
@@ -49,6 +52,7 @@ string gzip(string data, object id)
 //!
 int filter(object request, object response, mixed ... args)
 { 
+  Thread.MutexKey lock = _mutex->lock(1);
   string type = request->get_compress_encoding(); // does the browser support it ?
 
   if(type && !response->get_header("Content-Encoding")) // don't encode on already encoded

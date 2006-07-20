@@ -23,6 +23,9 @@ string static_dir;
 //!
 .Configuration config;
 
+//!
+Fins.Helpers.Filters.Compress _gzfilter;
+
 
 
 
@@ -61,7 +64,9 @@ static void create(.Configuration _config)
 //! controller have been loaded.
 void start()
 {
-
+#if constant(Fins.Helpers.Filters.Compress)
+  _gzfilter = Fins.Helpers.Filters.Compress();
+#endif
 }
 
 static void load_breakpoint()
@@ -448,6 +453,21 @@ array get_event(.Request request)
   response->set_header("Expires", (Calendar.Second() + (3600*12))->format_http());
   response->set_type(Protocols.HTTP.Server.filename_to_type(basename(fn)));
   response->set_file(Stdio.File(fn));
+
+  if (response->get_type() && _gzfilter) {
+    int pos = search(response->get_type(), "/");
+    if (has_suffix(response->get_type(), "xml")) {
+      _gzfilter->filter(request, response);
+    }
+    else if (pos != -1) {
+      switch(response->get_type()[0..pos-1]) {
+	case "text":
+	case "application":
+	case "chemical":
+	_gzfilter->filter(request, response);
+      }
+    }
+  }
 
   return response;
 }

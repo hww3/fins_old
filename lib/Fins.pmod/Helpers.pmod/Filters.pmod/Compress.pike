@@ -54,18 +54,31 @@ int filter(object request, object response, mixed ... args)
   if(type && !response->get_header("Content-Encoding")) // don't encode on already encoded
   {
       string nd = response->get_data();
+      object f = response->get_file();
+      if (!nd && f) {
+	object stat = f->stat();
+	if (stat->size < 256)
+	  return 1;
+	else {
+	  f->seek(0);
+	  nd = f->read(stat->size);
+	  f->seek(0);
+	}
+      }
       if(!nd || sizeof(nd) < 256) return 1;
       if(type=="deflate")
       {
-        nd = deflate(response->get_data(), request);
-        Log.debug("Deflating " + sizeof(response->get_data()) + " to " + sizeof(nd)); 
+	string _nd = nd;
+        nd = deflate(nd, request);
+        Log.debug("Deflating " + sizeof(_nd) + " to " + sizeof(nd)); 
         response->set_header("Content-Encoding", "deflate");
 	response->set_data(nd);
       }
       else if(type=="gzip")
       {
-        nd = gzip(response->get_data(), request);
-        Log.debug("Gzipping " + sizeof(response->get_data()) + " to " + sizeof(nd)); 
+	string _nd = nd;
+        nd = gzip(nd, request);
+        Log.debug("Gzipping " + sizeof(_nd) + " to " + sizeof(nd)); 
         response->set_data(nd);
 	response->set_header("Content-Encoding", "gzip");
       }

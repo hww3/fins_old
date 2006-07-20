@@ -37,6 +37,11 @@
   }
 
   //!
+  public void|string get_type() {
+    return response->type;
+  }
+
+  //!
   public int flash(string name, mixed data)
   {
     if(!request) return 0;
@@ -128,6 +133,11 @@
     if(!response->error)
       response->error = 200;
     response->data = 0;
+  }
+
+  //! 
+  public void|Stdio.File get_file() {
+    return response->file;
   }
 
   public void render()

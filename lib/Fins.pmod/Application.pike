@@ -57,6 +57,9 @@ static void create(.Configuration _config)
   load_view();
   load_controller();
 
+#if constant(Fins.Helpers.Filters.Compress)
+  _gzfilter = Fins.Helpers.Filters.Compress();
+#endif
   start();
 }
 
@@ -64,9 +67,6 @@ static void create(.Configuration _config)
 //! controller have been loaded.
 void start()
 {
-#if constant(Fins.Helpers.Filters.Compress)
-  _gzfilter = Fins.Helpers.Filters.Compress();
-#endif
 }
 
 static void load_breakpoint()
@@ -176,15 +176,9 @@ public mixed handle_request(.Request request)
           response->set_data(generate_template_error(er));
           break;
         default:
-          Log.exception("Exception while handling an event.", er);
           response->set_data(generate_error(er));
           break;
       }
-    }
-    else if(er)
-    {
-        Log.exception("Exception while handling an event.", er);
-        response->set_data(generate_error(er));
     }
 
   }
@@ -210,23 +204,12 @@ string generate_template_error(object er)
   return ret;
 }
 
-string generate_error(object|array er)
+string generate_error(object er)
 {
-  
 
-  string et, t, b;
-  if(objectp(er))
-  {
-    et = String.capitalize(er->error_type);
-    t = "Fins: " + et + " Error";
-  }
-  else
-  {
-    t = "Fins: " +er[0];
-    et = er[0];
-  }   
-
-  b = "<h1>" + et + " Error</h1>\n"
+  string et = String.capitalize(er->error_type);
+  string t = "Fins: " + et + " Error";
+  string b = "<h1>" + et + " Error</h1>\n"
              "An error occurred while processing your requst:<p>"
              + html_describe_error(er) +
              "<p>";
@@ -239,22 +222,13 @@ string generate_error(object|array er)
   return ret;
 }
 
-string html_describe_error(object|array er)
+string html_describe_error(object er)
 {
   string rv = "";
 
-  if(objectp(er))
-    rv = "<b>" + er->message() + "</b><p>Backtrace:<ol>";
-  else
-    rv = "<b>" + er[0] + "</b><p>Backtrace:<ol>";
+  rv = "<b>" + er->message() + "</b><p>Backtrace:<ol>";
 
-  array btr;
-  if(objectp(er))
-    btr = er->backtrace();
-  else
-   btr = er[1];
-
-  foreach(reverse(btr[2..]);int i; object btf)
+  foreach(reverse(er->backtrace()[2..]);int i; object btf)
   {
     rv += sprintf("<li> %s line %d, %O(%s)", (string)btf[0], btf[1], 
        btf[2], make_btargs(sizeof(btf)>3?btf[3..]:({}))) + "<br>";

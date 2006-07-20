@@ -11,7 +11,7 @@ import Fins;
 //! }
 
 //!
-static Thread.Mutex _mutex;
+static Thread.Mutex _mutex = Thread.Mutex();
 
 string real_deflate(string _data, string _name)
 {

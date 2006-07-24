@@ -6,7 +6,7 @@ string not_args;
 string get_compress_encoding()
 {
 
-  if(this->misc->session_variables->__encode)
+  if(this->misc->session_variables && this->misc->session_variables->__encode)
     return this->misc->session_variables->__encode;
 
   array available = ({"deflate", "gzip"});
@@ -52,7 +52,8 @@ string get_compress_encoding()
 #ifdef DEBUG
     werror("SELECTED ENCODING: %O\n", encode);
 #endif
-    this->misc->session_variables->__encode = encode;
+    if (this->misc->session_variables)
+      this->misc->session_variables->__encode = encode;
     return encode;
   }
 

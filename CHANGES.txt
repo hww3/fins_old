@@ -1,5 +1,7 @@
 Version 0.1
 
+- error messages are themeable: templates/error/[404|500|template].phtml
+- added beginning of scaffolding.
 - added validation callbacks for data model sets
 - added validation override flags to skip validation
 - added special Fins.Errors.Validation error type.

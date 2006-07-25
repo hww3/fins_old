@@ -2,15 +2,31 @@ constant error_500 =
 #"
 <html>
 <head>
-<title>Error 500: <%$title%></title>
+<title>Error 500: <%$error_type%></title>
 </head>
 <body>
-<h1><%$errorname%></h1>
+<h1><%$message%></h1>
 An error occurred while processing your request:
 <p>
 <%$backtrace%>
 </body>
 </html>
+";
+
+constant error_template = 
+#"
+<html>
+<head>
+<title>Fins: Template Error</title>
+</head>
+<body>
+<h1>Fins: Template Error</h1>
+An error occured while processing a template:
+<p>
+<%$message%>
+</body>
+</html>
+
 ";
 
 constant index = 

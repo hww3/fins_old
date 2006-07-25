@@ -166,19 +166,25 @@ public mixed handle_request(.Request request)
 
   if(objectp(event) || functionp(event))
   {
-    mixed er = catch(event(request, response, @args));
+    mixed er;
+    er = catch
+    {
+      event(request, response, @args);
+      mixed r = response->get_response();
+      return r;
+    };
 
     if(er && objectp(er))
     {
       switch(er->error_type)
       {
         case "template":
+          response->set_view(generate_template_error(er));
           response->set_error(500);
-          response->set_data(generate_template_error(er));
           break;
         default:
+          response->set_view(generate_error(er));
           response->set_error(500);
-          response->set_data(generate_error(er));
           break;
       }
     }
@@ -189,39 +195,23 @@ public mixed handle_request(.Request request)
   return response->get_response();
 }
 
-string generate_template_error(object er)
+object generate_template_error(object er)
 {
-
-  string t = "Fins: Template Error";
-  string b = "<h1>Template Error</h1>\n"
-             "An error occurred while processing your requst:<p>"
-             + er->message() +
-             "<p>";
+  object t = view->get_view("internal:error_template");
+  t->add("message", er->message());
              
-
-  string ret = "<html><head><title>" + t + "</title></head><body>" 
-    + b + 
-    "</body></html>";
-
-  return ret;
+  return t;
 }
 
-string generate_error(object er)
+object generate_error(object er)
 {
+  object t = view->get_view("internal:error_500");
 
-  string et = String.capitalize(er->error_type);
-  string t = "Fins: " + et + " Error";
-  string b = "<h1>" + et + " Error</h1>\n"
-             "An error occurred while processing your requst:<p>"
-             + html_describe_error(er) +
-             "<p>";
-             
+  t->add("error_type", String.capitalize(er->error_type || "Generic"));
+  t->add("message", er->message());
+  t->add("backtrace", html_describe_error(er));
 
-  string ret = "<html><head><title>" + t + "</title></head><body>" 
-    + b + 
-    "</body></html>";
-
-  return ret;
+  return t;
 }
 
 string html_describe_error(object er)

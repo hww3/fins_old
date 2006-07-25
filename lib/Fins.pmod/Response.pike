@@ -1,3 +1,5 @@
+  import Standards;
+
   Fins.Template.Template template;
   Fins.Template.TemplateData template_data;
 
@@ -106,13 +108,13 @@
   }
   
   //!
-  public void redirect(string to, int|void temp)
+  public void redirect(string|URI to, int|void temp)
   {
     if(temp)
       response->error = 302;
     else
       response->error = 301;
-    response->extra_heads->location = to;
+    response->extra_heads->location = (string)to;
   }
 
   //! using this method will clear any template set.

@@ -92,11 +92,11 @@
   //!
   public void not_found(string filename)
   {
-    response->error = 404;
-    response->data = "<h1>404: File Not Found</h1>\n"
-                     "The file " + filename + " was not found."
-                     "<p/>&nbsp;<p/>&nbsp;<p/>\n<hr/>\n<i>Fins</i>";
+    object e = request->fins_app->view->get_view("internal:error_404");
 
+    e->add("filename", filename);
+    set_view(e);
+    response->error = 404;
   }
 
   //!

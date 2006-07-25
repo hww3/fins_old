@@ -1,3 +1,16 @@
+constant error_404 =
+#"
+<html>
+<head>
+<title>File Not Found</title>
+</head>
+<body>
+<h1>404: File Not Found</h1>
+The file <%$filename%> was not found.
+<p/>&nbsp;<p/>&nbsp;<p/><hr/>
+<i>Fins</i>
+";
+
 constant error_500 =
 #"
 <html>

@@ -173,9 +173,11 @@ public mixed handle_request(.Request request)
       switch(er->error_type)
       {
         case "template":
+          response->set_error(500);
           response->set_data(generate_template_error(er));
           break;
         default:
+          response->set_error(500);
           response->set_data(generate_error(er));
           break;
       }

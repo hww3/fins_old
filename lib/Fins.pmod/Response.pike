@@ -126,6 +126,7 @@
       response->data = data;
     if(!response->error) response->error = 200;
     template = 0;
+    response->file = 0;
   }
 
   //!

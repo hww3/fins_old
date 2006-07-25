@@ -1,3 +1,18 @@
+constant error_500 =
+#"
+<html>
+<head>
+<title>Error 500: <%$title%></title>
+</head>
+<body>
+<h1><%$errorname%></h1>
+An error occurred while processing your request:
+<p>
+<%$backtrace%>
+</body>
+</html>
+";
+
 constant index = 
 #"
 <html>

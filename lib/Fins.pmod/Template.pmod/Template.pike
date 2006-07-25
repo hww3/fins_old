@@ -1,3 +1,4 @@
+import Tools.Logging;
 
 static .TemplateContext context;
 
@@ -25,21 +26,30 @@ static int template_updated(string templatename, int last_update)
 static string load_template(string templatename, void|object compilecontext)
 {
   string template;
+  string int_templatename;
+  int is_internal;
 
   if(has_prefix(templatename, "internal:"))
   {
+    is_internal = 1;
     if(has_suffix(templatename, ".phtml")) 
-      templatename = templatename[9..sizeof(templatename)-7];
-    template = load_internal_template(templatename, compilecontext);
+      int_templatename = templatename[9..sizeof(templatename)-7];
+    templatename = replace(templatename[9..], "_", "/");
   }
-  else
-  {
+
+
 //   werror("loading template " + templatename + " from " + context->application->config->app_dir + "\n");
+  Log.debug("Loading template %s.", templatename);
     template = Stdio.read_file(
                           combine_path(context->application->config->app_dir, 
                                        "templates/" + templatename));
+
+  if(!template || !sizeof(template) && is_internal)
+  {
+    template = load_internal_template(int_templatename, compilecontext);
   }
-   if(!template || !sizeof(template))
+
+  if(!template || !sizeof(template))
    {
      werror("!Template Error!\n");
      throw(Fins.Errors.Template("Template does not exist or is empty: " + templatename));
@@ -49,6 +59,7 @@ static string load_template(string templatename, void|object compilecontext)
 
 string load_internal_template(string inttn, void|object context)
 {
+  Log.debug("Loading internal template %s.", inttn);
   return Fins.Helpers.InternalTemplates[inttn];
 }
 

@@ -2,7 +2,7 @@ inherit "module";
 inherit "caudiumlib";
 inherit "socket";
 
-constant cvs_version= "$Id: fins_application.pike,v 1.3 2006-07-12 22:26:13 hww3 Exp $";
+constant cvs_version= "$Id: fins_application.pike,v 1.4 2006-07-26 00:58:41 jnt Exp $";
 constant thread_safe=1;
 
 
@@ -26,7 +26,7 @@ static int do_stat = 1;
 
 string loaderstub = "import Tools.Logging; Fins.Application load_application(string finsdir, string project, string config_name){  \n"
 " Fins.Application application;  application = Fins.Loader.load_app(combine_path(finsdir, project), config_name);\n"
-" Log.loglevel = Log.INFO|Log.WARN|Log.ERROR|Log.CRITICAL;\n"
+//" Log.loglevel = Log.INFO|Log.WARN|Log.ERROR|Log.CRITICAL;\n"
 " return application;}";
 
 

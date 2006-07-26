@@ -58,7 +58,7 @@ static void create(.Configuration _config)
   load_controller();
 
 #if constant(Fins.Helpers.Filters.Compress)
-  _gzfilter = Fins.Helpers.Filters.Compress();
+//  _gzfilter = Fins.Helpers.Filters.Compress();
 #endif
   start();
 }
@@ -390,7 +390,7 @@ array get_event(.Request request)
 {
   string fn = Stdio.append_path(static_dir, request->not_query[7..]);
 
-  .Response response = .Response();
+  .Response response = .Response(request);
 
   low_static_request(request, response, fn);
 
@@ -415,8 +415,8 @@ array get_event(.Request request)
     return response;
   }
 
-  response->set_header("Cache-Control", "max-age=" + (3600*12));
-  response->set_header("Expires", (Calendar.Second() + (3600*12))->format_http());
+  response->set_header("Cache-Control", "max-age=" + (3600*24));
+  response->set_header("Expires", (Calendar.Second() + (3600*24))->format_http());
   response->set_type(Protocols.HTTP.Server.filename_to_type(basename(fn)));
   response->set_file(Stdio.File(fn));
 
@@ -429,7 +429,7 @@ array get_event(.Request request)
       switch(response->get_type()[0..pos-1]) {
 	case "text":
 	case "application":
-	case "chemical":
+//	case "chemical":
 	_gzfilter->filter(request, response);
       }
     }

@@ -15,14 +15,24 @@ string simple_macro_javascript_includes(Fins.Template.TemplateData data, mapping
 //! id: the id of this form element, if provided, this form will be sent as part of the
 //!     asyncronous request.
 //! method
+//!
 //! url
+//!
 //! parameters
-//! update
-//! updatesuccess
-//! updatefailure
-//! before
-//! after
-//! condition
+//!
+//! update: if provided, the dom object with this id will be filled with the response from the server.
+//!
+//! success: if provided, should be javascript code that will be run on a successful response from the server. Javascript 
+//!    variables "type", "data", and "event" will be passed. see Dojo for descriptions of these elements. 
+//!
+//! complete: if provided, should be javascript code that will be run on at the end of a successful response from the server.
+//!
+//! load: if provided, should be javascript code (not a function) that is executed on successful load of a page. if provided,
+//!    this function replaces the use of update, success and complete above.
+//!
+//! error: same as load, except on a failure.
+//!
+//! begin: javascript code that will be run before the remote request is made.
 //!
 string simple_macro_remote_form(Fins.Template.TemplateData data, mapping|void arguments)
 {
@@ -97,7 +107,7 @@ string remote_function(mapping options)
 
   
 
-  if(options->formid)
+  if(options->id)
   {
     f += "var form = document.getElementById(" + stringify(options->id) + ");"
          "if(form) bindArgs.formNode = form;";

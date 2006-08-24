@@ -5,11 +5,15 @@ constant __author = "Bill Welliver <bill@welliver.org>";
 //!
 //! serialize an object as a JSON string
 //!
-string serialize(mapping data)
+string serialize(mapping|array data)
 {
   if(mappingp(data))
   {
     return (string).JSONObject(data);
+  }
+  else if(arrayp(data))
+  {
+    return (string).JSONArray(data);
   }
   else throw(Error.Generic("invalid dataset to serialize.\n"));
 

@@ -8,6 +8,7 @@ constant TYPE_DIRECTIVE = 4;
 string document_root = "";
 
 private int includes = 0;
+int is_layout = 0;
 
 // should this be configurable?
 int max_includes = 100;
@@ -16,6 +17,8 @@ static .TemplateContext context;
 
 int auto_reload;
 int last_update;
+
+object layout;
 
 string script;
 string templatename;
@@ -29,12 +32,14 @@ string _sprintf(mixed ... args)
 }
 
 //!
-static void create(string _templatename, .TemplateContext|void context_obj)
+static void create(string _templatename, 
+         .TemplateContext|void context_obj, int|void _is_layout)
 {
    context = context_obj;
 
    context->type = object_program(this);
 
+   if(_is_layout) is_layout = 1;
    auto_reload = (int)(context->application->config["view"]["reload"]);
    templatename = _templatename + ".phtml";
 
@@ -55,6 +60,17 @@ static void reload_template()
 
 }
 
+void set_layout(string layoutpath)
+{
+   layout = load_layout(layoutpath);
+}
+
+object load_layout(string path)
+{
+  object layout = object_program(this)(path, context, 1);
+  return layout;
+}
+
 //!
 public string render(.TemplateData d)
 {
@@ -65,11 +81,32 @@ public string render(.TemplateData d)
      reload_template();
    }
 
-    object t = compiled_template(context);
-    t->render(buf, d);
+   object t = compiled_template(context);
 
+   if(layout) 
+   {
+     layout->render_view(buf, t, d);
+   }
+   else
+   {
+      t->render(buf, d);
+   }
    return buf->get();
 
+}
+
+void render_view(String.Buffer buf, object ct, object d)
+{
+  if(!is_layout) throw(Error.Generic("trying to render a view from a non-layout.\n"));
+
+   if(auto_reload && template_updated(templatename, last_update))
+   {
+     reload_template();
+   }
+
+   object t = compiled_template(context);
+werror("rendering %O %O\n", t, ct);
+   t->render(buf, d, ct);
 }
 
 program compile_string(string code, string realfile, object|void compilecontext)
@@ -164,6 +201,7 @@ string parse_psp(string file, string realname, object|void compilecontext)
  
   [ps, h] = render_psp(contents, "", "", compilecontext);
 
+  header += ("int is_layout = " + is_layout + ";\n");
 
   foreach(macros_used; string macroname ;)
   {
@@ -172,7 +210,7 @@ string parse_psp(string file, string realname, object|void compilecontext)
   }
 
   header += h;
-  pikescript+=("object __context; static void create(object context){__context = context; " + initialization + "}\n void render(String.Buffer buf, Fins.Template.TemplateData __d){ mapping data = __d->get_data();\n");
+  pikescript+=("object __context; static void create(object context){__context = context; " + initialization + "}\n void render(String.Buffer buf, Fins.Template.TemplateData __d,object|void __view){ mapping data = __d->get_data();\n");
   pikescript += ps;
 
   return header + "\n\n" + pikescript + "}";
@@ -420,6 +458,13 @@ class PikeBlock
        return " } else { \n";
        break;
 
+     case "yield":
+       if(is_layout)
+       {
+         return "if(__view) __view->render(buf, __d);";
+       }
+       else throw(Error.Generic("invalid yield in non-layout template.\n"));
+       break;
 
      case "endif":
        return " } // endif \n";

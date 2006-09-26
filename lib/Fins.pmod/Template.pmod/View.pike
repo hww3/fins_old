@@ -7,6 +7,11 @@ void create(object _template, object _data)
 	data = _data;
 }
 
+void set_layout(string path) 
+{
+  template->set_layout(path);
+}
+
 void add(string name, mixed var)
 {
 	data->add(name, var);

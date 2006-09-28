@@ -1,5 +1,7 @@
 Version 0.1
 
+- added controller_name, controller_path and event_name to request
+- added support for layouts in simple templating
 - error messages are themeable: templates/error/[404|500|template].phtml
 - added beginning of scaffolding.
 - added validation callbacks for data model sets

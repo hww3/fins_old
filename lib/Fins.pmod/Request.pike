@@ -1,6 +1,9 @@
 object fins_app;
 
 string not_args;
+string controller_path;
+string controller_name;
+string event_name;
 
 //!
 string get_compress_encoding()

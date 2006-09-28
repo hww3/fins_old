@@ -13,6 +13,7 @@ constant __uses_session = 1;
 int __last_load;
 
 string __controller_source;
+string __controller_name;
 
 array __before_filters = ({});
 array __after_filters = ({});
@@ -60,6 +61,7 @@ static object load_controller(string controller_name)
 
   
   object o = c(app);
+  o->__controller_name = cn;
   o->__controller_source = f;
   return o;
 }

@@ -100,9 +100,12 @@ static void load_controller()
 {
   string conclass = (config["controller"]? config["controller"]["class"] :0);
   if(conclass)
+  {
     controller = ((program)conclass)(this);
+    controller->__controller_source = conclass;
+    controller->__controller_name = conclass;
+  }
   else Log.debug("No controller defined!");
-  controller->__controller_source = conclass;
 }
 
 static void load_model()
@@ -135,7 +138,7 @@ public mixed handle_request(.Request request)
   function event;
 
   request->fins_app = this;
-
+  request->controller_path="";
   //  Log.info("SESSION INFO: %O", request->misc->session_variables);
 
   // we have to short circuit this one...
@@ -268,7 +271,7 @@ array get_event(.Request request)
     controller_updated(controller, this, "controller");
   }
   cc = controller;
-
+  request->controller_name = cc->__controller_name;
   function event;
   array args = ({});
   array not_args = ({});
@@ -292,6 +295,7 @@ array get_event(.Request request)
 	{
 	  not_args += ({"index"});
 	  event = cc["index"];
+          request->event_name = "index";
 	}
 	else
 	{
@@ -320,6 +324,7 @@ array get_event(.Request request)
       {
 	not_args += ({comp});
 	event = cc[comp];
+        request->controller_path += ("/" + comp);
       }
       else if(cc && cc[comp] && objectp(cc[comp]))
       {
@@ -327,16 +332,20 @@ array get_event(.Request request)
 	{
 	  not_args += ({comp});
 	  event = cc[comp];
+          request->event_name = comp;
 	}    
 	else if(Program.implements(object_program(cc[comp]), Fins.FinsController))
 	{ 
 	  not_args += ({comp});
+          request->controller_path += ("/" + comp);
 	  if((int)config["controller"]["reload"])
 	  {            
 	    controller_updated(cc[comp], cc, comp);
 	  }
 
 	  cc = cc[comp];
+          request->controller_name = cc->__controller_name;
+          request->controller_path += ("/" + comp);
 	}
 	else
 	{
@@ -347,6 +356,7 @@ array get_event(.Request request)
       { 
 	not_args += ({"index"});
 	event = cc["index"];
+        request->event_name = "index";
 	args += ({comp});
       }
       else
@@ -376,7 +386,7 @@ array get_event(.Request request)
   }
 
   request->not_args = not_args * "/";
-
+  if(!sizeof(request->controller_path)) request->controller_path = "/";
 
   if(sizeof(args))
     return ({event, @args});

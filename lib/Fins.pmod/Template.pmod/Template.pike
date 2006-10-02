@@ -44,14 +44,13 @@ static string load_template(string templatename, void|object compilecontext)
                           combine_path(context->application->config->app_dir, 
                                        "templates/" + templatename));
 
-  if(!template || !sizeof(template) && is_internal)
+  if((!template || !sizeof(template)) && is_internal)
   {
     template = load_internal_template(int_templatename, compilecontext);
   }
 
   if(!template || !sizeof(template))
    {
-     werror("!Template Error!\n");
      throw(Fins.Errors.Template("Template does not exist or is empty: " + templatename));
    }
    return template;
@@ -59,7 +58,7 @@ static string load_template(string templatename, void|object compilecontext)
 
 string load_internal_template(string inttn, void|object context)
 {
-  Log.debug("Loading internal template %s.", inttn);
+  Log.debug("Loading internal template %s.", (string)inttn);
   return Fins.Helpers.InternalTemplates[inttn];
 }
 

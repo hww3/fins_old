@@ -92,7 +92,7 @@ public Template.View get_view(string tn)
 }
 
 //!
-public Template.Template low_get_template(program templateType, string templateName, void|object context)
+public Template.Template low_get_template(program templateType, string templateName, void|object context, int|void is_layout)
 {
   object t;
   if(!context) 
@@ -102,7 +102,7 @@ public Template.Template low_get_template(program templateType, string templateN
 	context->view = this;
   }
 
-  if(!sizeof(templateName))
+  if(!templateName || !sizeof(templateName))
     throw(Error.Generic("get_template(): template name not specified.\n"));
 
   if(!templates[templateType])
@@ -112,7 +112,7 @@ public Template.Template low_get_template(program templateType, string templateN
 
   if(!templates[templateType][templateName])
   {
-    t = templateType(templateName, context);
+    t = templateType(templateName, context, is_layout);
 
     if(!t)
     {

@@ -191,8 +191,8 @@ void handle_request(Protocols.HTTP.Server.Request request)
 
   if(e)
   {
-describe_backtrace(e);
-//    Log.exception("Error occurred while handling request!", e);
+//describe_backtrace(e);
+    Log.exception("Error occurred while handling request!", e);
     mapping response = ([]);
     response->error=500;
     response->type="text/html";
@@ -218,6 +218,8 @@ describe_backtrace(e);
     }
     else
     {
+      Log.warn("An unexpected response from the application occurred: %O\n", r);
+      if(e) Log.exception("An error occurred while processing the request\n", e);
       mapping response = ([]);
       response->server="FinServe " + my_version;
       response->type = "text/html";

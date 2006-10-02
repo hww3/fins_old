@@ -7,7 +7,7 @@ void create(object _template, object _data)
 	data = _data;
 }
 
-void set_layout(string path) 
+void set_layout(string|object path) 
 {
   template->set_layout(path);
 }

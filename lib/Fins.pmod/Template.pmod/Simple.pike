@@ -60,9 +60,12 @@ static void reload_template()
 
 }
 
-void set_layout(string layoutpath)
+void set_layout(string|object layoutpath)
 {
-   layout = load_layout(layoutpath);
+   if(objectp(layoutpath)) 
+     layout=layoutpath;
+   else
+     layout = load_layout(layoutpath);
 }
 
 object load_layout(string path)

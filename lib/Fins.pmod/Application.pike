@@ -176,7 +176,6 @@ public mixed handle_request(.Request request)
       mixed r = response->get_response();
       return r;
     };
-
     if(er && objectp(er))
     {
       switch(er->error_type)
@@ -276,6 +275,7 @@ array get_event(.Request request)
   array args = ({});
   array not_args = ({});
   array r = request->not_query/"/";
+  mixed ci;
 
   // first, let's find the right function to call.
   foreach(r; int i; string comp)
@@ -291,10 +291,10 @@ array get_event(.Request request)
 	{
 	  Log.error("undefined situation! we have to fix this.\n");
 	}
-	else if(cc && cc["index"])
+	else if(cc && (ci = cc["index"]))
 	{
 	  not_args += ({"index"});
-	  event = cc["index"];
+	  event = ci;
           request->event_name = "index";
 	}
 	else
@@ -320,42 +320,41 @@ array get_event(.Request request)
       {
 	args+=({comp});
       }
-      else if(cc && cc[comp] && functionp(cc[comp]))
+      else if(cc && (ci = cc[comp]) && functionp(ci))
       {
 	not_args += ({comp});
-	event = cc[comp];
+	event = ci;
         request->controller_path += ("/" + comp);
       }
-      else if(cc && cc[comp] && objectp(cc[comp]))
+      else if(cc && ci && objectp(ci))
       {
-	if(Program.implements(object_program(cc[comp]), Fins.Helpers.Runner))
+	if(Program.implements(object_program(ci), Fins.Helpers.Runner))
 	{
 	  not_args += ({comp});
-	  event = cc[comp];
+	  event = ci;
           request->event_name = comp;
 	}    
-	else if(Program.implements(object_program(cc[comp]), Fins.FinsController))
+	else if(Program.implements(object_program(ci), Fins.FinsController))
 	{ 
 	  not_args += ({comp});
           request->controller_path += ("/" + comp);
 	  if((int)config["controller"]["reload"])
 	  {            
-	    controller_updated(cc[comp], cc, comp);
+	    controller_updated(ci, cc, comp);
 	  }
 
 	  cc = cc[comp];
           request->controller_name = cc->__controller_name;
-          request->controller_path += ("/" + comp);
 	}
 	else
 	{
 	  throw(Error.Generic("Component " + comp + " is not a Controller.\n"));
 	}
       }
-      else if(cc && cc["index"])
+      else if(cc && (ci = cc["index"]))
       { 
 	not_args += ({"index"});
-	event = cc["index"];
+	event = ci;
         request->event_name = "index";
 	args += ({comp});
       }
@@ -366,7 +365,7 @@ array get_event(.Request request)
     }
   }
 
-  //  werror("got to end of path; current controller: %O, event: %O, args: %O\n", cc, event, args);
+//  werror("got to end of path; current controller: %O, event: %O, args: %O\n", cc, event, args);
 
   // we got all this way without an event.
   if(!event && r[-1] != "")

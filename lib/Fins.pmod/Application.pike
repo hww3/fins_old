@@ -96,14 +96,68 @@ static void load_view()
   else Log.debug("No view defined!");
 }
 
+//! loads the controller, providing support for auto-reload of
+//! updated controller classes.
+//!
+//! @example
+//!  Fins.FinsController foo;
+//!
+//!  void start()
+//!  {
+//!    foo = load_controller("foo_controller");
+//!  } 
+static object low_load_controller(string controller_name)
+{
+  program c;
+  string cn;
+  string f;
+
+  cn = controller_name;
+
+  if(!has_suffix(cn, ".pike"))
+    cn = cn + ".pike";
+
+  foreach( ({""}) + master()->pike_program_path;; string p)
+  {
+    f = Stdio.append_path(p, cn);
+    object stat = file_stat(f);
+     
+    if(stat && stat->isreg)
+    {
+      break;
+    }
+    else f = 0;
+  }
+
+  if(f)
+  {
+    c = compile_string(Stdio.read_file(f), f);
+  }
+  else return 0;
+
+  if(!c) Log.error("Unable to load controller %s", controller_name);
+
+  
+  object o = c(this);
+  o->__controller_name = cn;
+  o->__controller_source = f;
+  return o;
+}
+
 static void load_controller()
 {
+  Log.debug("%O->load_controller()", this);
   string conclass = (config["controller"]? config["controller"]["class"] :0);
   if(conclass)
   {
-    controller = ((program)conclass)(this);
-    controller->__controller_source = conclass;
-    controller->__controller_name = conclass;
+	controller = low_load_controller(conclass);
+// 	string conclassn = conclass;
+// 	if(!file_stat("classes/" + conclass)) conclassn = conclass + ".pike";
+// 
+//     controller = (compile_file(conclass))(this);
+//     controller->__controller_source = combine_path("classes" , conclassn);
+//     controller->__controller_name = conclass;
+// 
   }
   else Log.debug("No controller defined!");
 }
@@ -121,10 +175,15 @@ static void load_model()
 
 int controller_updated(object controller, object container, string cn)
 {
-  object stat = file_stat(controller->__controller_source||"");
+  if (!controller->__controller_source) return 0;
+
+  object stat = file_stat(combine_path(config->app_dir, controller->__controller_source));
+
   if(stat && stat->mtime > controller->__last_load)
   {
-    Log.debug("Reloading controllers.");
+    Log.debug("Reloading controllers: %O", container);
+	if(object_program(container) == object_program(this))
+	  load_controller();
     container->start();
     return 1;
   }
@@ -267,7 +326,7 @@ array get_event(.Request request)
 
   if((int)(config["controller"]["reload"]))
   {
-    controller_updated(controller, this, "controller");
+	controller_updated(controller, this, "controller");
   }
   cc = controller;
   request->controller_name = cc->__controller_name;

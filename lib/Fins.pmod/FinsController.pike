@@ -21,6 +21,8 @@ array __after_filters = ({});
 //! loads the controller, providing support for auto-reload of
 //! updated controller classes.
 //!
+//! @note
+//!   also exists in Fins.Application... we should fix this.
 //! @example
 //!  Fins.FinsController foo;
 //!

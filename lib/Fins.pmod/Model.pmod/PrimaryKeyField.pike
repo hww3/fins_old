@@ -17,11 +17,20 @@ mixed get_id(void|.DataObjectInstance i)
   if(v)
     return v;
   if(context->personality->get_last_insert_id)
+  {
+//	werror("context->personality->get_last_insert_id\n");
     return decode(context->personality->get_last_insert_id(this, i));
+  }
   if(context->sql->master_sql->insert_id)
+  {
+//    werror("context->sql->master_sql->insert_id\n");
     return decode(context->sql->master_sql->insert_id());
+  }
   if(context->sql->master_sql->last_insert_rowid)
+  {
+//    werror("context->sql->master_sql->last_insert_rowid\n");
     return decode(context->sql->master_sql->last_insert_rowid());
+  }
 }
 
 int decode(string value, void|.DataObjectInstance i)

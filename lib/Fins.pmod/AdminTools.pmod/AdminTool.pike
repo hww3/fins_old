@@ -33,5 +33,7 @@ int main(int argc, array argv)
 
    object cmd = meth(newargs);
 
-   return cmd->run();
+   int x = cmd->run();
+
+   return x;
 }

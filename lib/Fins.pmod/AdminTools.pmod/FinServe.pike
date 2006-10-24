@@ -86,8 +86,9 @@ int main(int argc, array(string) argv)
   if(argc>=2) project = argv[1];
   if(argc>=3) config_name = argv[2];
 
-  return do_startup();
+  int x = do_startup();
 
+  return x;
 }
 
 int do_startup()

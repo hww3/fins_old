@@ -62,10 +62,14 @@ void create(.DataModelContext c)
 
 string describe(object i)
 {
+  mixed e = catch{
   if(!i[primary_key->name]) return ("unidentified");
   if(alternate_key)
     return (alternate_key->name + "=" + (string)i[alternate_key->name]);
   return (primary_key->name + "=" + i[primary_key->name]);
+  };
+
+  if(e) return "unidentified";
 }
 
 //! define the object's fields and relationships
@@ -420,8 +424,10 @@ void load(mixed id, .DataObjectInstance i, int|void force)
 
      if(sizeof(result) != 1)
      {
-       throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
+       	throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
      }
+     else
+       werror("got results from query: %s\n", query);
 
      i->set_id(id);
      i->set_new_object(0);
@@ -832,11 +838,12 @@ static int commit_changes(multiset fields_set, mapping object_data, int|void no_
 
 int save(int|void no_validation, .DataObjectInstance i)
 {   
-
    if(i->is_new_object())
    {
+      mixed key;
       commit_changes(i->fields_set, i->object_data, no_validation, 0, i);
-      i->set_id(primary_key->get_id(i));
+   	  key = primary_key->get_id(i);
+      i->set_id(key);
       i->set_new_object(0);
       i->set_saved(1);
       add_ref(i);

@@ -2,6 +2,7 @@ import Tools.Logging;
 
 mapping(string:.DataObject) object_definitions = ([]);
 mapping(string:program) instance_definitions = ([]);
+static mapping(object:object) scaffold_controllers = ([]);
 
 object Objects = objects(this);
 
@@ -34,6 +35,16 @@ void add_object_type(.DataObject t, program i)
 void find_all(string|object ot)
 {
   find(ot, ([]));
+}
+
+object get_scaffold_controller(object model_component)
+{
+  return scaffold_controllers[model_component];
+}
+
+void set_scaffold_controller(object model_component, object controller)
+{
+   scaffold_controllers[model_component] = controller;
 }
 
 array find(string|object ot, mapping qualifiers, void|.Criteria criteria)

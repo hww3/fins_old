@@ -26,8 +26,7 @@ string static_dir;
 //!
 Fins.Helpers.Filters.Compress _gzfilter;
 
-
-
+static mapping controller_path_cache = ([]);
 
 // breakpointing support
 Stdio.Port breakpoint_port;
@@ -192,6 +191,70 @@ int controller_updated(object controller, object container, string cn)
 }
 
 //!
+string get_path_for_controller(object _controller)
+{
+  string path;
+  array pcs = ({});
+  if(controller_path_cache[_controller])
+    return controller_path_cache[_controller];
+
+  if(controller == _controller)
+    path = "/";
+
+  else
+  {
+    array x = ({_controller});
+    int i = 0;
+    object c = _controller;
+    do
+    {
+      object p = find_parent_controller(c);
+      if(!p)
+        break;
+      else x += ({p});
+      c = p;
+      i++;
+    } while(i < 100);
+  werror("CONTROLLER PATH: %O\n", x);
+    foreach(x;int i; object pc)
+    {
+      if(pc == controller) pcs += ({""});
+      else pcs += ({ search(mkmapping(indices(x[i+1]),values(x[i+1])), pc) });
+    }
+
+werror("PC: %O\n", pcs);
+   path = reverse(pcs)*"/";
+  }  
+
+
+  controller_path_cache[_controller] = path;
+  return path;
+}
+
+//!
+object find_parent_controller(object c)
+{
+  object parent = lookingfor(c, controller);
+
+  return parent;
+}
+
+private object lookingfor(object o, object in)
+{
+  foreach(indices(in);int i; mixed x)
+  {
+    if(in[x] == o) return in;
+    if(objectp(in[x]) && Program.inherits(object_program(in[x]), Fins.FinsController))
+    {
+      mixed r = lookingfor(o, in[x]);
+      if(r) return r;
+    } 
+  }
+
+  return 0;
+}
+
+//!
 public mixed handle_request(.Request request)
 {
   function event;
@@ -235,6 +298,7 @@ public mixed handle_request(.Request request)
       mixed r = response->get_response();
       return r;
     };
+
     if(er && objectp(er))
     {
       switch(er->error_type)
@@ -248,6 +312,11 @@ public mixed handle_request(.Request request)
           response->set_error(500);
           break;
       }
+    }
+    else if(er)
+    {
+          response->set_view(generate_error_array(er));
+          response->set_error(500);
     }
 
   }
@@ -275,13 +344,34 @@ object generate_error(object er)
   return t;
 }
 
-string html_describe_error(object er)
+object generate_error_array(array er)
+{
+  object t = view->get_view("internal:error_500");
+
+  t->add("error_type", String.capitalize("Generic"));
+  t->add("message", er[0]);
+  t->add("backtrace", html_describe_error(er));
+
+  return t;
+}
+
+string html_describe_error(array|object er)
 {
   string rv = "";
+  array bt;
 
-  rv = "<b>" + er->message() + "</b><p>Backtrace:<ol>";
-
-  foreach(reverse(er->backtrace()[2..]);int i; object btf)
+  if(arrayp(er))
+  {
+    bt = er[1];
+    rv = "<b>" + er[0] + "</b><p>Backtrace:<ol>";
+  }
+  else
+  {
+    bt = er->backtrace();
+    rv = "<b>" + er->message() + "</b><p>Backtrace:<ol>";
+  }
+  
+  foreach(reverse(bt[2..]);int i; object btf)
   {
     rv += sprintf("<li> %s line %d, %O(%s)", (string)btf[0], btf[1], 
        btf[2], make_btargs(sizeof(btf)>3?btf[3..]:({}))) + "<br>";

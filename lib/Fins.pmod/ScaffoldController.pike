@@ -11,7 +11,10 @@ object model_object;
 void start()
 {
   if(model_component)
+  {
     model_object = model->repository->get_object(model_component);
+    model->repository->set_scaffold_controller(model_object, this);
+  }
 }
 
 public void index(Fins.Request request, Fins.Response response, mixed ... args)
@@ -21,7 +24,7 @@ public void index(Fins.Request request, Fins.Response response, mixed ... args)
 
 public void list(Fins.Request request, Fins.Response response, mixed ... args)
 {
-  string rv = "hah";
+  string rv = "";
 
   object items = model->find(model_object, ([]));
   if(!sizeof(items))
@@ -45,7 +48,7 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
 {
   object item = model->find_by_id(model_object, (int)request->variables->id);
 
-  string rv = "hah!";
+  string rv = "";
 
   if(!item)
   {
@@ -106,7 +109,23 @@ string describe_object(object o)
 {
   if(o->master_object && o->master_object->alternate_key)
   {
-    return (string)o[o->master_object->alternate_key->name];
+    return (string)o[o->master_object->alternate_key->name]
+     + " <a href=\"" + get_view_url(o) + "\">view</a>";
   }
+
   else return sprintf("%O", o);
+}
+
+string get_view_url(object o)
+{
+  object controller = model->repository->get_scaffold_controller(o->master_object);  
+werror(" controller: %O\n", controller);
+  if(!controller)
+    return "";
+
+  string url = app->get_path_for_controller(controller);
+
+  url = url + "/view/" + o[o->primary_key->name];  
+
+  return url;
 }

@@ -37,7 +37,7 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
   {
     foreach(items;; object item)
     {
-      rv += "<a href=\"display?id=" + item->get_id() + "\">view</a> ";
+      rv += " <a href=\"display?id=" + item->get_id() + "\">view</a> ";
       rv += sprintf("%O<br/>\n", item);
     }
   }
@@ -109,8 +109,12 @@ string describe_object(object o)
 {
   if(o->master_object && o->master_object->alternate_key)
   {
+    string link;
+    link = get_view_url(o);
+    if(link) link = " <a href=\"" + link + "\">view</a>";
+    else link = "";
     return (string)o[o->master_object->alternate_key->name]
-     + " <a href=\"" + get_view_url(o) + "\">view</a>";
+     + link;
   }
 
   else return sprintf("%O", o);
@@ -121,11 +125,11 @@ string get_view_url(object o)
   object controller = model->repository->get_scaffold_controller(o->master_object);  
 werror(" controller: %O\n", controller);
   if(!controller)
-    return "";
+    return 0;
 
   string url = app->get_path_for_controller(controller);
 
-  url = url + "/view/" + o[o->primary_key->name];  
+  url = url + "/display/?id=" + o[o->master_object->primary_key->name];  
 
   return url;
 }

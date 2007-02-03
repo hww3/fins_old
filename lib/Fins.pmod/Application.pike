@@ -215,14 +215,12 @@ string get_path_for_controller(object _controller)
       c = p;
       i++;
     } while(i < 100);
-  werror("CONTROLLER PATH: %O\n", x);
     foreach(x;int i; object pc)
     {
       if(pc == controller) pcs += ({""});
       else pcs += ({ search(mkmapping(indices(x[i+1]),values(x[i+1])), pc) });
     }
 
-werror("PC: %O\n", pcs);
    path = reverse(pcs)*"/";
   }  
 

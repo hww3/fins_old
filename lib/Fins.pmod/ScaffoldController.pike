@@ -4,7 +4,7 @@
 //!
 
 inherit Fins.FinsController;
-
+import Tools.Logging;
 string model_component = 0;
 object model_object;
 
@@ -94,10 +94,43 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
 {
   object item = model->find_by_id(model_object, (int)request->variables->id);
 
-  string rv = "";
+  if(!item)
+  {
+    response->set_data(model_object->instance_name + " not found.");
+    return;
+  }
 
+
+  string rv = "";
   rv = "<h1>Editing " + model_object->instance_name + "</h1>\n";
+  if(request->misc->flash && request->misc->flash->msg)
+    rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
+  rv += "<form action=\"doupdate\" method=\"post\">";
   rv += "<table>\n";
+
+  foreach(item->get_atomic(); string key; mixed value)
+  {	
+      rv += "<tr><td><b>" + make_nice(key) + "</b>: </td><td> " + make_value_editor(key, value, item) + "</td></tr>\n"; 
+  }
+ 
+  rv += "</table>\n";
+  rv += "<input name=\"___save\" value=\"Save\" type=\"submit\">";
+  rv == "</form>";
+  response->set_data(rv);
+}
+
+public void doupdate(Fins.Request request, Fins.Response response, mixed ... args)
+{
+mixed e;
+
+e=catch{
+  if(!request->variables->id || !request->variables->___save)
+  {
+	response->set_data("error: invalid data");
+	return;
+  }
+
+  object item = model->find_by_id(model_object, (int)request->variables->id);
 
   if(!item)
   {
@@ -105,15 +138,33 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
     return;
   }
 
-  else foreach(item->get_atomic(); string key; mixed value)
-  {
-      rv += "<tr><td><b>" + make_nice(key) + "</b>: </td><td> " + make_value_editor(key, value, item) + "</td></tr>\n"; 
-  }
- 
-  rv += "</table>\n";
+  response->redirect("update?id=" + request->variables->id);
+  
+  m_delete(request->variables, "___save");
+  m_delete(request->variables, "id");
+  
+  mapping v = ([]);
 
-  response->set_data(rv);
+  foreach(request->variables; string key; string value)
+  {
+	if(has_prefix(key, "__old_value_")) continue;
+	
+	if(request->variables["__old_value_" + key] != value)
+	{
+		Log.debug("Scaffold: " + key + " in " + model_object->instance_name + " changed.");
+		v[key] = value;
+	}
+  }
+
+  item->set_atomic(v);
+
+  response->flash("msg", "update successful.");
+
+};
+if(e)
+  Log.exception("error", e);
 }
+
 
 public void new(Fins.Request request, Fins.Response response, mixed ... args)
 {
@@ -136,15 +187,18 @@ string make_nice(string v)
 
 string make_value_editor(string key, mixed value, object o)
 {
-  if(model_object->fields[key]->is_shadow || 
-         (model_object->primary_key->name == key))
+  if(model_object->fields[key]->is_shadow)
   {
     return describe(key, value);   
   }
-  if(model_object->fields[key]->get_editor_string)
+  else if(model_object->primary_key == o->master_object->fields[key])
+  {
+    return "<input type=\"hidden\" name=\"id\" value=\"" + value + "\">" + value;	
+  }
+  else if(model_object->fields[key]->get_editor_string)
     return model_object->fields[key]->get_editor_string(value, o);
-  else if(stringp(value) || intp(value))
-    return "<input type=\"text\" name=\"key\" value=\"" + value + "\">";
+//  else if(stringp(value) || intp(value))
+//    return "<input type=\"text\" name=\"" + key + "\" value=\"" + value + "\">";
   else 
     return sprintf("%O", value);
 }

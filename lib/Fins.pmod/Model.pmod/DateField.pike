@@ -91,8 +91,8 @@ mixed validate(mixed value, void|.DataObjectInstance i)
 }
 
 
-string get_editor_string(mixed value, void|.DataObjectInstance i)
+string get_editor_string(void|mixed value, void|.DataObjectInstance i)
 {
-	return "<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value->format_ymd() + "\">" 
-		"<input type=\"text\" name=\"" + name + "\" value=\"" + value->format_ymd() + "\">";
+	return (i?("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value->format_ymd() + "\">"):"")+
+		"<input type=\"text\" name=\"" + name + "\" value=\"" + (i?value->format_ymd():"") + "\">";
 }

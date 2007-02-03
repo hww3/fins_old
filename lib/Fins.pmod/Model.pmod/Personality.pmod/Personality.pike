@@ -83,7 +83,13 @@ mapping map_field(mapping t)
     case "text":
       if(t->default && sizeof(t->default)) field->default = t->default;
       field->type = "string";
-      field->length = t->length;
+	  if((int)t->length)
+        field->length = t->length;
+      else
+      {
+	     if(t->type == "text")
+	       field->length = 1024;
+	  }
       break;
     case "time":
       field->type = "time";
@@ -101,6 +107,13 @@ mapping map_field(mapping t)
       break;
     case "blob":
       field->type = "binary_string";
+	  if((int)t->length)
+        field->length = t->length;
+      else
+      {
+	     if(t->type == "blob")
+	       field->length = 32200;
+	  }
       break;
     default:
       throw(Error.Generic("unknown field type " + t->type + ".\n"));

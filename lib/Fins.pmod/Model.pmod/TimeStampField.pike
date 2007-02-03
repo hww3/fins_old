@@ -13,6 +13,10 @@ program unit_program = Calendar.Second;
 function unit_parse = Calendar.ISO.dwim_time;
 string output_unit_format = "%Y%M%D%h%m%s";
 
+string get_editor_string(void|mixed value, void|.DataObjectInstance i)
+{ return 0; }
+
+
 static void create(string _name, int(0..1) _null)
 {
    name = _name;

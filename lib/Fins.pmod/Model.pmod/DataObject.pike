@@ -41,7 +41,7 @@ int autosave = 1;
 string instance_name = "";
 string table_name = "";
 mapping new_object_data = ([]);
-
+array field_order = ({});
 //!
 void create(.DataModelContext c)
 {
@@ -314,6 +314,7 @@ void add_field(.Field f)
 {
    f->set_context(context);
    fields[f->name] = f;
+   field_order += ({f});
 
    if(Program.inherits(object_program(f), .Relationship))
    {

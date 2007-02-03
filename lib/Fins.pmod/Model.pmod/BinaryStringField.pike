@@ -1,6 +1,7 @@
 inherit .StringField;
 
 constant type = "BinaryString";
+int len = 1024;
 
 string encode(mixed value, void|.DataObjectInstance i)
 {

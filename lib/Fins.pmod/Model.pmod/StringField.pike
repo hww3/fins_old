@@ -7,10 +7,19 @@ string default_value;
 
 constant type = "String";
 
-string get_editor_string(string value, void|.DataObjectInstance i)
+string get_editor_string(void|string value, void|.DataObjectInstance i)
 {
-  if(len < 60) return ("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value + "\">" "<input type=\"text\" size=\"" + len + "\" name=\"" + name + "\" value = \"" + value + "\">");
-  else return ("<textarea name=\"" + name  + "\" rows=\"5\" cols=\"80\">" + value + "</textarea>" "<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value + "\">" );
+  if(i)
+  {
+    if(len < 60) return ("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value + "\">" "<input type=\"text\" size=\"" + len + "\" name=\"" + name + "\" value = \"" + value + "\">");
+    else return ("<textarea name=\"" + name  + "\" rows=\"5\" cols=\"80\">" + value + "</textarea>" "<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value + "\">" );
+  }
+  else
+  {
+    if(len < 60) return ("<input type=\"text\" size=\"" + len + "\" name=\"" + name + "\" value = \"\">");
+    else return ("<textarea name=\"" + name  + "\" rows=\"5\" cols=\"80\"></textarea>");
+	 
+  }
 }
 
 void create(string _name, int _len, int(0..1) _null, string|void _default)

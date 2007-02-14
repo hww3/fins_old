@@ -40,7 +40,10 @@ string unquote_binary(string s)
 
 string type()
 {
-  return (sprintf("%O", object_program(sql->master_sql))/".")[-1];
+  string t;
+  catch(t = app->config["model"]["personality"]);
+  if(t) return t;
+  else return (sprintf("%O", object_program(sql->master_sql))/".")[-1];
 }
 
 program get_personality()

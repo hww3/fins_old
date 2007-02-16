@@ -10,6 +10,10 @@ import Tools.Logging;
 
 //! set this to zero to avoid session redirects
 constant __uses_session = 1;
+
+//! set this to zero to prevent this controller from being cached in the request-to-controller mapping.
+constant __is_cacheable = 1;
+
 int __last_load;
 
 string __controller_source;

@@ -19,6 +19,6 @@ int run()
 {
   Log.info("InstallApplication module running.");
 
-  program p = compile_string("inherit Fins.PackageInstaller;");
-  return p()->main(sizeof(args), args);
+  
+  return Fins.PackageInstaller->run(args[0]);
 }

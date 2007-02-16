@@ -11,25 +11,29 @@ int main(int argc, array argv) {
 #endif
   if (sizeof(argv) < 2)
     return usage(argv);
-  string package = argv[1];
+  else run(argv[1]);
+}
+
+int run(string package)
+{
   if ((sizeof(package) > 7) && (package[0..6] == "http://")) {
-    // Download the package with HTTP.
-    write("Downloading packge from %s... ", package);
-    array nice = Protocols.HTTP.get_url_nice(package);
-    if (arrayp(nice) && sizeof(nice)) {
-      write("done (%d bytes).\n", sizeof(nice[1]));
-      return install_package(nice[1]);
-    }
-    else {
-      werror("Failed to download package from %s\n", package);
-      return 1;
+  // Download the package with HTTP.
+  write("Downloading packge from %s... ", package);
+  array nice = Protocols.HTTP.get_url_nice(package);
+  if (arrayp(nice) && sizeof(nice)) {
+    write("done (%d bytes).\n", sizeof(nice[1]));
+    return install_package(nice[1]);
+  }
+  else {
+    werror("Failed to download package from %s\n", package);
+    return 1;
     }
   }
   else if (Stdio.exist(package) && Stdio.is_file(package)) 
     return install_package(Stdio.read_file(package));
   else
     werror("Unknown package, %s.\n\n", package);
-    return usage(argv);
+  return 1;
 }
 
 int usage(array argv) {

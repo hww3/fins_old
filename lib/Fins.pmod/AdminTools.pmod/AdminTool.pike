@@ -18,6 +18,10 @@ int main(int argc, array argv)
        meth = Fins.AdminTools.CreateApplication;       
        break;
 
+     case "install":
+       meth = Fins.AdminTools.InstallApplication;       
+       break;
+
      case "start":
        meth = Fins.AdminTools.FinServe;       
        break;

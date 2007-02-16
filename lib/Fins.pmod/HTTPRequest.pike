@@ -9,7 +9,7 @@ inherit Fins.Request;
 inherit Protocols.HTTP.Server.Request;
 
 string referrer = "";
-
+constant low_protocol = "HTTP";
 void parse_request()
 {
   ::parse_request();

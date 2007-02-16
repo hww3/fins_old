@@ -1,3 +1,4 @@
+constant low_protocol = "NONE";
 object fins_app;
 
 string not_args;

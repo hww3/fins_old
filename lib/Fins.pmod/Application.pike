@@ -26,6 +26,7 @@ string static_dir;
 //!
 Fins.Helpers.Filters.Compress _gzfilter;
 
+static mapping processors = ([]);
 static mapping controller_path_cache = ([]);
 
 // breakpointing support
@@ -54,6 +55,7 @@ static void create(.Configuration _config)
   load_cache();
   load_model();
   load_view();
+  load_processors();
   load_controller();
 
 #if constant(Fins.Helpers.Filters.Compress)
@@ -66,6 +68,50 @@ static void create(.Configuration _config)
 //! controller have been loaded.
 void start()
 {
+}
+
+static void load_processors()
+{
+  if(config["processors"] && config["processors"]["class"])
+  {
+     mixed plist = config["processors"]["class"];
+  
+     if(stringp(plist))
+       plist = ({ plist });
+
+  	 foreach(plist;; string proc)
+ 	   load_processor(proc);
+
+  }
+}
+
+static void load_processor(string proc)
+{
+  object processor;
+
+  if(proc)
+    processor = ((program)proc)(this);
+  else Log.debug("No processor defined!");
+
+  if(!Program.implements(object_program(processor), Fins.Processor))
+  {
+    Log.error("class %s does not implement Fins.Processor.", proc);
+  }
+  else
+  {
+    foreach(processor->supported_protocols();; string protocol)
+    {
+      Log.info("Loaded processor for " + protocol);
+      processors[protocol] = processor;
+    }
+  }   
+
+  processor->start();
+}
+
+public object get_processor(string protocol)
+{
+  return processors[protocol];
 }
 
 static void load_breakpoint()
@@ -255,11 +301,27 @@ private object lookingfor(object o, object in)
 //!
 public mixed handle_request(.Request request)
 {
-  function event;
+  object processor;
 
   request->fins_app = this;
   request->controller_path="";
+
   //  Log.info("SESSION INFO: %O", request->misc->session_variables);
+
+  if(request->low_protocol == "HTTP")
+  {
+    return handle_http(request);
+  }
+  else if (processor = processors[request->low_protocol])
+  {
+    return processor->handle(request);
+  }
+
+}
+
+public mixed handle_http(.Request request)
+{
+  function event;
 
   // we have to short circuit this one...
   if(request->not_query == "/favicon.ico")

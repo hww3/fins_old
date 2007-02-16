@@ -18,15 +18,7 @@ void start()
 
   else
   {
-     Standards.URI uri;
-
-     uri = Standards.URI(config["stomp"]["broker"]);
-
-     stomp = Public.Protocols.Stomp.Client();
-     stomp->connect(uri->host, uri->port||61613);
-     if(uri->user)
-       stomp->set_auth(uri->user, uri->password);
-     
+     stomp = Public.Protocols.Stomp.Client(config["stomp"]["broker"]);
   }
 }
 

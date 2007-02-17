@@ -107,6 +107,14 @@
     response->error = 304;
   }
   
+  //! perform a redirection
+  //!
+  //! @param to
+  //!   a string, Standards.URI object or an action (event or controller)
+  //!   that will be redirected to
+  //!
+  //! @param args
+  //!    an optional array of arguments that will be appended to the request url
   //!
   public void redirect(string|URI|function|Fins.FinsController to, mixed ... args)
   {
@@ -130,6 +138,14 @@
     response->extra_heads->location = dest;
   }
 
+  //! perform a temporary redirection
+  //!
+  //! @param to
+  //!   a string, Standards.URI object or an action (event or controller)
+  //!   that will be redirected to
+  //!
+  //! @param args
+  //!    an optional array of arguments that will be appended to the request url
   //!
   public void redirect_temp(string|URI|function|Fins.FinsController to, mixed ... args)
   {

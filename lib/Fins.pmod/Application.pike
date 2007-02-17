@@ -522,32 +522,32 @@ array get_event(.Request request)
       // the current controller.
       if((i+1) == sizeof(r))
       {
-	if(event)
-	{
-	  Log.error("undefined situation! we have to fix this.\n");
-	}
-	else if(cc && (ci = cc["index"]))
-	{
-	  not_args += ({"index"});
-	  event = ci;
+  	    if(event)
+	    {
+	      Log.error("undefined situation! we have to fix this: got %O when we shouldn't have got anything\n", event);
+		  Log.error("a function event here usually means the programmer has a trailing / on the request.");
+	    }
+	    else if(cc && (ci = cc["index"]))
+	    {
+	      not_args += ({"index"});
+	      event = ci;
           request->event_name = "index";
-	}
-	else
-	{
-	  Log.info("cc: %O", cc);
-	}
-	break;
+	    }
+	    else
+	    {
+	      Log.info("cc: %O", cc);
+	    }
+	    break;
       }
       else
       {
-	// what should we do?
-	if(event)
-	{
-	  args+=({comp});
-	}
+	    // what should we do?
+	    if(event)
+    	{
+	      args+=({comp});
+	    }
       }
     }
-
     // ok, the component was not empty.
     else
     {

@@ -126,13 +126,14 @@
     else if(functionp(to) || (object_program(to) != Standards.URI))
     {
 	  dest = request->fins_app->action_url(to);
+
     }
     else
     {
 	   dest = (string)to;
     }
 
-    if(args)
+    if(args && sizeof(args))
       dest = combine_path(dest, args*"/");
 
     response->extra_heads->location = dest;
@@ -163,7 +164,7 @@
 	   dest = (string)to;
     }
 
-    if(args)
+    if(args && sizeof(args))
       dest = combine_path(dest, args*"/");
 
 

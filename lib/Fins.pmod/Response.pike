@@ -108,14 +108,52 @@
   }
   
   //!
-  public void redirect(string|URI to, int|void temp)
+  public void redirect(string|URI|function|Fins.FinsController to, mixed ... args)
   {
-    if(temp)
-      response->error = 302;
+	string dest;
+    response->error = 301;
+
+    if(stringp(to))
+      dest = to;
+    else if(functionp(to) || (object_program(to) != Standards.URI))
+    {
+	  dest = request->fins_app->action_url(to);
+    }
     else
-      response->error = 301;
-    response->extra_heads->location = (string)to;
+    {
+	   dest = (string)to;
+    }
+
+    if(args)
+      dest = combine_path(dest, args*"/");
+
+    response->extra_heads->location = dest;
   }
+
+  //!
+  public void redirect_temp(string|URI|function|Fins.FinsController to, mixed ... args)
+  {
+	string dest;
+    response->error = 302;
+
+    if(stringp(to))
+      dest = to;
+    else if(functionp(to) || (object_program(to) != Standards.URI))
+    {
+	  dest = request->fins_app->action_url(to);
+    }
+    else
+    {
+	   dest = (string)to;
+    }
+
+    if(args)
+      dest = combine_path(dest, args*"/");
+
+
+    response->extra_heads->location = dest;
+  }
+
 
   //! using this method will clear any template set.
   public void set_data(string data, mixed ... args)

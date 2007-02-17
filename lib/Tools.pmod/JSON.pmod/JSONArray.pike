@@ -1,58 +1,42 @@
 import Tools.JSON;
 
-/// <summary>
-/// <para>
-/// A JSONArray is an ordered sequence of values. Its external form is a string
-/// wrapped in square brackets with commas between the values. The internal form
-/// is an object having get() and opt() methods for accessing the values by
-/// index, and put() methods for adding or replacing values. The values can be
-/// any of these types: Boolean, JSONArray, JSONObject, Number, String, or the
-/// JSONObject.NULL object.
-/// </para>
-/// <para>
-/// The constructor can convert a JSON external form string into an
-/// internal form Java object. The toString() method creates an external
-/// form string.
-/// </para>
-/// <para>
-/// A get() method returns a value if one can be found, and throws an exception
-/// if one cannot be found. An opt() method returns a default value instead of
-/// throwing an exception, and so is useful for obtaining optional values.
-/// </para>
-/// <para>
-/// The generic get() and opt() methods return an object which you can cast or
-/// query for type. There are also typed get() and opt() methods that do typing
-/// checking and type coersion for you.
-///</para>
-/// <para>
-/// The texts produced by the toString() methods are very strict.
-/// The constructors are more forgiving in the texts they will accept.
-/// </para>
-/// <para>
-/// <list type="bullet">
-/// <item><description>An extra comma may appear just before the closing bracket.</description></item>
-/// <item><description>Strings may be quoted with single quotes.</description></item>
-/// <item><description>Strings do not need to be quoted at all if they do not contain leading
-///     or trailing spaces, and if they do not contain any of these characters:
-///     { } [ ] / \ : , </description></item>
-/// <item><description>Numbers may have the 0- (octal) or 0x- (hex) prefix.</description></item>
-/// </list>
-/// </para>
-/// <para>
-/// Public Domain 2002 JSON.org
-/// @author JSON.org
-/// @version 0.1
-///</para>
-/// Ported to C# by Are Bjolseth, teleplan.no
-/// TODO:
-/// 1. Implement Custom exceptions
-/// 2. Add indexer JSONObject[i] = object,     and object = JSONObject[i];
-/// 3. Add indexer JSONObject["key"] = object, and object = JSONObject["key"]
-/// 4. Add unit testing
-/// 5. Add log4net
-/// 6. Make get/put methods private, to force use of indexer instead?
-/// </summary>
-/// <summary>The ArrayList where the JSONArray's properties are kept.</summary>
+//! A JSONArray is an ordered sequence of values. Its external form is a string
+//! wrapped in square brackets with commas between the values. The internal form
+//! is an object having get() and opt() methods for accessing the values by
+//! index, and put() methods for adding or replacing values. The values can be
+//! any of these types: Boolean, JSONArray, JSONObject, Number, String, or the
+//! JSONObject.NULL object.
+//!
+//! The constructor can convert a JSON external form string into an
+//! internal form Java object. The toString() method creates an external
+//! form string.
+//
+//! A get() method returns a value if one can be found, and throws an exception
+//! if one cannot be found. An opt() method returns a default value instead of
+//! throwing an exception, and so is useful for obtaining optional values.
+//!
+//! The generic get() and opt() methods return an object which you can cast or
+//! query for type. There are also typed get() and opt() methods that do typing
+//! checking and type coersion for you.
+//!
+//! The texts produced by the toString() methods are very strict.
+//! The constructors are more forgiving in the texts they will accept.
+//!
+//! An extra comma may appear just before the closing bracket.
+//! Strings may be quoted with single quotes.
+//! Strings do not need to be quoted at all if they do not contain leading
+//!     or trailing spaces, and if they do not contain any of these characters:
+//!     { } [ ] / \ : ,
+//! Numbers may have the 0- (octal) or 0x- (hex) prefix.
+//!
+//! Public Domain 2002 JSON.org
+//! @author JSON.org
+//! @version 0.1
+//!
+//! Ported to C# by Are Bjolseth, teleplan.no
+
+
+//! The ArrayList where the JSONArray's properties are kept.
 private array myArrayList;
 
 //! Construct a JSONArray, empty, from a JSON datastream, or a Pike array.
@@ -73,10 +57,9 @@ static void create(void|JSONTokener|string|array x)
   }
 }
 
-/// <summary>
-/// Construct a JSONArray from a JSONTokener.
-/// </summary>
-/// <param name="x">A JSONTokener</param>
+//! Construct a JSONArray from a JSONTokener.
+//! @param x
+//!   A JSONTokener
 public void fromtokener(JSONTokener x)
 {
   if (x->nextClean() != '[') 
@@ -112,20 +95,6 @@ public void fromtokener(JSONTokener x)
   }
 }
 
-/// <summary>
-/// Construct a JSONArray from a source string.
-/// </summary>
-/// <param name="s">A string that begins with '[' and ends with ']'.</param>
-
-/// <summary>
-/// Construct a JSONArray from a Collection.
-/// </summary>
-/// <param name="collection">A Collection.</param>
-
-/// <summary>
-/// Alternate to Java get/put method, by using indexer
-/// </summary>
-
 //!
 static mixed `[](mixed i)
 {
@@ -151,22 +120,22 @@ public mixed getValue(int i)
   //return myArrayList[i];
 }
 
-/// <summary>
-/// Get the ArrayList which is holding the elements of the JSONArray.
-/// Use the indexer instead!! Added to be true to the orignal Java src
-/// </summary>
-/// <returns>The ArrayList</returns>
+//! Get the ArrayList which is holding the elements of the JSONArray.
+//! Use the indexer instead!! Added to be true to the orignal Java src
+//! 
+//! The ArrayList
 public array getArrayList()
 {
   return myArrayList;
 }
 
-/// <summary>
-/// Get the boolean value associated with an index.
-/// The string values "true" and "false" are converted to boolean.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>The truth</returns>
+//! Get the boolean value associated with an index.
+//! The string values "true" and "false" are converted to boolean.
+//! @param i
+//! index subscript
+//!
+//! @returns
+//! The truth
 public int(0..1) getBoolean(int i)
 {
   object obj = getValue(i);
@@ -179,11 +148,13 @@ public int(0..1) getBoolean(int i)
   throw(Error.Generic(msg));
 }
 
-/// <summary>
-/// Get the double value associated with an index.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>A double value</returns>
+//! 
+//! Get the double value associated with an index.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! A double value
 public float getDouble(int i)
 {
   mixed o = getValue(i);
@@ -200,11 +171,13 @@ public float getDouble(int i)
   throw(Error.Generic(msg));
 }
 
-/// <summary>
-/// Get the int value associated with an index.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>The int value</returns>
+//! 
+//! Get the int value associated with an index.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! The int value
 public int getInt(int i)
 {
   mixed o = getValue(i);
@@ -222,11 +195,13 @@ public int getInt(int i)
 
 }
 
-/// <summary>
-/// Get the JSONArray associated with an index.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>A JSONArray value</returns>
+//! 
+//! Get the JSONArray associated with an index.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! A JSONArray value
 public JSONArray getJSONArray(int i)
 {
   mixed o = getValue(i);
@@ -238,11 +213,13 @@ public JSONArray getJSONArray(int i)
   throw(Error.Generic(msg));
 }
 
-/// <summary>
-/// Get the JSONObject associated with an index.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>A JSONObject value</returns>
+//! 
+//! Get the JSONObject associated with an index.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! A JSONObject value
 public JSONObject getJSONObject(int i)
 {
   mixed o = getValue(i);
@@ -255,34 +232,40 @@ public JSONObject getJSONObject(int i)
 
 }
 
-/// <summary>
-/// Get the string associated with an index.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>A string value.</returns>
+//! 
+//! Get the string associated with an index.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! A string value.
 public string getString(int i)
 {
   return (string)getValue(i);
 }
 
-/// <summary>
-/// Determine if the value is null.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>true if the value at the index is null, or if there is no value.</returns>
+//! 
+//! Determine if the value is null.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! true if the value at the index is null, or if there is no value.
 public int(0..1) isNull(int i)
 {
   mixed obj = opt(i);
   return (!obj);
 }
 
-/// <summary>
-/// Make a string from the contents of this JSONArray. The separator string
-/// is inserted between each element.
-/// Warning: This method assumes that the data structure is acyclical.
-/// </summary>
-/// <param name="separator">separator A string that will be inserted between the elements.</param>
-/// <returns>A string.</returns>
+//! 
+//! Make a string from the contents of this JSONArray. The separator string
+//! is inserted between each element.
+//! Warning: This method assumes that the data structure is acyclical.
+//! 
+//! @param separator
+//! separator A string that will be inserted between the elements.
+//! @returns
+//! A string.
 public string join(string separator)
 {
   mixed obj;
@@ -324,21 +307,24 @@ public string join(string separator)
   return sb->get();
 }
 
-/// <summary>
-/// Get the length of the JSONArray.
-/// Added to be true to the original Java implementation
-/// </summary>
-/// <returns>Number of JSONObjects in array</returns>
+//! 
+//! Get the length of the JSONArray.
+//! Added to be true to the original Java implementation
+//! 
+//! @returns
+//! Number of JSONObjects in array
 public int Length()
 {
   return sizeof(myArrayList);
 }
 
-/// <summary>
-/// Get the optional object value associated with an index.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>object at that index.</returns>
+//! 
+//! Get the optional object value associated with an index.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! object at that index.
 public mixed opt(int i)
 {
   if (i < 0 || i >= sizeof(myArrayList))
@@ -348,14 +334,17 @@ public mixed opt(int i)
 }
 
 
-/// <summary>
-/// Get the optional boolean value associated with an index.
-/// It returns the defaultValue if there is no value at that index or if it is not
-/// a Boolean or the String "true" or "false".
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <param name="defaultValue"></param>
-/// <returns>The truth.</returns>
+//! 
+//! Get the optional boolean value associated with an index.
+//! It returns the defaultValue if there is no value at that index or if it is not
+//! a Boolean or the String "true" or "false".
+//! 
+//! @param i
+//! index subscript
+//! @param defaultValue
+//! 
+//! @returns
+//! The truth.
 public int(0..1) optBoolean(int i, int(0..1)|void defaultValue)
 {
   mixed obj = opt(i);
@@ -366,14 +355,17 @@ public int(0..1) optBoolean(int i, int(0..1)|void defaultValue)
   else return 0;
 }
 
-/// <summary>
-/// Get the optional double value associated with an index.
-/// NaN is returned if the index is not found,
-/// or if the value is not a number and cannot be converted to a number.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <param name="defaultValue"></param>
-/// <returns>The double value object</returns>
+//! 
+//! Get the optional double value associated with an index.
+//! NaN is returned if the index is not found,
+//! or if the value is not a number and cannot be converted to a number.
+//! 
+//! @param i
+//! index subscript
+//! @param defaultValue
+//! 
+//! @returns
+//! The double value object
 public float optDouble(int i)
 {
   mixed obj = opt(i);
@@ -391,22 +383,27 @@ public float optDouble(int i)
   return 0;
 }
 
-/// <summary>
-/// Get the optional int value associated with an index.
-/// Zero is returned if the index is not found,
-/// or if the value is not a number and cannot be converted to a number.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>The int value object</returns>
+//! 
+//! Get the optional int value associated with an index.
+//! Zero is returned if the index is not found,
+//! or if the value is not a number and cannot be converted to a number.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! The int value object
 
-/// <summary>
-/// Get the optional int value associated with an index.
-/// The defaultValue is returned if the index is not found,
-/// or if the value is not a number and cannot be converted to a number.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <param name="defaultValue">The default value</param>
-/// <returns>The int value object</returns>
+//! 
+//! Get the optional int value associated with an index.
+//! The defaultValue is returned if the index is not found,
+//! or if the value is not a number and cannot be converted to a number.
+//! 
+//! @param i
+//! index subscript
+//! @param defaultValue
+//! The default value
+//! @returns
+//! The int value object
 public int optInt(int i)
 {
   mixed obj = opt(i);
@@ -422,11 +419,13 @@ public int optInt(int i)
   return UNDEFINED;
 }
 
-/// <summary>
-/// Get the optional JSONArray associated with an index.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>A JSONArray value, or null if the index has no value, or if the value is not a JSONArray.</returns>
+//! 
+//! Get the optional JSONArray associated with an index.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! A JSONArray value, or null if the index has no value, or if the value is not a JSONArray.
 public JSONArray optJSONArray(int i)
 {
   mixed obj = opt(i);
@@ -435,13 +434,15 @@ public JSONArray optJSONArray(int i)
   return UNDEFINED;
 }
 
-/// <summary>
-/// Get the optional JSONObject associated with an index.
-/// Null is returned if the key is not found, or null if the index has
-/// no value, or if the value is not a JSONObject.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>A JSONObject value</returns>
+//! 
+//! Get the optional JSONObject associated with an index.
+//! Null is returned if the key is not found, or null if the index has
+//! no value, or if the value is not a JSONObject.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! A JSONObject value
 public JSONObject optJSONObject(int i)
 {
   mixed obj = opt(i);
@@ -452,21 +453,26 @@ public JSONObject optJSONObject(int i)
   return UNDEFINED;
 }
 
-/// <summary>
-/// Get the optional string value associated with an index. It returns an
-/// empty string if there is no value at that index. If the value
-/// is not a string and is not null, then it is coverted to a string.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <returns>A String value</returns>
+//! 
+//! Get the optional string value associated with an index. It returns an
+//! empty string if there is no value at that index. If the value
+//! is not a string and is not null, then it is coverted to a string.
+//! 
+//! @param i
+//! index subscript
+//! @returns
+//! A String value
 
-/// <summary>
-/// Get the optional string associated with an index.
-/// The defaultValue is returned if the key is not found.
-/// </summary>
-/// <param name="i">index subscript</param>
-/// <param name="defaultValue">The default value</param>
-/// <returns>A string value</returns>
+//! 
+//! Get the optional string associated with an index.
+//! The defaultValue is returned if the key is not found.
+//! 
+//! @param i
+//! index subscript
+//! @param defaultValue
+//! The default value
+//! @returns
+//! A string value
 public string optString(int i, string|void defaultValue)
 {
   mixed obj = opt(i);
@@ -484,11 +490,13 @@ public string optString(int i, string|void defaultValue)
  * public JSONArray put(double val)
  * public JSONArray put(int val)		
  */
-/// <summary>
-/// Append an object value.
-/// </summary>
-/// <param name="val">An object value.  The value should be a Boolean, Double, Integer, JSONArray, JSObject, or String, or the JSONObject.NULL object</param>
-/// <returns>this (JSONArray)</returns>
+//! 
+//! Append an object value.
+//! 
+//! @param val
+//! An object value.  The value should be a Boolean, Double, Integer, JSONArray, JSObject, or String, or the JSONObject.NULL object
+//! @returns
+//! this (JSONArray)
 
 /*
  * OMITTED:
@@ -496,15 +504,17 @@ public string optString(int i, string|void defaultValue)
  * public JSONArray put(int index, double value)
  * public JSONArray put(int index, int value)
  */
-/// <summary>
-/// Put or replace a boolean value in the JSONArray.
-/// </summary>
-/// <param name="i">
-/// The subscript. If the index is greater than the length of
-/// the JSONArray, then null elements will be added as necessary to pad it out.
-/// </param>
-/// <param name="val">An object value.</param>
-/// <returns>this (JSONArray)</returns>
+//! 
+//! Put or replace a boolean value in the JSONArray.
+//! 
+//! @param i
+//! The subscript. If the index is greater than the length of
+//! the JSONArray, then null elements will be added as necessary to pad it out.
+//! 
+//! @param val
+//! An object value.
+//! @returns
+//! this (JSONArray)
 public JSONArray put(int i, mixed val)
 {
   if (i < 0)
@@ -531,14 +541,15 @@ public JSONArray put(int i, mixed val)
   return this;
 }
 
-/// <summary>
-/// Produce a JSONObject by combining a JSONArray of names with the values
-/// of this JSONArray.
-/// </summary>
-/// <param name="names">
-/// A JSONArray containing a list of key strings. These will be paired with the values.
-/// </param>
-/// <returns>A JSONObject, or null if there are no names or if this JSONArray</returns>
+//! 
+//! Produce a JSONObject by combining a JSONArray of names with the values
+//! of this JSONArray.
+//! 
+//! @param names
+//! A JSONArray containing a list of key strings. These will be paired with the values.
+//! 
+//! @returns
+//! A JSONObject, or null if there are no names or if this JSONArray
 public JSONObject toJSONObject(JSONArray names)
 {
   if (!names || sizeof(names) == 0 || sizeof(this) == 0) 
@@ -553,12 +564,12 @@ public JSONObject toJSONObject(JSONArray names)
   return jo;
 }
 
-/// <summary>
-/// Make an JSON external form string of this JSONArray. For compactness, no
-/// unnecessary whitespace is added.
-/// </summary>
-/// <returns>a printable, displayable, transmittable representation of the array.</returns>
-
+//! 
+//! Make an JSON external form string of this JSONArray. For compactness, no
+//! unnecessary whitespace is added.
+//! 
+//! @returns
+//! a printable, displayable, transmittable representation of the array.
 //!
 static mixed cast(string to)
 {

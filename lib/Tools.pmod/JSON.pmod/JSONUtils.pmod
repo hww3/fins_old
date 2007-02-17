@@ -1,10 +1,12 @@
 import Tools.JSON;
 
-                /// <summary>
-                /// Produce a string from a number.
-                /// </summary>
-                /// <param name="number">Number value type object</param>
-                /// <returns>String representation of the number</returns>
+//! 
+//! Produce a string from a number.
+//! 
+//! @param number
+//!  Number value type object
+//! @returns
+//!   String representation of the number
                 public string numberToString(mixed number)
                 {
                         if (floatp(number) && !(float)number)
@@ -29,12 +31,13 @@ import Tools.JSON;
                 }
 
 
-
-		/// <summary>
-		/// Produce a string in double quotes with backslash sequences in all the right places.
-		/// </summary>
-		/// <param name="s">A String</param>
-		/// <returns>A String correctly formatted for insertion in a JSON message.</returns>
+//! 
+//! Produce a string in double quotes with backslash sequences in all the right places.
+//! 
+//! @param s
+//!  A String
+//! @returns
+//!   A String correctly formatted for insertion in a JSON message.
 		public string Enquote(string s) 
 		{
 			if (!s || sizeof(s) == 0) 

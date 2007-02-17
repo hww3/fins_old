@@ -1,58 +1,55 @@
 import Tools.JSON;
-	/// <summary>
-	/// <para>
-	///  A JSONTokener takes a source string and extracts characters and tokens from
-	///  it. It is used by the JSONObject and JSONArray constructors to parse
-	///  JSON source strings.
-	///  </para>
-	///  <para>
-	///  Public Domain 2002 JSON.org
-	///  @author JSON.org
-	///  @version 0.1
-	///  </para>
-	///  <para>Ported to C# by Are Bjolseth, teleplan.no</para>
-	///  <para>
-	///  <list type="bullet">
-	///  <item><description>Implement Custom exceptions</description></item>
-	///  <item><description>Add unit testing</description></item>
-	///  <item><description>Add log4net</description></item>
-	///  </list>
-	///  </para>
-	/// </summary>
-		/// <summary>The index of the next character.</summary>
+//! 
+//! 
+//!  A JSONTokener takes a source string and extracts characters and tokens from
+//!  it. It is used by the JSONObject and JSONArray constructors to parse
+//!  JSON source strings.
+//!  
+//!  
+//!  Public Domain 2002 JSON.org
+//!  @author JSON.org
+//!  @version 0.1
+//!  
+//!  Ported to C# by Are Bjolseth, teleplan.no
+//!  
+
+//! The index of the next character.
 		private int myIndex;
-		/// <summary>The source string being tokenized.</summary>
+//! The source string being tokenized.
 		private string mySource;
 
-		/// <summary>
-		/// Construct a JSONTokener from a string.
-		/// </summary>
-		/// <param name="s">A source string.</param>
+//! 
+//! Construct a JSONTokener from a string.
+//! 
+//! @param s
+//!  A source string.
 		static void create(string s)
 		{
 			myIndex = 0;
 			mySource = s;
 		}
 
-		/// <summary>
-		/// Back up one character. This provides a sort of lookahead capability,
-		/// so that you can test for a digit or letter before attempting to parse
-		/// the next number or identifier.
-		/// </summary>
+//! 
+//! Back up one character. This provides a sort of lookahead capability,
+//! so that you can test for a digit or letter before attempting to parse
+//! the next number or identifier.
+//! 
 		public void back()
 		{
 			if (myIndex > 0)
 				myIndex -= 1;
 		}
 
-		/// <summary>
-		/// Get the hex value of a character (base16).
-		/// </summary>
-		/// <param name="c">
-		/// A character between '0' and '9' or between 'A' and 'F' or
-		/// between 'a' and 'f'.
-		/// </param>
-		/// <returns>An int between 0 and 15, or -1 if c was not a hex digit.</returns>
+//! 
+//! Get the hex value of a character (base16).
+//! 
+//! @param c
+//!  
+//! A character between '0' and '9' or between 'A' and 'F' or
+//! between 'a' and 'f'.
+//! 
+//! @returns
+//!  An int between 0 and 15, or -1 if c was not a hex digit.
 		public static int dehexchar(int c)
 		{
 			if (c >= '0' && c <= '9') 
@@ -70,19 +67,21 @@ import Tools.JSON;
 			return -1;
 		}
 
-		/// <summary>
-		/// Determine if the source string still contains characters that next() can consume.
-		/// </summary>
-		/// <returns>true if not yet at the end of the source.</returns>
+//! 
+//! Determine if the source string still contains characters that next() can consume.
+//! 
+//! @returns
+//!  true if not yet at the end of the source.
 		public int more()
 		{
 			return myIndex < sizeof(mySource);
 		}
 
-		/// <summary>
-		/// Get the next character in the source string.
-		/// </summary>
-		/// <returns>The next character, or 0 if past the end of the source string.</returns>
+//! 
+//! Get the next character in the source string.
+//! 
+//! @returns
+//!  The next character, or 0 if past the end of the source string.
 		public int next(int|void x)
 		{
                    if(x)
@@ -104,11 +103,13 @@ import Tools.JSON;
 		}
 
 
-		/// <summary>
-		/// Get the next n characters.
-		/// </summary>
-		/// <param name="n">The number of characters to take.</param>
-		/// <returns>A string of n characters.</returns>
+//! 
+//! Get the next n characters.
+//! 
+//! @param n
+//!  The number of characters to take.
+//! @returns
+//!  A string of n characters.
 		public string nextn(int n)
 		{
 			int i = myIndex;
@@ -122,11 +123,12 @@ import Tools.JSON;
 			return mySource[i..j];
 		}
 
-		/// <summary>
-		/// Get the next char in the string, skipping whitespace
-		/// and comments (slashslash and slashstar).
-		/// </summary>
-		/// <returns>A character, or 0 if there are no more characters.</returns>
+//! 
+//! Get the next char in the string, skipping whitespace
+//! and comments (slashslash and slashstar).
+//! 
+//! @returns
+//!  A character, or 0 if there are no more characters.
 		public int nextClean()
 		{
 			while (1) 
@@ -172,14 +174,16 @@ import Tools.JSON;
 			}
 		}
 
-		/// <summary>
-		/// Return the characters up to the next close quote character.
-		/// Backslash processing is done. The formal JSON format does not
-		/// allow strings in single quotes, but an implementation is allowed to
-		/// accept them.
-		/// </summary>
-		/// <param name="quote">The quoting character, either " or '</param>
-		/// <returns>A String.</returns>
+//! 
+//! Return the characters up to the next close quote character.
+//! Backslash processing is done. The formal JSON format does not
+//! allow strings in single quotes, but an implementation is allowed to
+//! accept them.
+//! 
+//! @param quote
+//!  The quoting character, either " or '
+//! @returns
+//!  A String.
 		public string nextString(int quote)
 		{
 			int c;
@@ -233,12 +237,14 @@ import Tools.JSON;
 			}//END-while
 		}
 
-		/// <summary>
-		/// Get the text up but not including the specified character or the
-		/// end of line, whichever comes first.
-		/// </summary>
-		/// <param name="d">A delimiter character.</param>
-		/// <returns>A string.</returns>
+//! 
+//! Get the text up but not including the specified character or the
+//! end of line, whichever comes first.
+//! 
+//! @param d
+//!  A delimiter character.
+//! @returns
+//!  A string.
 		public string nextTo(int|string d)
 		{
                  
@@ -280,11 +286,12 @@ import Tools.JSON;
                     }
 		}
 
-		/// <summary>
-		/// Get the next value as object. The value can be a Boolean, Double, Integer,
-		/// JSONArray, JSONObject, or String, or the JSONObject.NULL object.
-		/// </summary>
-		/// <returns>An object.</returns>
+//! 
+//! Get the next value as object. The value can be a Boolean, Double, Integer,
+//! JSONArray, JSONObject, or String, or the JSONObject.NULL object.
+//! 
+//! @returns
+//!  An object.
 		public mixed nextObject()
 		{
 			int c = nextClean();
@@ -344,14 +351,16 @@ import Tools.JSON;
 			return s;
 		}
 
-		/// <summary>
-		/// Skip characters until the next character is the requested character.
-		/// If the requested character is not found, no characters are skipped.
-		/// </summary>
-		/// <param name="to">A character to skip to.</param>
-		/// <returns>
-		/// The requested character, or zero if the requested character is not found.
-		/// </returns>
+//! 
+//! Skip characters until the next character is the requested character.
+//! If the requested character is not found, no characters are skipped.
+//! 
+//! @param to
+//!  A character to skip to.
+//! @returns
+//!  
+//! The requested character, or zero if the requested character is not found.
+//! 
 		public int skipTo(int to)
 		{
 			int c;
@@ -370,11 +379,12 @@ import Tools.JSON;
 			return c;
 		}
 
-		/// <summary>
-		/// Skip characters until past the requested string.
-		/// If it is not found, we are left at the end of the source.
-		/// </summary>
-		/// <param name="to">A string to skip past.</param>
+//! 
+//! Skip characters until past the requested string.
+//! If it is not found, we are left at the end of the source.
+//! 
+//! @param to
+//!  A string to skip past.
 		public void skipPast(string to)
 		{
 			myIndex = search(mySource, to, myIndex);
@@ -391,26 +401,28 @@ import Tools.JSON;
 		// TODO implement exception SyntaxError
 
 
-		/// <summary>
-		/// Make a printable string of this JSONTokener.
-		/// </summary>
-		/// <returns>" at character [myIndex] of [mySource]"</returns>
+//! 
+//! Make a printable string of this JSONTokener.
+//! 
+//! @returns
+//!  " at character [myIndex] of [mySource]"
 		public string ToString()
 		{
 			return " at character " + myIndex + " of " + mySource;
 		}
 
-		/// <summary>
-		/// Unescape the source text. Convert %hh sequences to single characters,
-		/// and convert plus to space. There are Web transport systems that insist on
-		/// doing unnecessary URL encoding. This provides a way to undo it.
-		/// </summary>
-
-		/// <summary>
-		/// Convert %hh sequences to single characters, and convert plus to space.
-		/// </summary>
-		/// <param name="s">A string that may contain plus and %hh sequences.</param>
-		/// <returns>The unescaped string.</returns>
+//! 
+//! Unescape the source text. Convert %hh sequences to single characters,
+//! and convert plus to space. There are Web transport systems that insist on
+//! doing unnecessary URL encoding. This provides a way to undo it.
+//! 
+//! 
+//! Convert %hh sequences to single characters, and convert plus to space.
+//! 
+//! @param s
+//!  A string that may contain plus and %hh sequences.
+//! @returns
+//!  The unescaped string.
 		public string unescape(string|void s)
 		{
                         if(!s) s = mySource;

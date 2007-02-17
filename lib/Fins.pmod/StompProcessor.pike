@@ -5,6 +5,7 @@ inherit Processor;
 object stomp;
 
 mapping listeners = ([]);
+mapping r_listeners = ([]);
 
 array supported_protocols()
 {
@@ -18,7 +19,7 @@ void start()
 
   else
   {
-     stomp = Public.Protocols.Stomp.Client(config["stomp"]["broker"]);
+     stomp = Public.Protocols.Stomp.Client(config["stomp"]["broker"], 1);
   }
 }
 
@@ -27,16 +28,26 @@ void register_subscriber(object to)
 //  if(listeners[to]) unregister_subscriber(to);
 
   listeners[to] = to->subscribes_to;
-
-  stomp->subscribe(to->subscribes_to, lambda(object frame){ return process_message(frame, to); });
+  r_listeners[to->subscribes_to] = to;
+  stomp->subscribe(to->subscribes_to, lambda(object frame){ return process_message(frame, to->subscribes_to); });
 }
 
-int process_message(object frame, object to)
+int process_message(object frame, string to)
 {
   object e;
+  object c;
+  int r;
+
+  if((int)(config["controller"]["reload"]))
+  {
+	app->controller_updated(r_listeners[to], app, "controller");
+  }
+
+  c = r_listeners[to];
+
   e = catch {
-    if(to->on_message && functionp(to->on_message))
-      to->on_message(StompRequest(frame));
+    if(c && c->on_message && functionp(c->on_message))
+      c->on_message(StompRequest(frame));
   };
 
   if(e) 

@@ -38,6 +38,8 @@ int process_message(object frame, string to)
   object c;
   int r;
 
+//  write("got a frame: %O\n", frame);
+
   if((int)(config["controller"]["reload"]))
   {
 	app->controller_updated(r_listeners[to], app, "controller");
@@ -61,4 +63,9 @@ int process_message(object frame, string to)
 mixed handle(Request request)
 {
   
+}
+
+int publish(string destination, string body, mapping|void headers)
+{
+    return stomp->send(destination, body, headers);
 }

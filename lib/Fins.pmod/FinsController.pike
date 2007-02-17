@@ -109,3 +109,7 @@ static void breakpoint(string desc, object id, object response,
               (args?args:([])));
 }
 
+static string action_url(function|object action)
+{
+  return app->url_for_action(action);
+}

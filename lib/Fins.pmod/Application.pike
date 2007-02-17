@@ -4,6 +4,7 @@ import Tools.Logging;
 //! this is the base application class.
 
 object __fin_serve;
+string context_root = "";
 
 //!
 .FinsController controller;
@@ -28,6 +29,7 @@ Fins.Helpers.Filters.Compress _gzfilter;
 
 static mapping processors = ([]);
 static mapping controller_path_cache = ([]);
+static mapping action_path_cache = ([]);
 
 // breakpointing support
 Stdio.Port breakpoint_port;
@@ -50,6 +52,9 @@ static void create(.Configuration _config)
 
   config = _config;
   static_dir = Stdio.append_path(config->app_dir, "static");
+
+  if(config["app"] && config["app"]["context_root"])
+    context_root = config["app"]["context_root"];
 
   load_breakpoint();
   load_cache();
@@ -230,6 +235,8 @@ int controller_updated(object controller, object container, string cn)
 	if(object_program(container) == object_program(this))
 	  load_controller();
     container->start();
+    action_path_cache = ([]);
+    controller_path_cache = ([]);
     return 1;
   }
 
@@ -296,6 +303,25 @@ private object lookingfor(object o, object in)
   }
 
   return 0;
+}
+
+string url_for_action(function|object action)
+{
+  string path;
+  if(path = action_path_cache[action])
+    return path;
+
+  if(functionp(action))
+  {
+    object c = function_object(action);
+    string path1 = get_path_for_controller(c);
+    path = combine_path(context_root, path1, function_name(action));
+  }
+  else
+    path = combine_path(context_root, get_path_for_controller(action));
+
+  action_path_cache[action] = path;
+  return path;
 }
 
 //!

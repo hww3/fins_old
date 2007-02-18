@@ -60,13 +60,19 @@ class JMSHandler
 //		Log.debug("%O", indices(factory));
 		if(t && t->getQueueName)
 		{
-          qc = factory->createQueueConnection(); 
+		  if(controller->connection_user)
+            qc = factory->createQueueConnection(controller->connection_user, controller->connection_password); 
+		  else
+            qc = factory->createQueueConnection(); 
           s = qc->createQueueSession(0, 0); 
   		  sub = s->createReceiver(t); 
 		}
 		else if(t && t->getTopicName)
 		{
-          qc = factory->createTopicConnection(); 
+		  if(controller->connection_user)
+            qc = factory->createTopicConnection(controller->connection_user, controller->connection_password); 
+		  else
+            qc = factory->createTopicConnection(); 
           s = qc->createTopicSession(0, 0); 			
 		  sub = s->createSubscriber(t); 
 		}

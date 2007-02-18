@@ -65,7 +65,7 @@ mixed handle(Request request)
   
 }
 
-int publish(string destination, string body, mapping|void headers)
+void publish(string destination, string body, mapping|void headers)
 {
-    return stomp->send(destination, body, headers);
+    stomp->send(destination, body, headers);
 }

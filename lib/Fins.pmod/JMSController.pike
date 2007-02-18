@@ -1,10 +1,8 @@
 import Fins;
 inherit FinsController;
+inherit JMSMessenger;
 
 constant subscribes_to = "";
-constant connection_factory = "";
-constant connection_user = 0;
-constant connection_password = 0;
 
 void start()
 {
@@ -12,3 +10,5 @@ void start()
 
   p->register_subscriber(this);
 }
+
+void on_message(Fins.JMSRequest request);

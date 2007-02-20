@@ -139,6 +139,12 @@ public int flush_template(string templateName)
 }
 
 //!
+public int flush_templates()
+{
+  templates = ([]);
+}
+
+//!
 string macro_capitalize(.Template.TemplateData data, string|void args)
 {
   return String.capitalize(data->get_data()[args]||"");

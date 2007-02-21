@@ -20,7 +20,7 @@ void start()
 
 public void index(Fins.Request request, Fins.Response response, mixed ... args)
 {
-  response->redirect("list");
+  response->redirect(action_url(list));
 }
 
 public void list(Fins.Request request, Fins.Response response, mixed ... args)
@@ -96,7 +96,7 @@ public void delete(Request id, Response response, mixed ... args)
     response->set_data("error: invalid data.");
     return;	
   }
-  response->redirect("dodelete?id=" + id->variables->id);
+  response->redirect(action_url(dodelete) + "?id=" + id->variables->id);
 }
 
 public void dodelete(Request id, Response response, mixed ... args)
@@ -118,7 +118,7 @@ public void dodelete(Request id, Response response, mixed ... args)
   item->delete();
 
   response->flash("msg", make_nice(model_object->instance_name) + " deleted successfully.");
-  response->redirect("list");
+  response->redirect(action_url(list));
 
 }
 
@@ -185,7 +185,7 @@ e=catch{
   if(request->variables->___cancel)
   {
 	response->flash("msg", "editing canceled");
-    response->redirect("list");
+    response->redirect(action_url(list));
     return;	
   }
 
@@ -197,7 +197,7 @@ e=catch{
     return;
   }
 
-  response->redirect("update?id=" + request->variables->id);
+  response->redirect(action_url(update) + "?id=" + request->variables->id);
   
   m_delete(request->variables, "___save");
   m_delete(request->variables, "id");
@@ -239,7 +239,7 @@ e=catch{
   if(request->variables->___cancel)
   {
 	response->flash("msg", "create canceled.");
-    response->redirect("list");
+    response->redirect(action_url(list));
     return;	
   }
 
@@ -264,7 +264,7 @@ e=catch{
 
   item->save();
 
-  response->redirect("list");
+  response->redirect(action_url(list));
 
   response->flash("msg", "create successful.");
 

@@ -31,7 +31,7 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
   if(request->misc->flash && request->misc->flash->msg)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
 
-  rv += "<a href=\"new\">new " + make_nice(model_object->instance_name) + "</a><p>";
+  rv += "<a href=\"" + action_url(new) + "\">new " + make_nice(model_object->instance_name) + "</a><p>";
   object items = model->repository->find(model_object, ([]));
   if(!sizeof(items))
   {
@@ -44,9 +44,9 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
     rv+="<table>";
     foreach(items;; object item)
     {
-      rv += "<tr><td><a href=\"display?id=" + item->get_id() + "\">view</a> </td> ";
-      rv += " <td> <a href=\"update?id=" + item->get_id() + "\">edit</a> </td><td>";
-      rv += " <td> <a href=\"delete?id=" + item->get_id() + "\">delete</a> </td><td>";
+      rv += "<tr><td><a href=\"" action_url(display) + "?id=" + item->get_id() + "\">view</a> </td> ";
+      rv += " <td> <a href=\"" + action_url(update) + "?id=" + item->get_id() + "\">edit</a> </td><td>";
+      rv += " <td> <a href=\"" + action_url(delete) + "?id=" + item->get_id() + "\">delete</a> </td><td>";
       rv += sprintf("%O<br/>\n", item) + "</td></tr>\n";
     }
   }
@@ -64,7 +64,7 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
   rv = "<h1>Viewing " + make_nice(model_object->instance_name) + "</h1>\n";
   if(request->misc->flash && request->misc->flash->msg)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
-  rv += "<a href=\"update?id=" + request->variables->id + "\">edit " + make_nice(model_object->instance_name) + "</a><p>";
+  rv += "<a href=\"" + action_url(update) + "?id=" + request->variables->id + "\">edit " + make_nice(model_object->instance_name) + "</a><p>";
 
   rv += "<table>\n";
 
@@ -82,7 +82,7 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
   }
  
   rv += "</table>\n";
-  rv += "<form action=\"list\" method=\"post\">";
+  rv += "<form action=\"" + action_url(list) + "\" method=\"post\">";
   rv += "<input name=\"___return\" value=\"Return\" type=\"submit\"> ";
   rv += "</form>";
 
@@ -152,7 +152,7 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
   rv = "<h1>Editing " + make_nice(model_object->instance_name) + "</h1>\n";
   if(request->misc->flash && request->misc->flash->msg)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
-  rv += "<form action=\"doupdate\" method=\"post\">";
+  rv += "<form action=\"" + action_url(doupdate) + "\" method=\"post\">";
   rv += "<table>\n";
 
   mapping val = item->get_atomic();
@@ -280,7 +280,7 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
   rv = "<h1>Creating new " + model_object->instance_name + "</h1>\n";
   if(request->misc->flash && request->misc->flash->msg)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
-  rv += "<form action=\"donew\" method=\"post\">";
+  rv += "<form action=\"" + action_url(donew) + "\" method=\"post\">";
   rv += "<table>\n";
 
   foreach(model_object->field_order; int key; mixed value)
@@ -360,9 +360,9 @@ string get_view_url(object o)
   if(!controller)
     return 0;
 
-  string url = app->get_path_for_controller(controller);
+  string url 
 
-  url = url + "/display/?id=" + o[o->master_object->primary_key->name];  
+  url = action_url(controller->display) + "?id=" + o[o->master_object->primary_key->name];  
 
   return url;
 }

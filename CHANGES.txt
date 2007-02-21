@@ -1,9 +1,14 @@
 Version 0.1
 
+- added FinsController->action_url() to generate urls dynamically with 
+  support for an application's context root (mount point)
+- added FinsView->flush_templates() to flush all cached templates.
+- Response->redirect() is now split into redirect() and redirect_temp().
+- added Stomp and JMS messaging support
 - added controller_name, controller_path and event_name to request
 - added support for layouts in simple templating
 - error messages are themeable: templates/error/[404|500|template].phtml
-- added beginning of scaffolding.
+- added beginning of scaffolding: crud for basic types, no joins yet.
 - added validation callbacks for data model sets
 - added validation override flags to skip validation
 - added special Fins.Errors.Validation error type.

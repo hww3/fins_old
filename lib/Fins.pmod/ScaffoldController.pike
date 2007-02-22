@@ -44,7 +44,7 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
     rv+="<table>";
     foreach(items;; object item)
     {
-      rv += "<tr><td><a href=\"" action_url(display) + "?id=" + item->get_id() + "\">view</a> </td> ";
+      rv += "<tr><td><a href=\"" + action_url(display) + "?id=" + item->get_id() + "\">view</a> </td> ";
       rv += " <td> <a href=\"" + action_url(update) + "?id=" + item->get_id() + "\">edit</a> </td><td>";
       rv += " <td> <a href=\"" + action_url(delete) + "?id=" + item->get_id() + "\">delete</a> </td><td>";
       rv += sprintf("%O<br/>\n", item) + "</td></tr>\n";
@@ -360,7 +360,7 @@ string get_view_url(object o)
   if(!controller)
     return 0;
 
-  string url 
+  string url;
 
   url = action_url(controller->display) + "?id=" + o[o->master_object->primary_key->name];  
 

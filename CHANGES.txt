@@ -1,5 +1,6 @@
 Version 0.1
 
+- Added Fins.Model.InCriteria()
 - added FinsController->action_url() to generate urls dynamically with 
   support for an application's context root (mount point)
 - added FinsView->flush_templates() to flush all cached templates.

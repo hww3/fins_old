@@ -428,7 +428,7 @@ void load(mixed id, .DataObjectInstance i, int|void force)
        	throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
      }
      else
-       werror("got results from query: %s\n", query);
+       if(context->debug) werror("got results from query: %s\n", query);
 
      i->set_id(id);
      i->set_new_object(0);

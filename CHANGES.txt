@@ -1,5 +1,7 @@
 Version 0.1
 
+- added DataObject, DataObjectInstance->set_operator() to set the operator
+    used during find operations on multiple fields.
 - Added Fins.Model.InCriteria()
 - added FinsController->action_url() to generate urls dynamically with 
   support for an application's context root (mount point)

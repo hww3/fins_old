@@ -5,6 +5,8 @@
 
 import Tools.Logging;
 
+string default_operator = "AND";
+
 mapping default_values = ([]);
 
 //!
@@ -81,6 +83,16 @@ void define();
 //! define the object's fields and relationships; useful for adding custom attributes
 //! when also using automatic definition.
 void post_define();
+
+//! set the default operator to use when querying on multiple fields.
+//  valid values are @[Fins.Model.OPER_AND] and @[Fins.Model.OPER_OR].
+void set_operator(int oper_type)
+{
+  if(oper_type == Fins.Model.OPER_AND)
+    default_operator = " AND ";
+  else if(oper_type == Fins.Model.OPER_OR)
+    default_operator = " OR ";
+}
 
 //! validates the data being set for an object.
 //! runs for each individual or atomic change. all applicable validation methods
@@ -331,7 +343,6 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
   array _where = ({});
   array _tables = ({table_name});
   mapping _fieldnames = ([]);
-
   foreach(fields;; .Field f)
    if(f->field_name)
    {
@@ -372,7 +383,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 
   if(_where && sizeof(_where)) 
     query = sprintf(multi_select_query, (_fields * ", "), 
-      (Array.uniq(_tables) * ", "), (_where * " AND "));
+      (Array.uniq(_tables) * ", "), (_where * default_operator));
 
   else
     query = sprintf(multi_select_nowhere_query, (_fields * ", "), 

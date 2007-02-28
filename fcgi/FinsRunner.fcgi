@@ -63,11 +63,11 @@ void request_loop(int sock, int id)
 #ifdef RUN_THREADED
       key = lock->lock();
 #endif
-      request->write("Status: 500 Server Error\r\n");
-      request->write("Content-type: text/html\r\n\r\n");
-      request->write("<h1>Error 500: Internal Server Error</h1>");
-      request->write("The server was unable to parse your request.\n");
-      request->write("<p>" + describe_backtrace(e));                  
+      request->real_write("Status: 500 Server Error\r\n");
+      request->real_write("Content-type: text/html\r\n\r\n");
+      request->real_write("<h1>Error 500: Internal Server Error</h1>");
+      request->real_write("The server was unable to parse your request.\n");
+      request->real_write("<p>" + describe_backtrace(e));                  
       request->finish();
 #ifdef RUN_THREADED
       key = 0;

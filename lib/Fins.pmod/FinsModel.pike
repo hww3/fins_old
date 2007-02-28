@@ -54,7 +54,11 @@ void register_types()
   {
     object d = datatype_definition_module[n](context);
     program di;
-    if(datatype_instance_module && datatype_instance_module[n]) di = datatype_instance_module[n];
+    if(datatype_instance_module && datatype_instance_module[n])
+    {
+	  di = datatype_instance_module[n];
+      di->type_name = n;
+    }
     else
     {
       string dip = "inherit Fins.Model.DirectAccessInstance;\n string type_name = \"" + n + "\";\n"

@@ -166,38 +166,9 @@ static void reflect_definition()
         set_primary_key(field->name);
       }
 
-      if(field->type == "timestamp")
-      {
-        add_field(.TimeStampField(field->name, 0));
-      }
-
-      if(field->type == "date")
-      {
-        add_field(.DateField(field->name, !field->not_null, field->default));
-      }
-
-      if(field->type == "datetime")
-      {
-        add_field(.DateTimeField(field->name, !field->not_null, field->default));
-      }
-
-
-      if(field->type == "time")
-      {
-        add_field(.TimeField(field->name, !field->not_null, field->default));
-      }
-
-      if(field->type == "string")
-      {
-        add_field(.StringField(field->name, field->length, !field->not_null, field->default));
-      }
-
-      if(field->type == "binary_string")
-      {
-        add_field(.BinaryStringField(field->name, field->length, !field->not_null, field->default));
-      }
-
-      if(search(field->name, "_") != -1)
+      if(field->type != "integer" || search(field->name, "_")==-1)
+        do_add_field(field);
+      else  
       {
         Log.info("reflect_definition: have a possible link.");
         context->builder->possible_links += ({ (["obj": this, "field": field]) });
@@ -207,6 +178,38 @@ static void reflect_definition()
 
   if(!primary_key) throw(Error.Generic("No primary key defined for " + instance_name + ".\n"));
 
+}
+
+void do_add_field(mapping field)
+{
+      if(field->type == "integer")
+      {
+        add_field(.IntField(field->name, field->length, !field->not_null, (int)field->default));
+      }
+      if(field->type == "timestamp")
+      {
+        add_field(.TimeStampField(field->name, 0));
+      }
+      else if(field->type == "date")
+      {
+        add_field(.DateField(field->name, !field->not_null, field->default));
+      }
+      else if(field->type == "datetime")
+      {
+        add_field(.DateTimeField(field->name, !field->not_null, field->default));
+      }
+      else if(field->type == "time")
+      {
+        add_field(.TimeField(field->name, !field->not_null, field->default));
+      }
+      else if(field->type == "string")
+      {
+        add_field(.StringField(field->name, field->length, !field->not_null, field->default));
+      }
+      else if(field->type == "binary_string")
+      {
+        add_field(.BinaryStringField(field->name, field->length, !field->not_null, field->default));
+      }
 }
 
 //! define a one to one relationship in which the local object has a field

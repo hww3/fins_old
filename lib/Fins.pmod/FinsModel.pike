@@ -114,8 +114,10 @@ void initialize_links()
       {
         pl->obj->add_field(Model.KeyReference(od->instance_name, pl->field->name, od->instance_name));
         od->add_field(Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(pl->obj->instance_name), pl->obj->instance_name, od->instance_name));
+        context->builder->possible_links -= ({pl});
       }
     }
+
   }
 
   array table_components = ({});
@@ -153,5 +155,11 @@ void initialize_links()
 
       }
     }
+  }
+
+  werror("possible links left over: %O\n", context->builder->possible_links);
+  foreach(context->builder->possible_links;; mapping pl)
+  {
+    pl->obj->do_add_field(pl->field);
   }
 }

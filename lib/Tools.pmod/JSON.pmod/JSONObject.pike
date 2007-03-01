@@ -29,24 +29,20 @@ import Tools.JSON;
 //!     { } [ ] / \ : , 
 //! Numbers may have the 0- (octal) or 0x- (hex) prefix.
 //! 
+//! It is sometimes more convenient and less ambiguous to have a NULL.
+//! JSONObject.NULL.toString() returns "null".
+//! 
+//! 
 //! 
 //! Public Domain 2002 JSON.org
-//! @author JSON.org
-//! @version 0.1
 //!
 //! Ported to C# by Are Bjolseth, teleplan.no
 
 //!The hash map where the JSONObject's properties are kept.
 private mapping myHashMap;
 
-//!A shadow list of keys to enable access by sequence of insertion
+//! A shadow list of keys to enable access by sequence of insertion
 private array myKeyIndexList;
-
-//! 
-//! It is sometimes more convenient and less ambiguous to have a NULL
-//! object than to use C#'s null value.
-//! JSONObject.NULL.toString() returns "null".
-//! 
 
 //!  Construct a JSONObject, either empty, from a JSON datastream, or a pike mapping.
 		static void create(void|string|Tools.JSON.JSONTokener|mapping x)

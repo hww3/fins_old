@@ -7,14 +7,13 @@ import Tools.JSON;
 //!  
 //!  
 //!  Public Domain 2002 JSON.org
-//!  @author JSON.org
-//!  @version 0.1
 //!  
 //!  Ported to C# by Are Bjolseth, teleplan.no
 //!  
 
 //! The index of the next character.
 		private int myIndex;
+
 //! The source string being tokenized.
 		private string mySource;
 

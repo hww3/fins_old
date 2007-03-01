@@ -1,5 +1,3 @@
-import Tools.JSON;
-
 //! A JSONArray is an ordered sequence of values. Its external form is a string
 //! wrapped in square brackets with commas between the values. The internal form
 //! is an object having get() and opt() methods for accessing the values by
@@ -10,7 +8,7 @@ import Tools.JSON;
 //! The constructor can convert a JSON external form string into an
 //! internal form Java object. The toString() method creates an external
 //! form string.
-//
+//!
 //! A get() method returns a value if one can be found, and throws an exception
 //! if one cannot be found. An opt() method returns a default value instead of
 //! throwing an exception, and so is useful for obtaining optional values.
@@ -30,11 +28,10 @@ import Tools.JSON;
 //! Numbers may have the 0- (octal) or 0x- (hex) prefix.
 //!
 //! Public Domain 2002 JSON.org
-//! @author JSON.org
-//! @version 0.1
 //!
 //! Ported to C# by Are Bjolseth, teleplan.no
 
+import Tools.JSON;
 
 //! The ArrayList where the JSONArray's properties are kept.
 private array myArrayList;
@@ -385,23 +382,11 @@ public float optDouble(int i)
 
 //! 
 //! Get the optional int value associated with an index.
-//! Zero is returned if the index is not found,
-//! or if the value is not a number and cannot be converted to a number.
-//! 
-//! @param i
-//! index subscript
-//! @returns
-//! The int value object
-
-//! 
-//! Get the optional int value associated with an index.
 //! The defaultValue is returned if the index is not found,
 //! or if the value is not a number and cannot be converted to a number.
 //! 
 //! @param i
 //! index subscript
-//! @param defaultValue
-//! The default value
 //! @returns
 //! The int value object
 public int optInt(int i)
@@ -454,16 +439,6 @@ public JSONObject optJSONObject(int i)
 }
 
 //! 
-//! Get the optional string value associated with an index. It returns an
-//! empty string if there is no value at that index. If the value
-//! is not a string and is not null, then it is coverted to a string.
-//! 
-//! @param i
-//! index subscript
-//! @returns
-//! A String value
-
-//! 
 //! Get the optional string associated with an index.
 //! The defaultValue is returned if the key is not found.
 //! 
@@ -490,13 +465,6 @@ public string optString(int i, string|void defaultValue)
  * public JSONArray put(double val)
  * public JSONArray put(int val)		
  */
-//! 
-//! Append an object value.
-//! 
-//! @param val
-//! An object value.  The value should be a Boolean, Double, Integer, JSONArray, JSObject, or String, or the JSONObject.NULL object
-//! @returns
-//! this (JSONArray)
 
 /*
  * OMITTED:

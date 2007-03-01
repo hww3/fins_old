@@ -71,6 +71,7 @@ void register_types()
   }
 }
 
+//!
 string get_repo_class()
 {
   if(repository == Fins.Model.module) return "Fins.Model.module";

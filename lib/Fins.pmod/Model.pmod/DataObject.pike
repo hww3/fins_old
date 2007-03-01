@@ -44,6 +44,7 @@ string instance_name = "";
 string table_name = "";
 mapping new_object_data = ([]);
 array field_order = ({});
+
 //!
 void create(.DataModelContext c)
 {
@@ -85,7 +86,7 @@ void define();
 void post_define();
 
 //! set the default operator to use when querying on multiple fields.
-//  valid values are @[Fins.Model.OPER_AND] and @[Fins.Model.OPER_OR].
+//!  valid values are @[Fins.Model.OPER_AND] and @[Fins.Model.OPER_OR].
 void set_operator(int oper_type)
 {
   if(oper_type == Fins.Model.OPER_AND)

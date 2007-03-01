@@ -15,16 +15,19 @@ class objects(object repository)
   }
 }
 
+//!
 .DataObject get_object(string name)
 {
    return object_definitions[name];
 }
 
+//!
 program get_instance(string name)
 {
    return instance_definitions[name];
 }
 
+//!
 void add_object_type(.DataObject t, program i)
 {
    Log.debug("adding type def: %O", t->instance_name);
@@ -32,21 +35,25 @@ void add_object_type(.DataObject t, program i)
    instance_definitions[t->instance_name] = i;
 }
 
+//!
 void find_all(string|object ot)
 {
   find(ot, ([]));
 }
 
+//!
 object get_scaffold_controller(object model_component)
 {
   return scaffold_controllers[model_component];
 }
 
+//!
 void set_scaffold_controller(object model_component, object controller)
 {
    scaffold_controllers[model_component] = controller;
 }
 
+//!
 array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
 {
    object o;
@@ -58,7 +65,7 @@ array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
    return get_instance(o->instance_name)(UNDEFINED)->find(qualifiers, criteria);
 }
 
-
+//!
 .DataObjectInstance find_by_id(string|object ot, int id)
 {
    object o;
@@ -70,6 +77,7 @@ array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
    return  get_instance(o->instance_name)(id);
 }
 
+//!
 .DataObjectInstance find_by_alternate(string|object ot, mixed id)
 {
    object o;
@@ -84,6 +92,7 @@ array find(string|object ot, mapping qualifiers, void|.Criteria criteria)
    return find(o, ([o->alternate_key->name: id]))[0];
 }
 
+//!
 .DataObjectInstance new(string|object ot)
 {
    object o;

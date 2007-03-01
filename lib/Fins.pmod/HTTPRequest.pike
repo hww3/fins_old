@@ -28,6 +28,6 @@ void parse_request()
 }
 
 //!
-public string remoteaddr = "";
+string remoteaddr = "";
 
 //#endif

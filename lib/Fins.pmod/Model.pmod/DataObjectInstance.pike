@@ -49,7 +49,7 @@ string get_type()
 }
 
 //! set the default operator to use when querying on multiple fields.   
-//  valid values are @[Fins.Model.OPER_AND] and @[Fins.Model.OPER_OR].
+//!  valid values are @[Fins.Model.OPER_AND] and @[Fins.Model.OPER_OR].
 void set_operator(int o)
 {
   master_object->set_operator(o);

@@ -5,6 +5,7 @@ constant type = "";
 int is_shadow = 0;
 
 optional string get_editor_string(mixed|void value, void|.DataObjectInstance i);
+optional mixed from_form(mapping value, void|.DataObjectInstance i);
 
 mixed validate(mixed value, void|.DataObjectInstance i)
 {

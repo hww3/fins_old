@@ -156,17 +156,22 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
   rv += "<table>\n";
 
   mapping val = item->get_atomic();
+  array fields = ({});
 
   foreach(model_object->field_order; int key; mixed value)
   {	
 	string ed = make_value_editor(value->name, val[value->name], item);
     if(ed)
+    {
       rv += "<tr><td><b>" + make_nice(value->name) + "</b>: </td><td> " + ed + "</td></tr>\n"; 
+      fields += ({value->name});
+    }
   }
  
   rv += "</table>\n";
   rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\">";
   rv += "<input name=\"___save\" value=\"Save\" type=\"submit\"> ";
+  rv += "<input name=\"___fields\" value=\"" + (fields*",") + "\" type=\"hidden\"> ";
   rv += "</form>";
   response->set_data(rv);
 }
@@ -198,21 +203,37 @@ e=catch{
   }
 
   response->redirect(action_url(update) + "?id=" + request->variables->id);
-  
-  m_delete(request->variables, "___save");
-  m_delete(request->variables, "id");
-  
+    
   mapping v = ([]);
 
-  foreach(request->variables; string key; string value)
+  array inds = indices(request->variables);
+
+  foreach(request->variables->___fields/","; int ind; string field)
   {
-	if(has_prefix(key, "__old_value_")) continue;
 	
-	if(request->variables["__old_value_" + key] != value)
+	array elements = glob("_" + field + "__*", indices);
+	
+	if(sizeof(elements))
 	{
-		Log.debug("Scaffold: " + key + " in " + model_object->instance_name + " changed.");
-		v[key] = value;
+		foreach(elements;; string e)
+		{
+			if(request->variables["__old_value_" + e] != request->variables[e])
+			{
+				Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
+				mapping x = ([]);
+				foreach(elements;; string e)
+				  x[e[(sizeof(field)+3)..]] = request->variables[e];
+				v[field] = model_object->fields[field]->from_form(x, item);
+				break;
+			}
+		}
 	}
+    else	
+ 	  if(request->variables["__old_value_" + field] != request->variables[field])
+	  {
+		Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
+		v[field] = request->variables[field];
+	  }
   }
 
   item->set_atomic(v);

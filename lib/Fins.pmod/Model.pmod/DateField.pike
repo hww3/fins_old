@@ -93,6 +93,20 @@ mixed validate(mixed value, void|.DataObjectInstance i)
 
 string get_editor_string(void|mixed value, void|.DataObjectInstance i)
 {
-	return (i?("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value->format_ymd() + "\">"):"")+
-		"<input type=\"text\" name=\"" + name + "\" value=\"" + (i?value->format_ymd():"") + "\">";
+	string rv = "";
+	
+	foreach(({"month", "month_day", "year"});; string part)
+	{
+		if(i)
+  		  rv += "<input type=\"hidden\" name=\"\"__old_value_" + name + "__" + part + "\" value=\"" + value[part + "_no"]() + "\">";
+		rv += "<input type=\"text\" name=\"_" + name + "__" + part + "\" value=\"" + (i?value[part + "_no"]():"") + "\">";
+	}
+
+	return rv;
+}
+
+
+mixed from_form(mapping value, void|.DataObjectInstance i)
+{
+	return Calendar.now();
 }

@@ -3,7 +3,7 @@ import Tools.Logging;
 Fins.Template.Template __layout;
 
 //!
-//!  Impliments a controller which automatically provides a view based on
+//!  Implements a controller which automatically provides a view based on
 //!  the position of the request within the tree
 //!
 //!  it is the same as the standard controller, except that event functions
@@ -12,6 +12,24 @@ Fins.Template.Template __layout;
 //!  void event(Fins.Request request, Fins.Response response,
 //!                  Fins.Template.View view, mixed ... args);
 //!
+//!  the view parameter provided will be loaded from a file according to the 
+//!  event's name and position in the controller tree. for example, event "foo"
+//!  within controller "bar" would cause the template "foo/bar" to be loaded.
+//!
+//!  @note
+//!   If you have an event without a template, an error will not be thrown, but a view will not be set or provided.
+//!
+//!  DocController now sets a layout from the following locations, if present:
+//!
+//!  templates/layouts/path/to/controller.phtml
+//!  templates/layouts/application.phtml
+//!
+//!  if a layout is set and detected, you must reload to change the layout file name (ie, switching from application.phtml to controller.phtml). 
+//!  templates detected and changed will be reloaded if the file content changes.
+//!
+//!  use the <%yield%> macro in your layout file to insert the template specified.
+//!
+//!  additionally you may simply use Template.View->set_layout() instead, in your own non DocController apps.
 
 static mixed `[](mixed a)
 {

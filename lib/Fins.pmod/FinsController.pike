@@ -2,11 +2,19 @@ inherit Fins.FinsBase;
 import Protocols.HTTP.Server;
 import Tools.Logging;
 
-//! methods have this signature:
+//! this is the base Controller class in Fins. The controller is used to map incoming requests
+//! to functions that are called to handle the request.
+//!
+//! event methods have this signature:
 //!
 //!  void func(Fins.Request request, Fins.Response response, 
 //!            mixed ... args);
 //!
+//! where func is the name of the event that will trigger the event function to be called.
+//!
+//! @note
+//!   When using FinServe, an event that produces no output will return a "unable to find a handler" 
+//!   404 error. The event will still fire, though.
 
 //! set this to zero to avoid session redirects
 constant __uses_session = 1;
@@ -72,12 +80,29 @@ static object load_controller(string controller_name)
   return o;
 }
 
+
+//! adds a filter to be run after the event method for a request is called.
+//! 
+//! @param filter
+//!   either an object that provides a method "filter" or a function. either the 
+//!   function "filter" in the object, or the method itself should have the following
+//!   signature:
+//!
+//!  int filter(object request, object response, mixed ... args)
 //!
 static void before_filter(function|object filter)
 {
   __before_filters += ({ filter });
 }
 
+//! adds a filter to be run after the event method for a request is called.
+//! 
+//! @param filter
+//!   either an object that provides a method "filter" or a function. either the 
+//!   function "filter" in the object, or the method itself should have the following
+//!   signature:
+//!
+//!  int filter(object request, object response, mixed ... args)
 //!
 static void after_filter(function|object filter)
 {
@@ -96,11 +121,16 @@ static void create(.Application a)
 }
 
 //! the preferred method from which controllers are loaded.
+//!
+//! @seealso
+//!  @[load_controller]
 static void start()
 {
 }
 
-//!
+//! causes control of the application to be yielded to any connected breakpoint client.
+//! the breakpoint client may examine and or modify the request or response before passing
+//! control back to the application.
 static void breakpoint(string desc, object id, object response, 
                            void|mapping args)
 {
@@ -109,6 +139,7 @@ static void breakpoint(string desc, object id, object response,
               (args?args:([])));
 }
 
+//! returns a string containing the absolute URI to the desired event function or controller.
 static string action_url(function|object action)
 {
   return app->url_for_action(action);

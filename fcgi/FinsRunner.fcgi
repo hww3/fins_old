@@ -26,7 +26,7 @@ int start_listener(int port)
   }
   else
   {
-    sock = Public.Web.FCGI.open_socket(":" + port, 128);
+    sock = Public.Web.___FCGI.open_socket(":" + port, 128);
   }
 #ifdef RUN_THREADED
   for (int i = 0; i < 8; i++) {
@@ -47,7 +47,7 @@ void request_loop(int sock, int id)
   lock = Thread.Mutex();  
   key = lock->lock();
 #endif
-  object request = Public.Web.FCGI.FCGI(sock);
+  object request = Public.Web.___FCGI.FCGI(sock);
 #ifdef RUN_THREADED
   key = 0;
 #endif

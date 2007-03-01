@@ -5,7 +5,7 @@
 
 import Tools.Logging;
 
-string default_operator = "AND";
+string default_operator = " AND ";
 
 mapping default_values = ([]);
 

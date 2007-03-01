@@ -211,7 +211,7 @@ e=catch{
   foreach(request->variables->___fields/","; int ind; string field)
   {
 	
-	array elements = glob("_" + field + "__*", indices);
+	array elements = glob( "_" + field + "__*", inds);
 	
 	if(sizeof(elements))
 	{

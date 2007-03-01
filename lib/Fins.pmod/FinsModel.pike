@@ -57,7 +57,7 @@ void register_types()
     if(datatype_instance_module && datatype_instance_module[n])
     {
 	  di = datatype_instance_module[n];
-      di->type_name = n;
+          if(di && !di->type_name) {werror("%O\n", di);/*di->type_name = n;*/}
     }
     else
     {

@@ -36,7 +36,11 @@ static void create(string _name, int(0..1) _null, mixed|void _default)
 
 object decode(string value, void|.DataObjectInstance i)
 {
-   return Calendar.parse(output_unit_format, value);
+   object x;
+   catch {
+     x = Calendar.parse(output_unit_format, value);
+   };
+   return x;
 }
 
 string encode(mixed value, void|.DataObjectInstance i)
@@ -95,11 +99,11 @@ string get_editor_string(void|mixed value, void|.DataObjectInstance i)
 {
 	string rv = "";
 	
-	foreach(({"month", "month_day", "year"});; string part)
+	foreach(({"month_no", "month_day", "year_no"});; string part)
 	{
-		if(i)
-  		  rv += "<input type=\"hidden\" name=\"\"__old_value_" + name + "__" + part + "\" value=\"" + value[part + "_no"]() + "\">";
-		rv += "<input type=\"text\" name=\"_" + name + "__" + part + "\" value=\"" + (i?value[part + "_no"]():"") + "\">";
+		if(value)
+  		  rv += "<input type=\"hidden\" name=\"\"__old_value_" + name + "__" + part + "\" value=\"" + value[part]() + "\">";
+		rv += "<input type=\"text\" name=\"_" + name + "__" + part + "\" value=\"" + (value?value[part]():"") + "\">";
 	}
 
 	return rv;

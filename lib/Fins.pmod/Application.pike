@@ -167,7 +167,14 @@ static object low_load_controller(string controller_name)
   if(!has_suffix(cn, ".pike"))
     cn = cn + ".pike";
 
-  foreach( ({""}) + master()->pike_program_path;; string p)
+  array program_path;
+
+  if(master()->get_program_path)
+    program_path = master()->get_program_path();
+  else
+    program_path = master()->pike_program_path();
+
+  foreach( ({""}) + program_path;; string p)
   {
     f = Stdio.append_path(p, cn);
     object stat = file_stat(f);
@@ -191,6 +198,7 @@ static object low_load_controller(string controller_name)
   object o = c(this);
   o->__controller_name = cn;
   o->__controller_source = f;
+
   return o;
 }
 
@@ -362,6 +370,7 @@ public mixed handle_http(.Request request)
   }
 
   array x = get_event(request);
+
   if(sizeof(x)>=1)
     event = x[0];
 

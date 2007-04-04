@@ -2,7 +2,7 @@ inherit "module";
 inherit "caudiumlib";
 inherit "socket";
 
-constant cvs_version= "$Id: fins_application.pike,v 1.4 2006-07-26 00:58:41 jnt Exp $";
+constant cvs_version= "$Id: fins_application.pike,v 1.5 2007-04-04 04:03:06 hww3 Exp $";
 constant thread_safe=1;
 
 
@@ -22,12 +22,20 @@ constant module_unique = 0;
 int redirects, accesses, errors, dirlists;
 int puts, deletes, mkdirs, moves, chmods, appes;
 
+int running_isolated = 0;
+object findprog_handler;
+Thread.Queue queue;
+Thread.Thread handler_thread;
+
 static int do_stat = 1;
 
-string loaderstub = "import Tools.Logging; Fins.Application load_application(string finsdir, string project, string config_name){  \n"
-" Fins.Application application;  application = Fins.Loader.load_app(combine_path(finsdir, project), config_name);\n"
-//" Log.loglevel = Log.INFO|Log.WARN|Log.ERROR|Log.CRITICAL;\n"
-" return application;}";
+string loaderstub = #"
+import Tools.Logging; 
+Fins.Application load_application(string finsdir, string project, string config_name){  \n
+Fins.Application application;  application = Fins.Loader.load_app(combine_path(finsdir, project), config_name);
+  // Log.loglevel = Log.INFO|Log.WARN|Log.ERROR|Log.CRITICAL;
+ return application;}
+";
 
 
 string status()
@@ -66,6 +74,13 @@ void create()
          "The name of the application configuration file to use."
         );
 
+  defvar("run_isolated", 0, "Run application in isolation?", TYPE_FLAG,
+         "Should the Fins application be run in isolation? This allows"
+         "multiple instances of the same Fins application to run "
+         "concurrently, however it uses threads, and has implications "
+         "for applications that spawn new threads."
+        );
+
   
 }
 
@@ -76,7 +91,7 @@ int dirperm, fileperm, default_umask;
 
 void start (int cnt, object conf) {
     module_dependencies(conf, ({ "123session" }));
-werror("STARTING!\n");
+
   if(!QUERY(finsdir) || has_prefix(QUERY(finsdir), "NONE"))
   {
     return;
@@ -95,18 +110,41 @@ werror("STARTING!\n");
   }
 
   if(QUERY(finsdir))
-{
-    add_module_path(combine_path(QUERY(finsdir), "lib"));
+  {
+    object findprog_handler;
 
-  werror("added to module path: %O\n", combine_path(QUERY(finsdir), "lib"));
-}
+    if(QUERY(run_isolated) &&  master()->findprog_handler)
+    {
+      werror("Running Isolated...\n");
+      running_isolated++;
+      findprog_handler = master()->findprog_handler();
+      master()->add_handler_for_key(this, findprog_handler);
+      findprog_handler->pike_module_path = master()->pike_module_path;
+      findprog_handler->pike_include_path = master()->pike_include_path;
+      findprog_handler->pike_program_path = master()->pike_program_path;
+      findprog_handler->add_program_path("whee");
+    }
+    else
+    {
+       findprog_handler = master();
+    }
+
+    findprog_handler->add_module_path(combine_path(QUERY(finsdir), "lib"));
+    werror("added to module path: %O\n", combine_path(QUERY(finsdir), "lib"));
+  }
   else
   {
     report_error("Fins: No Fins directory specified.\n");
     return;
   }
 
-  call_out(low_load_app, 0.1);
+
+  if(running_isolated)
+  {
+    Thread.Thread(low_load_app);
+  }
+  else
+    call_out(low_load_app, 0.1);
 
 }
 
@@ -114,7 +152,12 @@ void low_load_app()
 {
   program loader;
   mixed e;
- master()->set_inhibit_compile_errors(0);
+  if(running_isolated)
+  {
+    master()->add_thread_for_key(this, master()->current_thread());
+  }
+
+  master()->set_inhibit_compile_errors(0);
   e = catch(loader = compile_string(loaderstub));
 
   if(e)
@@ -140,9 +183,58 @@ void low_load_app()
   {
     report_error("Fins: An error occurred while loading the application " + QUERY(appname) + ".\n");
     werror(describe_backtrace(e));
+    return;
   }
   application = a;
 
+  if(running_isolated)
+  {
+    queue = Thread.Queue();
+    handler_thread = Thread.Thread(worker_thread);
+  }
+
+}
+
+void worker_thread()
+{
+  master()->add_thread_for_key(this, master()->current_thread());
+
+  mixed err;
+
+  do
+  {
+    object id;
+    err = catch 
+    {
+      id = queue->read();
+      if(!id)
+      {
+        werror("shutting down worker thread.\n");
+        return;
+      }
+      mixed res = application->handle_request(id);
+      id->misc->__fins_response = res;
+      id->misc->__fins_waiter->signal();
+
+
+    };
+
+    if(err)
+    {
+      id->misc->__fins_err = err;
+      id->misc->__fins_waiter->signal();
+    }
+
+  } while(1);
+
+  // TODO: we need to figure out how to shut down the worker
+  //       when the module is reloaded.
+
+}
+
+void stop()
+{
+  if(queue) queue->write(0);
 }
 
 string query_location()
@@ -155,7 +247,19 @@ mixed find_file( string f, object id )
   TRACE_ENTER("find_file(\""+f+"\")", 0);
   if(application)
   {
-    return application->handle_request(id);
+    if(running_isolated)
+    {
+      object lock = Thread.Mutex();
+      object key = lock->lock();
+      id->misc->__fins_waiter = Thread.Condition();
+      queue->write(id);
+      id->misc->__fins_waiter->wait(key);
+      if(id->misc->__fins_err)
+        throw(id->misc->fins_err);
+      return id->misc->__fins_response;
+    }
+    else
+      return application->handle_request(id);
   }
   else return 0;
 }

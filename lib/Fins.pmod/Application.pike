@@ -172,7 +172,7 @@ static object low_load_controller(string controller_name)
   if(master()->get_program_path)
     program_path = master()->get_program_path();
   else
-    program_path = master()->pike_program_path();
+    program_path = master()->pike_program_path;
 
   foreach( ({""}) + program_path;; string p)
   {

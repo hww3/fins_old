@@ -5,6 +5,10 @@ string datadir;
 
 int initialize()
 {
+
+  if(!Sql.Provider.SQLite.__version || (float)(Sql.Provider.SQLite.__version) < 1.7)
+    error("Your version of SQL.Provider.SQLite is too old. You must use at least version 1.7.\n");
+
   sql->query("PRAGMA full_column_names=1");
 
   if((int)(context->app->config["model"]["datadir"]))

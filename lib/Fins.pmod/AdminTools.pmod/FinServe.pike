@@ -20,6 +20,7 @@ Session.SessionManager session_manager;
 
 Fins.Application app;
 Protocols.HTTP.Server.Port port;
+program server = Protocols.HTTP.Server.Port;
 
 #if constant(_Protocols_DNS_SD)
 Protocols.DNS_SD.Service bonjour;
@@ -127,7 +128,7 @@ int do_startup()
   else
   {
 
-    port = Protocols.HTTP.Server.Port(handle_request, (int)my_port);  
+    port = server(handle_request, (int)my_port);  
     port->request_program = Fins.HTTPRequest;
 
 #if constant(_Protocols_DNS_SD)

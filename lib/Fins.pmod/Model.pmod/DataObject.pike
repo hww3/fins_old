@@ -167,7 +167,7 @@ static void reflect_definition()
         set_primary_key(field->name);
       }
 
-      if(field->type != "integer" || search(field->name, "_")==-1)
+      else if(field->type != "integer" || search(field->name, "_")==-1)
         do_add_field(field);
       else  
       {

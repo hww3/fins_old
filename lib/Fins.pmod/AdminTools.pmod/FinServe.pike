@@ -133,7 +133,7 @@ int do_startup()
 
 #if constant(_Protocols_DNS_SD)
     bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + "/" + config_name + ")",
-                     "_http._tcp", "", my_port);
+                     "_http._tcp", "", (int)my_port);
 
     Log.info("Advertising this application via Bonjour.");
 #endif

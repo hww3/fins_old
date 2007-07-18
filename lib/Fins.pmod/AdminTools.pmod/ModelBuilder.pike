@@ -3,6 +3,9 @@ import Tools.Logging;
 string project;
 string config_name = "dev";
 
+// obj->is_resolv_joinnode
+// obj->joined_modules[0]->dirname
+
 void create(array args)
 {
 	int argc;

@@ -286,5 +286,3 @@ void load_application()
 
     Log.debug( "Created new session sid='%s' host='%s'",ssid,request->remoteaddr);
   }
-
-

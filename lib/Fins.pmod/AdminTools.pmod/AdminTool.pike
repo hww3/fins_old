@@ -26,6 +26,10 @@ int main(int argc, array argv)
        meth = Fins.AdminTools.FinServe;       
        break;
 
+     case "model":
+       meth = Fins.AdminTools.ModelBuilder;       
+       break;
+
      default:
        werror("unknown command %s.\n", command);
        return 1;

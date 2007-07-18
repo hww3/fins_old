@@ -39,17 +39,12 @@ object bp_key;
 object breakpoint_cond;
 object bp_lock = Thread.Mutex();
 object breakpoint_hilfe;
-object bpbe = Pike.Backend();
-object bpbet = Thread.Thread(lambda(){ do { catch(bpbe()); } while (1); });
-
-
-
+object bpbe;
+object bpbet;
 
 //!
 static void create(.Configuration _config)
 {
-  
-
   config = _config;
   static_dir = Stdio.append_path(config->app_dir, "static");
 
@@ -66,6 +61,7 @@ static void create(.Configuration _config)
 #if constant(Fins.Helpers.Filters.Compress)
 //  _gzfilter = Fins.Helpers.Filters.Compress();
 #endif
+
   start();
 }
 
@@ -121,8 +117,11 @@ public object get_processor(string protocol)
 
 static void load_breakpoint()
 {
-  if(config["app"] && config["app"]["breakpoint"])
+  if(config["app"] && (int)config["app"]["breakpoint"])
   {
+    bpbe = Pike.Backend();
+    bpbet = Thread.Thread(lambda(){ do { catch(bpbe()); } while (1); });
+
     if((int)config["app"]["breakpoint_port"]) breakpoint_port_no = 
                                              (int)config["app"]["breakpoint_port"];
     Log.info("Starting Breakpoint Server on port %d.", breakpoint_port_no);

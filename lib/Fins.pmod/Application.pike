@@ -312,6 +312,7 @@ private object lookingfor(object o, object in)
   return 0;
 }
 
+//!
 string url_for_action(function|object action)
 {
   string path;
@@ -352,6 +353,7 @@ public mixed handle_request(.Request request)
 
 }
 
+//!
 public mixed handle_http(.Request request)
 {
   function event;
@@ -690,6 +692,12 @@ array get_event(.Request request)
   return response;
 }
 
+//! trigger a breakpoint in execution
+//! @param desc
+//!   description of breakpoint, to be passed to breakpoint client
+//! @param state
+//!   a mapping of data to make available for query at breakpoint client
+//!
 public void breakpoint(string desc, mapping state)
 {
   if(config["app"] && config["app"]["breakpoint"])

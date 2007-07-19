@@ -31,7 +31,7 @@ string config_name = "dev";
 int go_background = 0;
 void print_help()
 {
-	werror("Help: fin_serve [-p portnum|--port=portnum|--hilfe] [-d]  appname configname\n");
+	werror("Help: fin_serve [-p portnum|--port=portnum|--hilfe] [-c|--config configname] [-d]  appname\n");
 }
 
 array tool_args;
@@ -52,6 +52,7 @@ int main(int argc, array(string) argv)
 
   foreach(Getopt.find_all_options(argv,aggregate(
     ({"port",Getopt.HAS_ARG,({"-p", "--port"}) }),
+    ({"config",Getopt.HAS_ARG,({"-c", "--config"}) }),
 #if constant(fork)
     ({"daemon",Getopt.NO_ARG,({"-d"}) }),
 #endif /* fork() */
@@ -63,6 +64,10 @@ int main(int argc, array(string) argv)
       {
 		case "port":
 		my_port = opt[1];
+		break;
+		
+		case "config":
+		config_name = opt[1];
 		break;
 		
 		case "hilfe":
@@ -85,7 +90,6 @@ int main(int argc, array(string) argv)
 
 
   if(argc>=2) project = argv[1];
-  if(argc>=3) config_name = argv[2];
 
   int x = do_startup();
 

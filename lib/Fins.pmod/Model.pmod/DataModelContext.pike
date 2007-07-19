@@ -17,6 +17,7 @@ object app;
 
 //!
 Sql.Sql sql;
+string sql_url;
 
 string _sprintf(mixed ... args)
 {

@@ -27,9 +27,11 @@ static void create(Fins.Application a)
 
 void load_model()
 {
-   object s = Sql.Sql(config->get_value("model", "datasource"));
+   string url = config->get_value("model", "datasource");
+   object s = Sql.Sql(url);
    object d = Fins.Model.DataModelContext();
    d->sql = s;
+   d->sql_url = url;
    d->debug = (int)(config->get_value("model", "debug"));
    d->repository = repository;
    d->cache = cache;

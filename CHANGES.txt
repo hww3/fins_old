@@ -1,5 +1,6 @@
 Version 0.1
 
+- added get_session_by_id() to Fins.Request.
 - added "sessionid" macro
 - pike -x fins start now uses -c|--config= configname, instead of the 
     config being specified using the last command line argument

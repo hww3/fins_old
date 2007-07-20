@@ -6,6 +6,14 @@ string controller_path;
 string controller_name;
 string event_name;
 
+function get_session_by_id = _get_session_by_id;
+
+//!
+static mapping _get_session_by_id(string SessionID)
+{
+  return ([]);
+}
+
 //!
 string get_compress_encoding()
 {

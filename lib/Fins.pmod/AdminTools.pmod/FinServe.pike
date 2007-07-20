@@ -186,6 +186,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
   {
     string ssid=request->cookies[session_cookie_name]||request->variables[session_cookie_name];
     Session.Session sess = session_manager->get_session(ssid);
+    request->get_session_by_id = session_manager->get_session;
     request->misc->_session = sess;
     request->misc->session_id = sess->id;
     request->misc->session_variables = sess->data;

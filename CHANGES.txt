@@ -1,5 +1,9 @@
 Version 0.1
 
+- added "sessionid" macro
+- pike -x fins start now uses -c|--config= configname, instead of the 
+    config being specified using the last command line argument
+- added pike -x fins model add tablename... to create model stub classes
 - added DataObject, DataObjectInstance->set_operator() to set the operator
     used during find operations on multiple fields.
 - Added Fins.Model.InCriteria()

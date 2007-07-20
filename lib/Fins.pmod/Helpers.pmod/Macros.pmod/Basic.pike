@@ -1,5 +1,10 @@
 inherit .Base;
 
+string simple_sessionid(Fins.Template.TemplateData data, mapping|void args)
+{
+  return data->get_request()->misc->session_id;
+}
+
 //! args: var
 string simple_macro_capitalize(Fins.Template.TemplateData data, mapping|void args)
 {

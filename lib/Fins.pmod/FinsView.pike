@@ -78,17 +78,23 @@ public string render_partial(string view, mapping data,
 }
 
 //!
-public Template.View get_view(string tn)
+public Template.View low_get_view(program templateType, string tn)
 {
   object t;
 
-  t = low_get_template(default_template, tn);
+  t = low_get_template(templateType, tn);
 
   object d = default_data();
 
   d->set_data((["config": config])); 
 
   return Template.View(t, d);
+
+}
+
+public Template.View get_view(string tn)
+{
+  return low_get_view(default_template, tn);
 }
 
 //!

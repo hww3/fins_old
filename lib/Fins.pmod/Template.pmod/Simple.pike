@@ -35,9 +35,7 @@ string _sprintf(mixed ... args)
 static void create(string _templatename, 
          .TemplateContext|void context_obj, int|void _is_layout)
 {
-   context = context_obj;
-
-   context->type = object_program(this);
+   ::create(_templatename, context_obj);
 
    if(_is_layout) is_layout = 1;
    auto_reload = (int)(context->application->config["view"]["reload"]);

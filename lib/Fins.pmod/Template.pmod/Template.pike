@@ -3,7 +3,11 @@ import Tools.Logging;
 static .TemplateContext context;
 
 //!
-static void create(string template, .TemplateContext c);
+static void create(string template, .TemplateContext c)
+{
+   context = context_obj;
+   context->type = object_program(this);
+}
 
 //!
 public string render(.TemplateData d);

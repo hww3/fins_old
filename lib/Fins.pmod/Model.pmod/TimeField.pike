@@ -28,6 +28,9 @@ string encode(mixed value, void|.DataObjectInstance i)
 
 string get_editor_string(void|mixed value, void|.DataObjectInstance i)
 {
-	return (i?("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value->format_tod() + "\">" ):"") +
-		"<input type=\"text\" name=\"" + name + "\" value=\"" + (i?value->format_tod():"") + "\">";
+  string rv = "";
+  if(i) rv +=("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value->format_tod() + "\">" );
+  rv += "<input type=\"text\" name=\"" + name + "\" value=\"";
+  if(i) rv+=value->format_tod();
+  rv += "\">";
 }

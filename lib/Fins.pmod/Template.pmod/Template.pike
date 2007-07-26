@@ -5,7 +5,7 @@ static .TemplateContext context;
 //!
 static void create(string template, .TemplateContext c)
 {
-   context = context_obj;
+   context = c;
    context->type = object_program(this);
 }
 

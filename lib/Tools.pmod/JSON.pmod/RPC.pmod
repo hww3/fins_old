@@ -12,7 +12,7 @@ string encode_call(string method, mixed id, mixed ... params)
 }
 
 //!
-string encode_response(mixed id, mixed result)
+string encode_response(mixed id, void|mixed result)
 {
   mapping request = ([]);
 
@@ -48,34 +48,34 @@ string encode_notification(string method, mixed ... params)
 //!
 Message decode_jsonrpc(string json)
 {
-  mapping r = .JSONObject(json);
+  mapping r = (mapping).JSONObject(json);
 
   if(r->error)
   {
     // error
-    return .Error(r);
+    return eError(r);
   }
   else if(r->result)
   {
     // response
-    return .Result(r);
+    return Response(r);
   }
   else if(has_index(r, "id"))
   {
     if(!r->id && zero_type(r->id))
     {
       // notification
-      return .Notification(r);
+      return Notification(r);
     }
     else
     {
       // request
-    return .Request(r);
+    return Request(r);
     }
   }
   else 
   {
-    throw(Error.Generic("Invalid JSON-RPC message.\n");
+    throw(Error.Generic("Invalid JSON-RPC message.\n"));
   }
 }
 
@@ -100,7 +100,7 @@ class Response
 }
 
 //!
-class Error
+class eError
 {
   inherit Message;
   constant type = "error";

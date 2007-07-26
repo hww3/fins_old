@@ -59,7 +59,7 @@ static void create(.Configuration _config)
   load_controller();
 
 #if constant(Fins.Helpers.Filters.Compress)
-//  _gzfilter = Fins.Helpers.Filters.Compress();
+  _gzfilter = Fins.Helpers.Filters.Compress();
 #endif
 
   start();
@@ -670,21 +670,27 @@ array get_event(.Request request)
   }
 
   response->set_header("Cache-Control", "max-age=" + (3600*24));
-  response->set_header("Expires", (Calendar.Second() + (3600*24))->format_http());
+  response->set_header("Expires", (Calendar.Second() + (3600*48))->format_http());
   response->set_type(Protocols.HTTP.Server.filename_to_type(basename(fn)));
   response->set_file(Stdio.File(fn));
 
-  if (response->get_type() && _gzfilter) {
-    int pos = search(response->get_type(), "/");
-    if (has_suffix(response->get_type(), "xml")) {
+  int _handled;
+  string t = response->get_type();
+
+  // content compression
+  if (t && _gzfilter) {
+    if (has_prefix(t, "text") || has_suffix(t, "xml")) {
+      _handled = 1;
       _gzfilter->filter(request, response);
     }
-    else if (pos != -1) {
-      switch(response->get_type()[0..pos-1]) {
-	case "text":
+
+    int pos = search(t, "/");
+
+    if (!_handled && pos != -1) {
+      switch(t[0..pos-1]) {
 	case "application":
-//	case "chemical":
-	_gzfilter->filter(request, response);
+   	  _gzfilter->filter(request, response);
+        break;
       }
     }
   }

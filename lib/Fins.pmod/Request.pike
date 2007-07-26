@@ -51,16 +51,18 @@ string get_compress_encoding()
       ae += ({encode});
       aq += ({q});
     }
-
     sort(aq, ae);
     ae = reverse(ae);
-
-    foreach(ae;;string desired)
-      if(search(available, desired) != -1)
-      {
-        encode = desired;
-        break;
-      }
+     // we prefer gzip.
+     if(search(ae, "gzip") != -1)
+       encode = "gzip";
+     else
+      foreach(ae;;string desired)
+        if(search(available, desired) != -1)
+        {
+          encode = desired;
+          break;
+        }
 #ifdef DEBUG
     werror("SELECTED ENCODING: %O\n", encode);
 #endif

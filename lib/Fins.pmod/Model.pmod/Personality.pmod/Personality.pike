@@ -94,6 +94,8 @@ mapping map_field(mapping t)
     case "time":
       field->type = "time";
       break;
+    case "date":
+      field->type = "date";
     case "datetime":
       field->type = "datetime";
       break;

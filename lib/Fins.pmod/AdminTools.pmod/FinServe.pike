@@ -3,6 +3,8 @@
 import Fins;
 import Tools.Logging;
 
+object logger;
+
 constant default_port = 8080;
 constant my_version = "0.1";
 int my_port;
@@ -131,7 +133,7 @@ int do_startup()
   }
   else
   {
-
+    logger = Tools.Logging.get_logger("access");
     port = server(handle_request, (int)my_port);  
     port->request_program = Fins.HTTPRequest;
 
@@ -177,7 +179,7 @@ void session_startup()
 
 void handle_request(Protocols.HTTP.Server.Request request)
 {
-  Log.debug("Received %O", request);
+  logger->debug("Received %O", request);
   mixed r;
 
   // Do we have either the session cookie or the PSESSIONID var?

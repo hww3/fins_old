@@ -16,6 +16,9 @@ constant SORT_DESCEND = -1;
 //! an array with each element being an array with 2 elements: a field name and 
 //! the sort order  @[SORT_ASCEND] or @[SORT_DESCEND]. Note that any 
 //! criteria provided to a find operation will override this setting.
+//!
+//! @example
+//!   array default_sort_fields = ({ ({"name", SORT_DESCEND}) });
 array default_sort_fields;
 
 string _default_sort_order_cached;

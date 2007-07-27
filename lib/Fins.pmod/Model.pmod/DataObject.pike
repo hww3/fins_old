@@ -7,11 +7,14 @@ import Tools.Logging;
 
 string default_operator = " AND ";
 
-constant SORT_ORDER_ASCEND = 1;
-constant SORT_ORDER_DESCEND = -1;
+//!
+constant SORT_ASCEND = 1;
+
+//!
+constant SORT_DESCEND = -1;
 
 //! an array with each element being an array with 2 elements: a field name and the sort order
-//! @[SORT_ORDER_ASCEND] or @[SORT_ORDER_DESCEND].
+//! @[SORT_ASCEND] or @[SORT_DESCEND].
 array default_sort_fields;
 string _default_sort_order_cached;
 
@@ -439,9 +442,11 @@ void generate_sort_order()
 	array x = ({});
 	foreach(default_sort_fields;; array f)
 	{
-		x += (f[0] + " " + (f[1]==1?"ASC":"DESC"));
+		x += ({f[0] + " " + (f[1]==1?"ASC":"DESC")});
 	}
 	o += x*", ";
+	
+	_default_sort_order_cached = o;
 }
 
 void load(mixed id, .DataObjectInstance i, int|void force)

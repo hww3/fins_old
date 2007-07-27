@@ -13,9 +13,11 @@ constant SORT_ASCEND = 1;
 //!
 constant SORT_DESCEND = -1;
 
-//! an array with each element being an array with 2 elements: a field name and the sort order
-//! @[SORT_ASCEND] or @[SORT_DESCEND].
+//! an array with each element being an array with 2 elements: a field name and 
+//! the sort order  @[SORT_ASCEND] or @[SORT_DESCEND]. Note that any 
+//! criteria provided to a find operation will override this setting.
 array default_sort_fields;
+
 string _default_sort_order_cached;
 
 mapping default_values = ([]);
@@ -406,12 +408,12 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
     query = sprintf(multi_select_nowhere_query, (_fields * ", "), 
       table_name);
 
+  // criteria always overrides default sorting.
   if(criteria)
   {
      query += " " + criteria->get("", this);
   }
-
-  if(default_sort_fields)
+  else if(default_sort_fields)
   {
     if(!_default_sort_order_cached)
       generate_sort_order();	

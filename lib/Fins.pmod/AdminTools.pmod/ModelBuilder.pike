@@ -112,18 +112,21 @@ int run()
   if(!commands) 
   {
 	Log.error("Error: no command given.");
+        print_help();
 	return 1;
   }
 
   if(commands[0] != "add")
   {
 	Log.error("Error: bad command " + commands[0] + " given.");
+        print_help();
 	return 1;
   }
 
   if(sizeof(commands) < 2)
   {
 	Log.error("Error: no tables given.");
+        print_help();
 	return 1;
   }
   

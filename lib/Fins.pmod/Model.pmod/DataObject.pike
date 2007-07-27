@@ -7,6 +7,14 @@ import Tools.Logging;
 
 string default_operator = " AND ";
 
+constant SORT_ORDER_ASCEND = 1;
+constant SORT_ORDER_DESCEND = -1;
+
+//! an array with each element being an array with 2 elements: a field name and the sort order
+//! @[SORT_ORDER_ASCEND] or @[SORT_ORDER_DESCEND].
+array default_sort_fields;
+string _default_sort_order_cached;
+
 mapping default_values = ([]);
 
 //!
@@ -400,6 +408,13 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
      query += " " + criteria->get("", this);
   }
 
+  if(default_sort_fields)
+  {
+    if(!_default_sort_order_cached)
+      generate_sort_order();	
+    query += (" " + _default_sort_order_cached);
+  }
+
   if(context->debug) werror("QUERY: %O\n", query);
   
   array qr = context->sql->query(query);
@@ -416,6 +431,17 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
   }
 
   return results;
+}
+
+void generate_sort_order()
+{
+	string o = "ORDER BY ";
+	array x = ({});
+	foreach(default_sort_fields;; array f)
+	{
+		x += (f[0] + " " + (f[1]==1?"ASC":"DESC"));
+	}
+	o += x*", ";
 }
 
 void load(mixed id, .DataObjectInstance i, int|void force)

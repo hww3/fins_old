@@ -1,5 +1,7 @@
 Version 0.1
 
+- automatically set alternate key during model configuration for data sources 
+    that provide unique constraint information (mysql in pike 7.7). 
 - added get_session_by_id() to Fins.Request.
 - added "sessionid" macro
 - pike -x fins start now uses -c|--config= configname, instead of the 

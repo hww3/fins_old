@@ -183,34 +183,38 @@ static void reflect_definition()
 
 void do_add_field(mapping field)
 {
+	object f;
+	
       if(field->type == "integer")
       {
-        add_field(.IntField(field->name, field->length, !field->not_null, (int)field->default));
+        add_field(f=.IntField(field->name, field->length, !field->not_null, (int)field->default));
       }
       if(field->type == "timestamp")
       {
-        add_field(.TimeStampField(field->name, 0));
+        add_field(f=.TimeStampField(field->name, 0));
       }
       else if(field->type == "date")
       {
-        add_field(.DateField(field->name, !field->not_null, field->default));
+        add_field(f=.DateField(field->name, !field->not_null, field->default));
       }
       else if(field->type == "datetime")
       {
-        add_field(.DateTimeField(field->name, !field->not_null, field->default));
+        add_field(f=.DateTimeField(field->name, !field->not_null, field->default));
       }
       else if(field->type == "time")
       {
-        add_field(.TimeField(field->name, !field->not_null, field->default));
+        add_field(f=.TimeField(field->name, !field->not_null, field->default));
       }
       else if(field->type == "string")
       {
-        add_field(.StringField(field->name, field->length, !field->not_null, field->default));
+        add_field(f=.StringField(field->name, field->length, !field->not_null, field->default));
       }
       else if(field->type == "binary_string")
       {
-        add_field(.BinaryStringField(field->name, field->length, !field->not_null, field->default));
+        add_field(f=.BinaryStringField(field->name, field->length, !field->not_null, field->default));
       }
+   if(field->flags->unique && ! alternate_key)
+     set_alternate_key(f);
 }
 
 //! define a one to one relationship in which the local object has a field

@@ -3,16 +3,46 @@ static mapping loggers = ([]);
 string config_file_path;
 mapping config_values = ([]);
 mapping appenders = ([]);
+mapping config_variables = ([]);
+static array _rk;
+static array _rv;
 
+object default_logger = Tools.Logging.Log.Logger();
+//! 
+//!  configuration file is standard ini-style.
+//!
+//!  [logger.logger_name] <-- configures a logger named "logger_name"
+//!  appender=appender_name <-- use the appender "appender_name"
+//!
+//!  [appender.appender_name] <-- configures an appender named "appender_name"
+//!  class=Some.Pike.Class <-- use the specified pike class for appending
+//!
+//!  example: Tools.Logging.Log.FileAppender uses argument "file" to specify logging file
+//!
+//!  if the configuring application specifies any, you may use substitution variables
+//!  in the form ${varname} in your configuration values.
+//!
 static void create()
 {
   create_default_appender();
-  create_logger("default");
 }
 
 static void create_default_appender()
 {
-  appenders->default = Tools.Logging.Log.FileAppender();
+  appenders->default = Tools.Logging.Log.ConsoleAppender();
+}
+
+object get_default_logger()
+{
+	return default_logger;
+}
+
+void set_config_variables(mapping vars)
+{
+   config_variables =  mkmapping(("${" + indices(vars)[*])[*] + "}", values(vars));
+   _rk = indices(config_variables);
+   _rv = values(config_variables);
+    //werror("%O\n", config_variables);
 }
 
 void set_config_file(string configfile)
@@ -27,6 +57,11 @@ void set_config_file(string configfile)
   }
 
   load_config_file();
+  if(config_values["logger.default"])
+  {
+    default_logger->configure(config_values["logger.default"]);
+    Tools.Logging.Log.configure(config_values["logger.default"]);
+  }
 }
 
 void load_config_file()
@@ -41,7 +76,7 @@ void load_config_file()
 
 Tools.Logging.Log.Logger get_logger(string loggername)
 {
- werror("get_logger(%s)\n", loggername);
+ // werror("get_logger(%s)\n", loggername);
   if(!loggers[loggername]) 
     loggers[loggername] = create_logger(loggername);
 
@@ -53,7 +88,10 @@ Tools.Logging.Log.Logger create_logger(string loggername)
   object l = create_logger_from_config(loggername);
 
   // go with a default.
-  if(!l) l = Tools.Logging.Log.Logger();
+  if(!l) {	
+    werror("no defined logger " + loggername + ", using default.");
+   l = Tools.Logging.Log.Logger();
+  }
   return l;
 }
 
@@ -63,10 +101,10 @@ Tools.Logging.Log.Logger create_logger_from_config(string loggername)
 
   if(!cx) return 0;
 
+  cx = insert_config_variables(cx);
+
   object l = Tools.Logging.Log.Logger(cx);
   
-  array appenders = get_appenders(arrayp(cx->appender)?cx->appender:({cx->appender}));
-  l->set_appenders(appenders);
   return l;
 }
 
@@ -76,7 +114,7 @@ array get_appenders(array config)
 
   array a = ({});
 
-  werror("get_appenders(%O)\n", config);
+  //werror("get_appenders(%O)\n", config);
 
   foreach(config;; string appender_config)
   {
@@ -88,7 +126,6 @@ array get_appenders(array config)
   return a;
 }
 
-
 object get_appender(string config)
 {
   if(!appenders[config])
@@ -96,6 +133,9 @@ object get_appender(string config)
     mapping c = config_values["appender." + config];
   
     if(!c) return 0;
+
+    c = insert_config_variables(c);
+
     object ap;
     program apc = master()->resolv(c["class"]);
     if(!apc) 
@@ -109,5 +149,15 @@ object get_appender(string config)
   }
 
   return appenders[config];
+}
 
+mapping insert_config_variables(mapping c)
+{
+    if(_rk)
+ 	  foreach(c; string k; string v)
+	  {
+	 	 c[k] = replace(v, _rk, _rv);
+	  }
+	//werror("%O\n", c);
+	return c;
 }

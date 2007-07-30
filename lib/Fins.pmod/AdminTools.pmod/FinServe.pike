@@ -3,6 +3,7 @@
 import Fins;
 import Tools.Logging;
 
+object access_logger;
 object logger;
 
 constant default_port = 8080;
@@ -117,10 +118,11 @@ int do_startup()
 
   Log.info("FinServe loading application " + project + " using configuration " + config_name);
   load_application();
+  logger=Tools.Logging.get_default_logger();
 
   app->__fin_serve = this;
 
-  Log.info("Application " + project + " loaded.");
+  logger->info("Application " + project + " loaded.");
 
   if(hilfe_mode)
   {
@@ -133,7 +135,7 @@ int do_startup()
   }
   else
   {
-    logger = Tools.Logging.get_logger("access");
+    access_logger = Tools.Logging.get_logger("access");
     port = server(handle_request, (int)my_port);  
     port->request_program = Fins.HTTPRequest;
 
@@ -141,10 +143,10 @@ int do_startup()
     bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + "/" + config_name + ")",
                      "_http._tcp", "", (int)my_port);
 
-    Log.info("Advertising this application via Bonjour.");
+    logger->info("Advertising this application via Bonjour.");
 #endif
 
-    Log.info("Application ready for business.");
+    logger->info("Application ready for business.");
     return -1;
   }
 }
@@ -179,7 +181,7 @@ void session_startup()
 
 void handle_request(Protocols.HTTP.Server.Request request)
 {
-  logger->debug("Received %O", request);
+  access_logger->debug("Received %O", request);
   mixed r;
 
   // Do we have either the session cookie or the PSESSIONID var?
@@ -249,7 +251,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
 
   if(e)
   {
-    Log.exception("Internal Server Error!", e);
+    logger->exception("Internal Server Error!", e);
     mapping response = ([]);
     response->error=500;
     response->type="text/html";
@@ -291,5 +293,5 @@ void load_application()
     }
     response->redirect(req);
 
-    Log.debug( "Created new session sid='%s' host='%s'",ssid,request->remoteaddr);
+    logger->debug( "Created new session sid='%s' host='%s'",ssid,request->remoteaddr);
   }

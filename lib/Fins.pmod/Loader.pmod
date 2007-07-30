@@ -11,11 +11,15 @@ Fins.Application load_app(string app_dir, string config_name)
   master()->add_program_path(combine_path(app_dir, "classes")); 
   master()->add_module_path(combine_path(app_dir, "modules")); 
 
-  Fins.Configuration config = load_configuration(app_dir, config_name);
-
   string logcfg = combine_path(app_dir, "config", "log_" + config_name+".cfg");
+  Tools.Logging.set_config_variables((["appdir": app_dir, "config": config_name ]));
+
+  Log.info("Loading log configuration from " + logcfg + ", if present.");
+
   if(file_stat(logcfg))
     Tools.Logging.set_config_file(logcfg);
+
+  Fins.Configuration config = load_configuration(app_dir, config_name);
 
   program p;
 

@@ -26,12 +26,37 @@ mapping log_strs = ([
   CRITICAL: "CRITICAL"
 ]);
 
+mapping strs_log = ([
+  "DEBUG": DEBUG, 
+  "INFO": INFO,
+  "WARN": WARN,
+  "ERROR": ERROR,
+  "CRITICAL": CRITICAL
+]);
+
+
 static void create(mapping|void config)
 {
   // NOTE: we probably shouldn't do this...
 //  if(!config) werror("Logger.create(%O)\n", backtrace());
   if(!config)
-    set_appenders(({ .FileAppender() }));
+  {
+    set_appenders(({ .ConsoleAppender() }));
+    set_level(DEBUG);
+  }
+  else configure(config);
+}
+
+void configure(mapping config)
+{
+//	werror("Logger.configure: %O\n", config);
+  if(config->level)
+    set_level(strs_log[config->level]);
+  else
+    set_level(DEBUG);
+
+  array appenders = Tools.Logging["get_appenders"](arrayp(config->appender)?config->appender:({config->appender}));
+  set_appenders(appenders);
 }
 
 public void set_appenders(array a)
@@ -42,8 +67,8 @@ public void set_appenders(array a)
 
 static void do_msg(int level, string m, mixed|void ... extras)
 {
-//werror("DEBUG: %s, %O\n", m, extras);
-  if(!(loglevel & level))
+//werror("DEBUG: %d, %d\n", level, loglevel);
+  if(level < loglevel)
     return;
 
   if(extras && sizeof(extras))

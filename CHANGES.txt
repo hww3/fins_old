@@ -1,5 +1,7 @@
 Version 0.1
 
+- Applications are created with default logging configurations for each
+    tier, with a debug and access log.
 - Added Tools.String.named_sprintf().
 - added DataObject->default_sort_fields which configures the order in 
     which multiple objects of a given type are sorted.

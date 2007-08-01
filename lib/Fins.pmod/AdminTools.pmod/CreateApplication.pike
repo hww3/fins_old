@@ -22,6 +22,27 @@ reload=1
 class=application
 ";
 
+string log_config_contents = 
+#"
+[logger.default]
+appender=default_console
+appender=default_debuglog
+
+[logger.access]
+appender=access_log
+
+[appender.default_console]
+class=Tools.Logging.Log.ConsoleAppender
+
+[appender.default_debuglog]
+class=Tools.Logging.Log.FileAppender
+file=${appdir}/logs/debug.log
+
+[appender.access_log]
+file=${appdir}/logs/access.log
+class=Tools.Logging.Log.FileAppender
+";
+
 string model_contents =
 #"
 inherit Fins.FinsModel;
@@ -114,6 +135,7 @@ int run()
   foreach(({"dev", "test", "prod"});; string tier)
   {
     Stdio.write_file(tier + ".cfg", customize("#\n# this is the configuration for " + upper_case(tier) + ".\n#\n" + config_contents));
+    Stdio.write_file("log_" + tier + ".cfg", customize("#\n# this is the logging configuration for " + upper_case(tier) + ".\n#\n" + log_config_contents));
   }
 
   cd("../classes");

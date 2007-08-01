@@ -112,7 +112,6 @@ int do_startup()
 #endif /* fork() */
 
   Log.info("FinServe starting on port " + my_port);
-
   Log.info("Starting Session Manager.");
   call_out(session_startup, 0);
 
@@ -146,6 +145,7 @@ int do_startup()
     logger->info("Advertising this application via Bonjour.");
 #endif
 
+    logger->info("FinServe listening on port " + my_port);
     logger->info("Application ready for business.");
     return -1;
   }

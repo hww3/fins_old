@@ -541,21 +541,22 @@ array get_event(.Request request)
 	    {
 	      not_args += ({"index"});
 	      event = ci;
-          request->event_name = "index";
+              request->event_name = "index";
 	    }
 	    else
 	    {
-	      Log.info("cc: %O", cc);
+	      Log.info("Controller has no index method: %O", cc);
 	    }
 	    break;
       }
       else
       {
-	    // what should we do?
-	    if(event)
+	// what should we do?
+	if(event)
     	{
-	      args+=({comp});
-	    }
+	  args+=({comp}); 
+        }
+        // otherwise, we've probably got a double slash somewhere (//)
       }
     }
     // ok, the component was not empty.

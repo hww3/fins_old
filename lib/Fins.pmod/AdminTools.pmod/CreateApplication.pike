@@ -47,10 +47,6 @@ string model_contents =
 #"
 inherit Fins.FinsModel;
 
-object repository = __APPNAME__.Repo;
-object datatype_definition_module = __APPNAME__.Model;
-object datatype_instance_module = __APPNAME__.Objects;
-
 ";
 
 string view_contents = 
@@ -80,11 +76,6 @@ void index(object id, object response, mixed ... args)
 
   response->set_view(v);
 }
-";
-
-string repo_contents =
-#"
-inherit Fins.Model.Repository;
 ";
 
 string start_contents =
@@ -151,7 +142,7 @@ int run()
   cd(newappname + ".pmod");
   mkdir("Objects.pmod");
   mkdir("Model.pmod");  
-  Stdio.write_file("Repo.pmod", customize(repo_contents));
+//  Stdio.write_file("Repo.pmod", customize(repo_contents));
 
   cd("../..");
 

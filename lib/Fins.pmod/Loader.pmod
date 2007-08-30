@@ -21,6 +21,12 @@ Fins.Application load_app(string app_dir, string config_name)
 
   Fins.Configuration config = load_configuration(app_dir, config_name);
 
+  object o;
+  if(o = master()->resolv(config->app_name + ".Model"))
+    Fins.Model.set_model_module(o);
+  if(o = master()->resolv(config->app_name + ".Objects"))
+    Fins.Model.set_object_module(o);
+
   program p;
 
   cn = "application";

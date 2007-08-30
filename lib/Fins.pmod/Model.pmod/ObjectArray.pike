@@ -73,7 +73,7 @@ int(0..1) _is_type(string t)
 
 void get_contents()
 {
-  contents = parentobject->master_object->context->repository["find"](otherobject, ([ field->otherkey :
+  contents = Fins.Model.old_find(otherobject, ([ field->otherkey :
                                   (int) parentobject->get_id()]));
 
   changed = 0;

@@ -25,7 +25,7 @@ mixed decode(string value, void|.DataObjectInstance i)
     return .ObjectArray(this, i);
   else
   {
-    array r = i->master_object->context->repository->find(otherobject, ([ otherkey : (int) i->get_id()]), criteria);
+    array r = Fins.Model.old_find(otherobject, ([ otherkey : (int) i->get_id()]), criteria);
     if(r && sizeof(r))
       return r[0];
     else return 0;

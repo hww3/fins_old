@@ -5,12 +5,12 @@ inherit FinsBase;
 //! an object whose indices are the (mandatory) data type definitions for your model
 //!
 //! this value is used for automatic type registration.
-object datatype_definition_module = 0;
+//object datatype_definition_module = 0;
 
 //! an object whose indices are the (optional) classes that are used for direct data access
 //!
 //! this value is used for automatic type registration.
-object datatype_instance_module = 0;
+//object datatype_instance_module = 0;
 
 //!
 object context;
@@ -47,18 +47,22 @@ void load_model()
 //!
 void register_types()
 {
-  if(!datatype_definition_module)
+  if(!repository->get_object_module())
   {
     Log.warn("Using automatic model registration, but no datatype_definition_module set. Skipping.");
     return;
   }
-  foreach(indices(datatype_definition_module);; string n)
+  object im = repository->get_object_module();
+  object mm = repository->get_model_module();
+
+ werror("mm: %O\n", mm);
+  foreach(mkmapping(indices(mm), values(mm));string n; program c)
   {
-    object d = datatype_definition_module[n](context);
+    object d = c(context);
     program di;
-    if(datatype_instance_module && datatype_instance_module[n])
+    if(im && im[n])
     {
-	  di = datatype_instance_module[n];
+	  di = im[n];
           if(di && !di->type_name) {werror("%O\n", di);/*di->type_name = n;*/}
     }
     else

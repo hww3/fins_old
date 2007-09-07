@@ -2,21 +2,12 @@ import Fins;
 import Tools.Logging;
 inherit FinsBase;
 
-//! an object whose indices are the (mandatory) data type definitions for your model
-//!
-//! this value is used for automatic type registration.
-//object datatype_definition_module = 0;
-
-//! an object whose indices are the (optional) classes that are used for direct data access
-//!
-//! this value is used for automatic type registration.
-//object datatype_instance_module = 0;
-
 //!
 object context;
 
 //! an object that provides Model repository service, by default
-//! this will be @[Fins.Model].
+//! this will be @[Fins.Model]. Do not change this, as the app loader
+//! won't use this value, causing the model to break.
 object repository = Fins.Model.module;
 
 static void create(Fins.Application a)

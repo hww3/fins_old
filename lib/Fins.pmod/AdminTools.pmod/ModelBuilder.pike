@@ -70,21 +70,21 @@ int run()
 	return 1;
   }
 
-  if(!app->model->datatype_definition_module)
+  if(!app->model->repository->get_model_module())
   {
 	Log.error("No datatype definition module specified.");
 	return 1;	
   }
   else
-    ddm = app->model->datatype_definition_module;
+    ddm = app->model->repository->get_model_module();
 
-  if(!app->model->datatype_instance_module)
+  if(!app->model->repository->get_object_module())
   {
 	Log.warn("No datatype instance module specified, so we won't work with that.");
 //	return 1;	
   }
   else
-    dim = app->model->datatype_instance_module;
+    dim = app->model->repository->get_object_module();
 
   Log.debug("Model is connected to " + app->model->context->sql_url + ".");
   Log.debug("Checking Model module directories.");

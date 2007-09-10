@@ -91,9 +91,9 @@ void set_scaffold_controller(object model_component, object controller)
 }
 
 //!
-void find_all(string|object ot)
+array find_all(string|object ot)
 {
-  old_find(ot, ([]));
+  return old_find(ot, ([]));
 }
 
 // find() is in module.pmod.
@@ -108,6 +108,19 @@ void find_all(string|object ot)
      o = ot;
    if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
    return  get_instance(o->instance_name)(id);
+}
+
+//!
+array find_by_query(string|program|object ot, string query)
+{
+   object o;
+   if(!objectp(ot))
+     o = get_object(ot);
+   else
+     o = ot;
+   if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
+
+   return old_find(o, (["0": Fins.Model.Criteria(query)]));
 }
 
 //!

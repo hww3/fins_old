@@ -31,7 +31,8 @@ int main(int argc, array argv)
        break;
 
      default:
-       werror("unknown command %s.\n", command);
+       werror("unknown command \"%s\".\n", command);
+       werror("valid commands include: create, install, start, model\n");
        return 1;
        break;
    }

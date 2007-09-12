@@ -18,6 +18,8 @@ class objects(object repository)
   }
 }
 
+function(string|program|object,mapping,void|.Criteria:array) _find = old_find;
+
 //!
 array old_find(string|program|object ot, mapping qualifiers, void|.Criteria criteria)
 {

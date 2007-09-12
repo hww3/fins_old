@@ -91,6 +91,12 @@ string describe(object i)
   if(e) return "unidentified";
 }
 
+//!
+.PrimaryKeyField get_primary_key()
+{
+  return primary_key;
+}
+
 //! define the object's fields and relationships
 //! if not defined, the object will attempt to auto-configure itself
 //! from the table definition. see the Fins automatic model configuration

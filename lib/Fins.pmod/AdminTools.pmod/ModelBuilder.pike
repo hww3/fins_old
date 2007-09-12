@@ -152,9 +152,19 @@ int run()
 
   // okay, by this point, we should have valid tables.
   string reponame = sprintf("%O", app->model->repository);
-  if(app->model->repository != master()->resolv(reponame))
+Log.debug("repo name is %O\n", reponame);
+  object repo =  master()->resolv(reponame);
+
+  if(object_program(repo) == master()->joinnode)
+  {
+    Log.debug("repo is a joinnode.");
+    repo = repo["module"];
+  }
+
+  if(app->model->repository != repo)
   {
     Log.error("You're either not using a module for your repository, or you're playing sprintf() games, aren't you?");
+    Log.error("Expected %O, got %O", (app->model->repository),  master()->resolv(reponame));
     return 1;
     /*
 	reponame = Fins.Util.get_path_for_program(object_program(app->model->repository));

@@ -32,7 +32,7 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
 
   rv += "<a href=\"" + action_url(new) + "\">new " + make_nice(model_object->instance_name) + "</a><p>";
-  object items = model->repository->find(model_object, ([]));
+  object items = model->repository->_find(model_object, ([]));
   if(!sizeof(items))
   {
     rv += "No " + 
@@ -169,7 +169,7 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
   }
  
   rv += "</table>\n";
-  rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\">";
+  rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> ";
   rv += "<input name=\"___save\" value=\"Save\" type=\"submit\"> ";
   rv += "<input name=\"___fields\" value=\"" + (fields*",") + "\" type=\"hidden\"> ";
   rv += "</form>";
@@ -208,9 +208,13 @@ e=catch{
 
   array inds = indices(request->variables);
 
+  int should_update;
+
   foreach(request->variables->___fields/","; int ind; string field)
   {
-	
+     // we don't worry about the primary key.
+     if(item->master_object->get_primary_key()->name == field) continue; 
+
 	array elements = glob( "_" + field + "__*", inds);
 	
 	if(sizeof(elements))
@@ -220,6 +224,7 @@ e=catch{
 			if(request->variables["__old_value_" + e] != request->variables[e])
 			{
 				Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
+				should_update = 1;
 				mapping x = ([]);
 				foreach(elements;; string e)
 				  x[e[(sizeof(field)+3)..]] = request->variables[e];
@@ -228,17 +233,27 @@ e=catch{
 			}
 		}
 	}
-    else	
+        else	
  	  if(request->variables["__old_value_" + field] != request->variables[field])
 	  {
 		Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
+		should_update = 1;
 		v[field] = request->variables[field];
 	  }
   }
 
-  item->set_atomic(v);
+  mixed err;
 
-  response->flash("msg", "update successful.");
+  if(should_update)
+  {
+    err = catch(item->set_atomic(v));
+    if(err)
+      response->flash("msg", "Error: " + err[0]);
+    else
+      response->flash("msg", "Update successful.");
+  }
+  else
+    response->flash("msg", "Nothing to update.");
 
 };
 if(e)
@@ -313,7 +328,7 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
   }
 
   rv += "</table>\n";
-  rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\">";
+  rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> ";
   rv += "<input name=\"___save\" value=\"Save\" type=\"submit\">";
   rv += "</form>";
   response->set_data(rv);

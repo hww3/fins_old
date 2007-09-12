@@ -523,11 +523,7 @@ array get_event(.Request request)
       // the current controller.
       if((i+1) == sizeof(r))
       {
-  	    if(event)
-	    {
-	      Log.error("undefined situation! we have to fix this: got %O when we shouldn't have got anything\n", event);
-		  Log.error("a function event here usually means the programmer has a trailing / on the request.");
-	    }
+  	    if(event) ; // do nothing
 	    else if(cc && (ci = cc["index"]))
 	    {
 	      not_args += ({"index"});
@@ -548,6 +544,7 @@ array get_event(.Request request)
 	  args+=({comp}); 
         }
         // otherwise, we've probably got a double slash somewhere (//)
+        // and can ignore it.
       }
     }
     // ok, the component was not empty.

@@ -60,6 +60,8 @@ int run()
 
   Log.info("ModelBuilder module running.");
 
+  project = combine_path(getcwd(), project);
+
   Fins.Application app = Fins.Loader.load_app(project, config_name);  
 
   Log.debug("Application loaded.");

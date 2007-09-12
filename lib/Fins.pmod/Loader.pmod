@@ -1,5 +1,7 @@
 import Tools.Logging;
 
+//! @param app_dir
+//!   the full path to the application directory.
 Fins.Application load_app(string app_dir, string config_name)
 {
   string cn;
@@ -20,6 +22,7 @@ Fins.Application load_app(string app_dir, string config_name)
     Tools.Logging.set_config_file(logcfg);
 
   Fins.Configuration config = load_configuration(app_dir, config_name);
+  Log.info("Preparing to load application " + config->app_name + ".");
 
   object o;
   if(o = master()->resolv(config->app_name + ".Model"))

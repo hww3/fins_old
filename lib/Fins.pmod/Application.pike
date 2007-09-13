@@ -323,7 +323,7 @@ string url_for_action(function|object action, array|void args, mapping|void vars
   }
 
   if(args)
-    path+= ("/" + (args*"/"));
+    path = combine_path(path, args*"/");
 
   if(vars)
   {
@@ -331,7 +331,6 @@ string url_for_action(function|object action, array|void args, mapping|void vars
     foreach(vars; string k;string v)
       e += ({(k + "=" + v)});
     path += "?" + (e*"&");
-      
   }
 
   return path;

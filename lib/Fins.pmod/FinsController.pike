@@ -140,7 +140,7 @@ static void breakpoint(string desc, object id, object response,
 }
 
 //! returns a string containing the absolute URI to the desired event function or controller.
-static string action_url(function|object action)
+static string action_url(function|object action, array|void args, mapping|void vars)
 {
-  return app->url_for_action(action);
+  return app->url_for_action(action, args, vars);
 }

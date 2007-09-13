@@ -305,22 +305,35 @@ private object lookingfor(object o, object in)
 }
 
 //!
-string url_for_action(function|object action)
+string url_for_action(function|object action, array|void args, mapping|void vars)
 {
   string path;
-  if(path = action_path_cache[action])
-    return path;
-
-  if(functionp(action))
+  if(!(path = action_path_cache[action]))
   {
-    object c = function_object(action);
-    string path1 = get_path_for_controller(c);
-    path = combine_path(context_root, path1, function_name(action));
-  }
-  else
-    path = combine_path(context_root, get_path_for_controller(action));
+    if(functionp(action))
+    {
+      object c = function_object(action);
+      string path1 = get_path_for_controller(c);
+      path = combine_path(context_root, path1, function_name(action));
+    }
+    else
+      path = combine_path(context_root, get_path_for_controller(action));
 
-  action_path_cache[action] = path;
+    action_path_cache[action] = path;
+  }
+
+  if(args)
+    path+= ("/" + (args*"/"));
+
+  if(vars)
+  {
+    array e = ({});
+    foreach(vars; string k;string v)
+      e += ({(k + "=" + v)});
+    path += "?" + (e*"&");
+      
+  }
+
   return path;
 }
 

@@ -44,9 +44,9 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
     rv+="<table>";
     foreach(items;; object item)
     {
-      rv += "<tr><td><a href=\"" + action_url(display) + "?id=" + item->get_id() + "\">view</a> </td> ";
-      rv += " <td> <a href=\"" + action_url(update) + "?id=" + item->get_id() + "\">edit</a> </td><td>";
-      rv += " <td> <a href=\"" + action_url(delete) + "?id=" + item->get_id() + "\">delete</a> </td><td>";
+      rv += "<tr><td><a href=\"" + action_url(display, 0, (["id": item->get_id()])) + "\">view</a> </td> ";
+      rv += " <td> <a href=\"" + action_url(update, 0,  (["id": item->get_id()]))+ "\">edit</a> </td><td>";
+      rv += " <td> <a href=\"" + action_url(delete, 0, (["id": item->get_id()])) + "\">delete</a> </td><td>";
       rv +=  item->describe() + "<br></td></tr>\n";
     }
   }
@@ -64,7 +64,7 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
   rv = "<h1>Viewing " + make_nice(model_object->instance_name) + "</h1>\n";
   if(request->misc->flash && request->misc->flash->msg)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
-  rv += "<a href=\"" + action_url(update) + "?id=" + request->variables->id + "\">edit " + make_nice(model_object->instance_name) + "</a><p>";
+  rv += "<a href=\"" + action_url(update, 0, (["id": request->variables->id])) + "\">edit " + make_nice(model_object->instance_name) + "</a><p>";
 
   rv += "<table>\n";
 
@@ -97,7 +97,7 @@ public void delete(Request id, Response response, mixed ... args)
     response->set_data("error: invalid data.");
     return;	
   }
-  response->redirect(action_url(dodelete) + "?id=" + id->variables->id);
+  response->redirect(action_url(dodelete, 0, (["id": id->variables->id])));
 }
 
 public void dodelete(Request id, Response response, mixed ... args)
@@ -203,7 +203,7 @@ e=catch{
     return;
   }
 
-  response->redirect(action_url(update) + "?id=" + request->variables->id);
+  response->redirect(action_url(display, 0, (["id": request->variables->id])));
     
   mapping v = ([]);
 
@@ -294,7 +294,7 @@ e=catch{
   array inds = indices(request->variables);
 
   int should_update;
-werror("inds: %O\n", inds);
+//werror("inds: %O\n", inds);
 
   foreach(request->variables->___fields/","; int ind; string field)
   {
@@ -323,7 +323,7 @@ werror("inds: %O\n", inds);
 		v[field] = request->variables[field];
 	  }
   }
-werror("setting: %O\n", v);
+//werror("setting: %O\n", v);
   item->set_atomic(v);  
 
   response->redirect(action_url(list));
@@ -434,7 +434,7 @@ string get_view_url(object o)
 
   string url;
 
-  url = action_url(controller->display) + "?id=" + o[o->master_object->primary_key->name];  
+  url = action_url(controller->display, 0, (["id": o[o->master_object->primary_key->name]]));  
 
   return url;
 }

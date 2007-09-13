@@ -38,3 +38,8 @@ string make_qualifier(mixed v)
 {
   return field_name + "=" + encode(v);
 }
+
+string describe(mixed v, void|.DataObjectInstance i)
+{
+  return encode(v, i);
+}

@@ -9,6 +9,8 @@ constant type = "String";
 
 string get_editor_string(void|string value, void|.DataObjectInstance i)
 {
+  if(!value && zero_type(value)) value = "";
+
   if(i)
   {
     if(len < 60) return ("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value + "\">" "<input type=\"text\" size=\"" + len + "\" name=\"" + name + "\" value = \"" + value + "\">");

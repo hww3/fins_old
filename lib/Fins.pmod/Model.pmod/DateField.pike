@@ -9,6 +9,7 @@ inherit .Field;
 
 constant type = "Date";
 
+int includetime=0;
 program unit_program = Calendar.Day;
 function unit_parse = Calendar.ISO.dwim_day;
 string output_unit_format = "%Y-%M-%D";
@@ -55,6 +56,11 @@ string encode(mixed value, void|.DataObjectInstance i)
   return "'" + value->format_ymd() + "'";
 }
 
+string describe(mixed v, void|.DataObjectInstance i)
+{
+  v->format_ymd();
+}
+
 mixed validate(mixed value, void|.DataObjectInstance i)
 {
    if(value == .Undefined && !null && default_value == .Undefined)
@@ -94,23 +100,9 @@ mixed validate(mixed value, void|.DataObjectInstance i)
    return value;
 }
 
-
-string get_editor_string(void|mixed value, void|.DataObjectInstance i)
-{
-	string rv = "";
-	
-	foreach(({"month_no", "month_day", "year_no"});; string part)
-	{
-		if(value)
-  		  rv += "<input type=\"hidden\" name=\"\"__old_value_" + name + "__" + part + "\" value=\"" + value[part]() + "\">";
-		rv += "<input type=\"text\" name=\"_" + name + "__" + part + "\" value=\"" + (value?value[part]():"") + "\">";
-	}
-
-	return rv;
-}
-
-
 mixed from_form(mapping value, void|.DataObjectInstance i)
 {
-	return Calendar.now();
+  object c = Calendar.dwim_day(sprintf("%04d-02d-02d", (int)value->year_no, 
+                (int)value->month_no, (int)value->month_day));
+	return c;
 }

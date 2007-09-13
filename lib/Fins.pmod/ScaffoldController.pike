@@ -31,7 +31,7 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
   if(request->misc->flash && request->misc->flash->msg)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
 
-  rv += "<a href=\"" + action_url(new) + "\">new " + make_nice(model_object->instance_name) + "</a><p>";
+  rv += "<a href=\"" + action_url(new) + "\">New " + make_nice(model_object->instance_name) + "</a><p>";
   object items = model->repository->_find(model_object, ([]));
   if(!sizeof(items))
   {
@@ -47,7 +47,7 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
       rv += "<tr><td><a href=\"" + action_url(display) + "?id=" + item->get_id() + "\">view</a> </td> ";
       rv += " <td> <a href=\"" + action_url(update) + "?id=" + item->get_id() + "\">edit</a> </td><td>";
       rv += " <td> <a href=\"" + action_url(delete) + "?id=" + item->get_id() + "\">delete</a> </td><td>";
-      rv += sprintf("%O<br/>\n", item) + "</td></tr>\n";
+      rv +=  item->describe() + "<br></td></tr>\n";
     }
   }
 
@@ -78,7 +78,8 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
 
   foreach(model_object->field_order; int key; mixed field)
   {
-      rv += "<tr><td><b>" + make_nice(field->name) + "</b>: </td><td> " + describe(field->name, val[field->name]) + "</td></tr>\n"; 
+      rv += "<tr><td><b>" + make_nice(field->name) + "</b>: </td><td> " + 
+	      describe(item, field->name, val[field->name]) + "</td></tr>\n"; 
   }
  
   rv += "</table>\n";
@@ -123,16 +124,16 @@ public void dodelete(Request id, Response response, mixed ... args)
 }
 
 
-string describe(string key, mixed value)
+string describe(object o, string key, mixed value)
 {
   string rv = "";
 
     if(stringp(value) || intp(value))
       rv += value; 
     else if(arrayp(value))
-      rv += describe_array(value);
+      rv += describe_array(o, key, value);
     else if(objectp(value))
-      rv += describe_object(value);
+      rv += describe_object(o, key, value);
 
   return rv;
 }
@@ -264,7 +265,7 @@ if(e)
 public void donew(Fins.Request request, Fins.Response response, mixed ... args)
 {
 mixed e;
-
+mapping v = ([]);
 e=catch{
   if(!(request->variables->___save || request->variables->___cancel))
   {
@@ -289,16 +290,41 @@ e=catch{
 
   
   m_delete(request->variables, "___save");
-  
-  foreach(request->variables; string key; string value)
-  {
-	{
-		Log.debug("Scaffold: " + key + " in " + model_object->instance_name + " changed.");
-		item[key] = value;
-	}
-  }
 
-  item->save();
+  array inds = indices(request->variables);
+
+  int should_update;
+werror("inds: %O\n", inds);
+
+  foreach(request->variables->___fields/","; int ind; string field)
+  {
+     // we don't worry about the primary key.
+     if(item->master_object->get_primary_key()->name == field) continue; 
+
+	array elements = glob( "_" + field + "__*", inds);
+	
+	if(sizeof(elements))
+	{
+		foreach(elements;; string e)
+		{
+				Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
+				should_update = 1;
+				mapping x = ([]);
+				foreach(elements;; string e)
+				  x[e[(sizeof(field)+3)..]] = request->variables[e];
+				v[field] = model_object->fields[field]->from_form(x, item);
+				break;
+		}
+	}
+        else	
+	  {
+		Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
+		should_update = 1;
+		v[field] = request->variables[field];
+	  }
+  }
+werror("setting: %O\n", v);
+  item->set_atomic(v);  
 
   response->redirect(action_url(list));
 
@@ -312,6 +338,7 @@ if(e)
 
 public void new(Fins.Request request, Fins.Response response, mixed ... args)
 {
+  array fields = ({});
   string rv = "";
   rv = "<h1>Creating new " + model_object->instance_name + "</h1>\n";
   if(request->misc->flash && request->misc->flash->msg)
@@ -319,15 +346,20 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
   rv += "<form action=\"" + action_url(donew) + "\" method=\"post\">";
   rv += "<table>\n";
 
+  object no = Fins.Model.new(model_object->instance_name);
+
   foreach(model_object->field_order; int key; mixed value)
   {	
 //	 if(value->is_shadow) continue;
-	  string ed = make_value_editor(value->name);
+	if(value->is_primary_key) continue;
+	  string ed = make_value_editor(value->name, UNDEFINED, no);
       if(ed)
         rv += "<tr><td><b>" + make_nice(value->name) + "</b>: </td><td> " + ed + "</td></tr>\n"; 
+	fields += ({value->name});
   }
 
   rv += "</table>\n";
+  rv += "<input name=\"___fields\" value=\"" + (fields*",") + "\" type=\"hidden\"> ";
   rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> ";
   rv += "<input name=\"___save\" value=\"Save\" type=\"submit\">";
   rv += "</form>";
@@ -344,7 +376,7 @@ string make_value_editor(string key, void|mixed value, void|object o)
   if(model_object->fields[key]->is_shadow)
   {
 	if(o)
-      return describe(key, value);   
+      return describe(o, key, value);   
     else return "";
   }
   else if(model_object->primary_key->name == key)
@@ -362,31 +394,35 @@ string make_value_editor(string key, void|mixed value, void|object o)
     return sprintf("%O", value);
 }
 
-string describe_array(object a)
+string describe_array(object o, string key, object a)
 {
   array x = ({});
   foreach(a;; object v)
   {
     if(objectp(v))
-      x += ({ describe_object(v) });
+      x += ({ describe_object(0, key, v) });
     else x+= ({ (string)v });
   }
 
   return x * ", ";
 }
 
-string describe_object(object o)
+string describe_object(object m, string key, object o)
 {
+  string rv;
   if(o->master_object && o->master_object->alternate_key)
   {
     string link;
     link = get_view_url(o);
     if(link) link = " <a href=\"" + link + "\">view</a>";
     else link = "";
-    return (string)o[o->master_object->alternate_key->name]
+    return (string)o->describe()
      + link;
   }
-
+  else if(o->_cast)
+    return  (string)o;
+  else if(m && (rv = m->describe_value(key, o)))
+    return rv;
   else return sprintf("%O", o);
 }
 

@@ -1,6 +1,7 @@
 inherit .Field;
 
 string name;
+int is_primary_key = 1;
 
 static void create(string _name)
 {

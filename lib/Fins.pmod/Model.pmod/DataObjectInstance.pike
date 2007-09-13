@@ -16,6 +16,16 @@ string _sprintf(mixed ... args)
   return object_type + "(" + get_descriptor() + ")";
 }
 
+string describe_value(string key, mixed value)
+{
+  return master_object->describe_value(key, value, this);
+}
+
+string describe()
+{
+  return get_descriptor();
+}
+
 string get_descriptor()
 {
   if(master_object && master_object->describe)

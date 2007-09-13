@@ -79,6 +79,11 @@ void create(.DataModelContext c)
      post_define();
 }
 
+string describe_value(string key, mixed value, .DataObjectInstance|void i)
+{
+  return fields[key]->describe(value, i);
+}
+
 string describe(object i)
 {
   mixed e = catch{
@@ -604,10 +609,22 @@ int set_atomic(mapping values, int|void no_validation, .DataObjectInstance i)
        fields_set[field] = 1;      
    }
 
-   commit_changes(fields_set, object_data, no_validation, i->get_id(), i);
+   if(i->is_new_object())
+   {
+      mixed key;
+      commit_changes(fields_set, object_data, no_validation, 0, i);
+      key = primary_key->get_id(i);
+      i->set_id(key);
+      i->set_new_object(0);
+      i->set_saved(1);
+      add_ref(i);
+      i->object_data = ([]);
+      i->fields_set = (<>);      
+   }
+   else
+     commit_changes(fields_set, object_data, no_validation, i->get_id(), i);
    load(i->get_id(), i, 1);
 }
-
 
 int set(string field, mixed value, int|void no_validation, .DataObjectInstance i)
 {
@@ -902,7 +919,7 @@ int save(int|void no_validation, .DataObjectInstance i)
    {
       mixed key;
       commit_changes(i->fields_set, i->object_data, no_validation, 0, i);
-   	  key = primary_key->get_id(i);
+      key = primary_key->get_id(i);
       i->set_id(key);
       i->set_new_object(0);
       i->set_saved(1);

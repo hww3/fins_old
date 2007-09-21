@@ -61,3 +61,41 @@ mixed validate(mixed value, void|.DataObjectInstance i)
 
    return value;
 }
+
+
+
+string get_editor_string(mixed|void value, void|.DataObjectInstance i)
+{
+  string desc = "";
+  object sc = context->app->model->repository->get_scaffold_controller(i->master_object);
+
+  if(!value) desc = "not set";
+  else 
+  {
+    if(objectp(value) && value->describe)
+      desc = value->describe();
+    else desc = sprintf("%O", value);
+
+    if(sc && sc->display)
+     desc = sprintf("<a href=\"%s\">%s</a>", 
+      context->app->url_for_action(sc->display, ({}), (["id": i->get_id() ])),  
+      desc);
+  }
+
+werror("other object is %O\n", otherobject);
+  sc = context->app->model->repository->get_scaffold_controller(
+          context->app->model->repository->get_object(otherobject));
+
+  if(sc && sc->pick_one)
+  {
+    desc += sprintf(" <a href='javascript:fire_select(%O)'>select</a>",
+      context->app->url_for_action(sc->pick_one, ({}), (["for": i->master_object->instance_name,"for_id": i->get_id()]))
+     );
+  }
+
+  return desc;
+}
+  
+//optional mixed from_form(mapping value, void|.DataObjectInstance i);
+  
+  

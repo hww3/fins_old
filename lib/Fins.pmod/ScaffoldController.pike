@@ -9,6 +9,15 @@ import Tools.Logging;
 string model_component = 0;
 object model_object;
 
+string get_js()
+{
+  
+  return "<script type=\"text/javascript\">function fire_select(n){"
+    "window.document.forms[0].action = n;"
+    "window.document.forms[0].submit();"
+    "}</script>";
+}
+
 void start()
 {
   if(model_component)
@@ -88,6 +97,62 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
   rv += "</form>";
 
   response->set_data(rv);
+}
+
+public void do_pick(Request id, Response response, mixed ... args)
+{
+  if(!(id->variables->for && id->variables->for_id))
+  {
+    response->set_data("error: invalid data.");
+    return;	
+  }
+
+  object sc = model->repository->get_scaffold_controller(model->repository->get_object(id->variables["for"]));
+  function action;
+
+  if(!(int)id->variables->for_id)
+    action = sc->new;
+  else
+    action = sc->update;
+
+  id->variables->id = id->variables->for_id;
+
+  response->redirect(action_url(action, ({}), id->variables));
+}
+
+public void pick_one(Request id, Response response, mixed ... args)
+{
+  object rv = String.Buffer();
+
+  if(!(id->variables->for && id->variables->for_id))
+  {
+    response->set_data("error: invalid data.");
+    return;	
+  }
+
+  id->variables->old_data = MIME.encode_base64(encode_value(id->variables));
+
+  rv += "<h1>Choose " + make_nice(model_object->instance_name) + "</h1>\n";
+  if(id->misc->flash && id->misc->flash->msg)
+    rv += "<i>" + id->misc->flash->msg + "</i><p>\n";
+  rv += "<form action=\"" + action_url(do_pick) + "\" method=\"post\">";
+
+  array x = Fins.Model.find_all(model_component);
+
+  foreach(x;; object o)
+  {
+    rv += "<input type=\"radio\" name=\"selected_id\" value=\"" 
+            + o->get_id() + "\"> " + o->describe() + "<br/>";
+  }
+
+  rv += "<input type=\"hidden\" name=\"old_data\" value=\"" + id->variables->old_data + "\">";
+  rv += "<input type=\"hidden\" name=\"for\" value=\"" + id->variables["for"] + "\">";
+  rv += "<input type=\"hidden\" name=\"for_id\" value=\"" + id->variables["for_id"] + "\">";
+  rv += "<p/><input type=\"submit\" name=\"__return\" value=\"Cancel\"> ";
+  rv += "<input type=\"submit\" value=\"Select\"></form>";
+
+  response->set_data((string)rv);
+  
 }
 
 public void delete(Request id, Response response, mixed ... args)
@@ -339,8 +404,9 @@ if(e)
 public void new(Fins.Request request, Fins.Response response, mixed ... args)
 {
   array fields = ({});
-  string rv = "";
-  rv = "<h1>Creating new " + model_object->instance_name + "</h1>\n";
+  object rv = String.Buffer();
+  rv += get_js();
+  rv += "<h1>Creating new " + model_object->instance_name + "</h1>\n";
   if(request->misc->flash && request->misc->flash->msg)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
   rv += "<form action=\"" + action_url(donew) + "\" method=\"post\">";
@@ -373,8 +439,10 @@ string make_nice(string v)
 
 string make_value_editor(string key, void|mixed value, void|object o)
 {
-  if(model_object->fields[key]->is_shadow)
+werror("make_value_editor(%O=%O)\n", key, model_object->fields[key]);
+  if(model_object->fields[key]->is_shadow && !model_object->fields[key]->get_editor_string())
   {
+werror("no editor for shadow field " + key + "\n");
 	if(o)
       return describe(o, key, value);   
     else return "";

@@ -173,8 +173,9 @@
 
 
   //! using this method will clear any template set.
-  public void set_data(string data, mixed ... args)
+  public void set_data(string|String.Buffer data, mixed ... args)
   {
+    if(objectp(data)) data = (string)data;
     if(args && sizeof(args))
       response->data = sprintf(data, @args); 
     else  

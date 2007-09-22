@@ -208,6 +208,8 @@ string describe(object o, string key, mixed value)
 
 public void update(Fins.Request request, Fins.Response response, mixed ... args)
 {
+  mapping orig = ([]);
+
   object item = model->repository->find_by_id(model_object, (int)request->variables->id);
 
   if(!item)
@@ -216,9 +218,16 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
     return;
   }
 
+  if(request->variables->old_data)
+  {
+    decode_from_form(decode_value(MIME.decode_base64(request->variables->old_data)), orig);
+    werror("old data: %O\n", orig);
+    orig[request->variables->selected_field] = model->repository->find_by_id(model_object->fields[request->variables->selected_field]->otherobject, (int)request->variables->selected_id);
+  }
 
-  string rv = "";
-  rv = "<h1>Editing " + make_nice(model_object->instance_name) + "</h1>\n";
+  object rv = String.Buffer();
+  rv += get_js();
+  rv += "<h1>Editing " + make_nice(model_object->instance_name) + "</h1>\n";
   if(request->misc->flash && request->misc->flash->msg)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
   rv += "<form action=\"" + action_url(doupdate) + "\" method=\"post\">";
@@ -229,7 +238,7 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
 
   foreach(model_object->field_order; int key; mixed value)
   {	
-	string ed = make_value_editor(value->name, val[value->name], item);
+	string ed = make_value_editor(value->name, orig[value->name] || val[value->name], item);
     if(ed)
     {
       rv += "<tr><td><b>" + make_nice(value->name) + "</b>: </td><td> " + ed + "</td></tr>\n"; 

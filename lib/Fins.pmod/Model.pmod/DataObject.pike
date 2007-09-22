@@ -89,7 +89,7 @@ string describe(object i)
   mixed e = catch{
   if(!i[primary_key->name]) return ("unidentified");
   if(alternate_key)
-    return (alternate_key->name + "=" + (string)i[alternate_key->name]);
+    return (string)i[alternate_key->name];
   return (primary_key->name + "=" + i[primary_key->name]);
   };
 

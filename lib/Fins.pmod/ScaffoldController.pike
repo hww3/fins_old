@@ -116,6 +116,8 @@ public void do_pick(Request id, Response response, mixed ... args)
     action = sc->update;
 
   id->variables->id = id->variables->for_id;
+  m_delete(id->variables, "for_id");
+  m_delete(id->variables, "for");
 
   response->redirect(action_url(action, ({}), id->variables));
 }
@@ -124,14 +126,14 @@ public void pick_one(Request id, Response response, mixed ... args)
 {
   object rv = String.Buffer();
 
-  if(!(id->variables->for && id->variables->for_id))
+  if(!(id->variables->for && id->variables->for_id && id->variables->selected_field))
   {
     response->set_data("error: invalid data.");
     return;	
   }
 
-  id->variables->old_data = MIME.encode_base64(encode_value(id->variables));
-
+  id->variables->old_data = MIME.encode_base64(encode_value(id->variables), 1);
+  werror("%O\n", id->variables->old_data);
   rv += "<h1>Choose " + make_nice(model_object->instance_name) + "</h1>\n";
   if(id->misc->flash && id->misc->flash->msg)
     rv += "<i>" + id->misc->flash->msg + "</i><p>\n";
@@ -146,6 +148,7 @@ public void pick_one(Request id, Response response, mixed ... args)
   }
 
   rv += "<input type=\"hidden\" name=\"old_data\" value=\"" + id->variables->old_data + "\">";
+  rv += "<input type=\"hidden\" name=\"selected_field\" value=\"" + id->variables->selected_field + "\">";
   rv += "<input type=\"hidden\" name=\"for\" value=\"" + id->variables["for"] + "\">";
   rv += "<input type=\"hidden\" name=\"for_id\" value=\"" + id->variables["for_id"] + "\">";
   rv += "<p/><input type=\"submit\" name=\"__return\" value=\"Cancel\"> ";
@@ -326,6 +329,34 @@ if(e)
   Log.exception("error", e);
 }
 
+static void decode_from_form(mapping variables, mapping v)
+{
+  array inds = indices(variables);
+
+  foreach((variables->___fields || "")/","; int ind; string field)
+  {
+     // we don't worry about the primary key.
+     if(model_object->get_primary_key()->name == field) continue;
+
+        array elements = glob( "_" + field + "__*", inds);
+
+        if(sizeof(elements))
+        {
+                foreach(elements;; string e)
+                {
+                  mapping x = ([]);
+                  foreach(elements;; string e)
+                    x[e[(sizeof(field)+3)..]] = variables[e];
+                  v[field] = model_object->fields[field]->from_form(x);
+                  break;
+                }
+        }
+        else
+          {
+                v[field] = variables[field];
+          }
+  }
+}
 
 public void donew(Fins.Request request, Fins.Response response, mixed ... args)
 {
@@ -353,7 +384,7 @@ e=catch{
     return;
   }
 
-  
+  werror("%O\n", request->variables);
   m_delete(request->variables, "___save");
 
   array inds = indices(request->variables);
@@ -388,7 +419,7 @@ e=catch{
 		v[field] = request->variables[field];
 	  }
   }
-//werror("setting: %O\n", v);
+werror("setting: %O\n", v);
   item->set_atomic(v);  
 
   response->redirect(action_url(list));
@@ -404,6 +435,7 @@ if(e)
 public void new(Fins.Request request, Fins.Response response, mixed ... args)
 {
   array fields = ({});
+  mapping orig = ([]);
   object rv = String.Buffer();
   rv += get_js();
   rv += "<h1>Creating new " + model_object->instance_name + "</h1>\n";
@@ -414,11 +446,19 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
 
   object no = Fins.Model.new(model_object->instance_name);
 
+  if(request->variables->old_data)
+  {
+    decode_from_form(decode_value(MIME.decode_base64(request->variables->old_data)), orig);
+    werror("old data: %O\n", orig);
+    orig[request->variables->selected_field] = model->repository->find_by_id(model_object->fields[request->variables->selected_field]->otherobject, (int)request->variables->selected_id);
+
+  }
+
   foreach(model_object->field_order; int key; mixed value)
   {	
 //	 if(value->is_shadow) continue;
 	if(value->is_primary_key) continue;
-	  string ed = make_value_editor(value->name, UNDEFINED, no);
+	  string ed = make_value_editor(value->name, orig[value->name]||UNDEFINED, no);
       if(ed)
         rv += "<tr><td><b>" + make_nice(value->name) + "</b>: </td><td> " + ed + "</td></tr>\n"; 
 	fields += ({value->name});

@@ -67,7 +67,7 @@ mixed validate(mixed value, void|.DataObjectInstance i)
 string get_editor_string(mixed|void value, void|.DataObjectInstance i)
 {
   string desc = "";
-  object sc = context->app->model->repository->get_scaffold_controller(i->master_object);
+  object sc = context->app->model->repository->get_scaffold_controller(context->app->model->repository->get_object(otherobject));
 
   if(!value) desc = "not set";
   else 
@@ -77,8 +77,8 @@ string get_editor_string(mixed|void value, void|.DataObjectInstance i)
     else desc = sprintf("%O", value);
 
     if(sc && sc->display)
-     desc = sprintf("<a href=\"%s\">%s</a>", 
-      context->app->url_for_action(sc->display, ({}), (["id": i->get_id() ])),  
+     desc = sprintf("<input type=\"hidden\" name=\"_%s__id\" value=\"%d\"><a href=\"%s\">%s</a>", 
+      name, value?value->get_id():0, context->app->url_for_action(sc->display, ({}), (["id": value?value->get_id():0 ])),  
       desc);
   }
 
@@ -89,13 +89,16 @@ werror("other object is %O\n", otherobject);
   if(sc && sc->pick_one)
   {
     desc += sprintf(" <a href='javascript:fire_select(%O)'>select</a>",
-      context->app->url_for_action(sc->pick_one, ({}), (["for": i->master_object->instance_name,"for_id": i->get_id()]))
+      context->app->url_for_action(sc->pick_one, ({}), (["selected_field": name, "for": i->master_object->instance_name,"for_id": i->get_id()]))
      );
   }
 
   return desc;
 }
   
-//optional mixed from_form(mapping value, void|.DataObjectInstance i);
+optional mixed from_form(mapping value, void|.DataObjectInstance i)
+{ 
+  return context->app->model->repository->find_by_id(otherobject, (int)value->id);
+}
   
   

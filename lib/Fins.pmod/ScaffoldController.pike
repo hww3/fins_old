@@ -206,6 +206,17 @@ string describe(object o, string key, mixed value)
   return rv;
 }
 
+public void decode_old_values(mapping variables, mapping orig)
+{
+  if(variables->old_data)
+  {
+    decode_from_form(decode_value(MIME.decode_base64(variables->old_data)), orig);
+    werror("old data: %O\n", orig);
+    orig[variables->selected_field] = model->repository->find_by_id(model_object->fields[variables->selected_field]->otherobject, (int)variables->selected_id);
+  }
+
+}
+
 public void update(Fins.Request request, Fins.Response response, mixed ... args)
 {
   mapping orig = ([]);
@@ -218,12 +229,7 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
     return;
   }
 
-  if(request->variables->old_data)
-  {
-    decode_from_form(decode_value(MIME.decode_base64(request->variables->old_data)), orig);
-    werror("old data: %O\n", orig);
-    orig[request->variables->selected_field] = model->repository->find_by_id(model_object->fields[request->variables->selected_field]->otherobject, (int)request->variables->selected_id);
-  }
+  decode_old_values(request->variables, orig);
 
   object rv = String.Buffer();
   rv += get_js();
@@ -455,17 +461,10 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
 
   object no = Fins.Model.new(model_object->instance_name);
 
-  if(request->variables->old_data)
-  {
-    decode_from_form(decode_value(MIME.decode_base64(request->variables->old_data)), orig);
-    werror("old data: %O\n", orig);
-    orig[request->variables->selected_field] = model->repository->find_by_id(model_object->fields[request->variables->selected_field]->otherobject, (int)request->variables->selected_id);
-
-  }
+  decode_old_values(request->variables, orig);
 
   foreach(model_object->field_order; int key; mixed value)
   {	
-//	 if(value->is_shadow) continue;
 	if(value->is_primary_key) continue;
 	  string ed = make_value_editor(value->name, orig[value->name]||UNDEFINED, no);
       if(ed)

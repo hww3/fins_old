@@ -349,9 +349,9 @@ void set_alternate_key(string _key)
 void add_default_value_object(string field, string objecttype, mapping criteria, int unique)
 {
    if(unique)
-     default_values[field] = lambda(){ return context->repository->find(objecttype, criteria)[0];};
+     default_values[field] = lambda(){ return context->app->model->repository->old_find(objecttype, criteria)[0];};
    else
-     default_values[field] = lambda(){ return context->repository->find(objecttype, criteria);};
+     default_values[field] = lambda(){ return context->app->model->repository->old_find(objecttype, criteria);};
 }
 
 //!

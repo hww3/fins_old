@@ -1,5 +1,9 @@
 Version 0.1
 
+- Added template type StringSimple and Application->get_string_view()
+- Added describe_object and action_link macros
+- Added Application->get_controller_for_path()
+- Added magic field "_id" in model objects for getting the primary key value.
 - Applications are created with default logging configurations for each
     tier, with a debug and access log.
 - Added Tools.String.named_sprintf().

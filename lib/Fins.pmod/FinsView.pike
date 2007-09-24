@@ -6,6 +6,7 @@ inherit Fins.Helpers.Macros.Basic;
 
 //! the default class to be used for templates in this application
 program default_template = Fins.Template.Simple;
+program default_string_template = Fins.Template.StringSimple;
 
 //! the default template data object class for use in this application
 program default_data = Fins.Template.TemplateData;
@@ -90,6 +91,11 @@ public Template.View low_get_view(program templateType, string tn)
 
   return Template.View(t, d);
 
+}
+
+public Template.View get_string_view(string ts)
+{
+  return low_get_view(default_string_template, ts);
 }
 
 public Template.View get_view(string tn)

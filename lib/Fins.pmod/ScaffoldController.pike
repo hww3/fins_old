@@ -9,6 +9,18 @@ import Tools.Logging;
 string model_component = 0;
 object model_object;
 
+
+string list_template_string = "<h1><%$type%></h1>"
+  "<div class=\"flash-message\"><% flash var=\"msg\" %></div>"
+  "<%foreach var=\"items\" val=\"item\"%> ["
+  "<%action_link event=\"delete\"%>delete</a> | "
+  "<%action_link event=\"update\"%>edit</a> | "
+  "<%action_link event=\"display\"%>view</a>] "
+  "<%describe_object var=\"item\"%>"
+  "<%end%>";
+
+
+
 string get_js()
 {
   
@@ -34,34 +46,35 @@ public void index(Fins.Request request, Fins.Response response, mixed ... args)
 
 public void list(Fins.Request request, Fins.Response response, mixed ... args)
 {
+
+  object v = view->get_string_view(list_template_string);
+
   string rv = "";
 
-  rv += "<h1>" + Tools.Language.Inflect.pluralize(model_object->instance_name) + "</h1>";
-  if(request->misc->flash && request->misc->flash->msg)
-    rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
+  v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 
   rv += "<a href=\"" + action_url(new) + "\">New " + make_nice(model_object->instance_name) + "</a><p>";
   object items = model->repository->_find(model_object, ([]));
   if(!sizeof(items))
   {
-    rv += "No " + 
+    response->flash("msg", "No " + 
       Tools.Language.Inflect.pluralize(model_object->instance_name) + 
-         " found.<p>\n";
+         " found.<p>\n");
   }
   else
   {
-    rv+="<table>";
-    foreach(items;; object item)
+    v->add("items", items);
     {
+/*
       rv += "<tr><td><a href=\"" + action_url(display, 0, (["id": item->get_id()])) + "\">view</a> </td> ";
       rv += " <td> <a href=\"" + action_url(update, 0,  (["id": item->get_id()]))+ "\">edit</a> </td><td>";
       rv += " <td> <a href=\"" + action_url(delete, 0, (["id": item->get_id()])) + "\">delete</a> </td><td>";
       rv +=  item->describe() + "<br></td></tr>\n";
+*/
     }
   }
 
-  rv +="</table>";
-  response->set_data(rv);
+  response->set_view(v);
 }
 
 public void display(Fins.Request request, Fins.Response response, mixed ... args)
@@ -69,6 +82,8 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
   object item = model->repository->find_by_id(model_object, (int)request->variables->id);
 
   string rv = "";
+
+  object v = view->get_string_view("Hi");
 
   rv = "<h1>Viewing " + make_nice(model_object->instance_name) + "</h1>\n";
   if(request->misc->flash && request->misc->flash->msg)
@@ -96,7 +111,7 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
   rv += "<input name=\"___return\" value=\"Return\" type=\"submit\"> ";
   rv += "</form>";
 
-  response->set_data(rv);
+  response->set_view(v);
 }
 
 public void do_pick(Request id, Response response, mixed ... args)
@@ -251,9 +266,13 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
       fields += ({value->name});
     }
   }
- 
+
+  // FIXME: this could go very wrong...
+  string orig_data = MIME.encode_base64(encode_value(val), 1); 
+
   rv += "</table>\n";
   rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> ";
+  rv += "<input name=\"___orig_data\" value=\"" + orig_data + "\" type=\"hidden\"> ";
   rv += "<input name=\"___save\" value=\"Save\" type=\"submit\"> ";
   rv += "<input name=\"___fields\" value=\"" + (fields*",") + "\" type=\"hidden\"> ";
   rv += "</form>";

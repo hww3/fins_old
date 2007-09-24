@@ -209,6 +209,7 @@
        if(request && request->misc->session_variables->__flash)
          f+=(request->misc->session_variables->__flash);
        template_data->set_flash(f);
+       template_data->set_request(request);
 
         response->data = template->render(template_data);
         response["extra_heads"]["content-type"] = template->get_type();

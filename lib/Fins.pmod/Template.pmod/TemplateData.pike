@@ -1,6 +1,6 @@
-static mapping data = ([]);
-static mapping flash = ([]);
-static object request;
+ mapping data = ([]);
+ mapping flash = ([]);
+ object request;
 
 int debug = 0;
 
@@ -57,6 +57,7 @@ public mapping get_flash()
 public .TemplateData clone()
 {
   object d = object_program(this)();
+  d->set_request(request);
   d->set_data(data + ([]));
   d->set_flash(flash + ([]));
   return d;

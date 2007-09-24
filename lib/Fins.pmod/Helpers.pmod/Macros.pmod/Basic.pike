@@ -1,9 +1,32 @@
 inherit .Base;
 
+//!
 string simple_macro_sessionid(Fins.Template.TemplateData data, mapping|void args)
 {
   return data->get_request()->misc->session_id;
 }
+
+//!
+string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void args)
+{
+  object controller;
+  object request = data->get_request();
+  string event = args->event;
+//  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
+
+  controller = request->controller;
+  if(args->controller)
+    controller = data->get_request()->fins_app->get_controller_for_path(args->controller, controller);
+  if(!controller) throw(Error.Generic("action_link: controller " + args->controller + " can not be resolved.\n"));
+
+  mixed action = controller[event];
+  if(!action) throw(Error.Generic("action_link: event " + args->event + " can not be resolved.\n"));
+
+  string url = data->get_request()->fins_app->url_for_action(action, ({}), ([]));
+
+  return "<a href=\"" + url + "\">";
+}
+
 
 //! args: var
 string simple_macro_capitalize(Fins.Template.TemplateData data, mapping|void args)
@@ -61,6 +84,15 @@ string simple_macro_boolean(Fins.Template.TemplateData data, mapping|void args)
                 {
                         return "invalid type for boolean ";
                 }
+}
+
+//! args: var
+string simple_macro_describe_object(Fins.Template.TemplateData data, mapping|void args)
+{
+  mixed v = get_var_value(args->var, data->get_data());
+
+  if(objectp(v) && v->describe) return v->describe();
+  else return sprintf("%O\n", v);
 }
 
 //! args: var, format

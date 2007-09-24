@@ -1,16 +1,13 @@
-inherit .Simple.pike;
+inherit .Simple;
 
 string template_string;
 
 //!
-static void create(string _templatename, string _templatestring,
+static void create(string _templatestring,
          .TemplateContext|void context_obj, int|void _is_layout)
 {
-   ::create(_templatename, context_obj, _is_layout);
-
    template_string = _templatestring;
-
-   reload_template();
+   ::create("template_from_string", context_obj, _is_layout);
 }
 
 
@@ -18,11 +15,8 @@ static void reload_template()
 {
    last_update = time();
 
-   string psp = parse_psp(template_string, templatename);
-   script = psp;
-
    mixed x = gauge{
-     compiled_template = compile_string(template, templatename);
+     compiled_template = compile_string(template_string, templatename);
    };
 
 }

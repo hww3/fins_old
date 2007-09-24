@@ -90,6 +90,7 @@ public string render(.TemplateData d)
    }
    else
    {
+
       t->render(buf, d);
    }
    return buf->get();
@@ -106,14 +107,13 @@ void render_view(String.Buffer buf, object ct, object d)
    }
 
    object t = compiled_template(context);
-werror("rendering %O %O\n", t, ct);
    t->render(buf, d, ct);
 }
 
 program compile_string(string code, string realfile, object|void compilecontext)
 {
   string psp = parse_psp(code, realfile, compilecontext);
-//werror("PSP: %O\n", psp);
+  //werror("PSP: %O\n", psp);
   return predef::compile_string(psp, realfile);
 }
 
@@ -211,7 +211,8 @@ string parse_psp(string file, string realname, object|void compilecontext)
   }
 
   header += h;
-  pikescript+=("object __context; static void create(object context){__context = context; " + initialization + "}\n void render(String.Buffer buf, Fins.Template.TemplateData __d,object|void __view){ mapping data = __d->get_data();\n");
+  pikescript+=("object __context; static void create(object context){__context = context; " + initialization + 
+"}\n void render(String.Buffer buf, Fins.Template.TemplateData __d,object|void __view){mapping data = __d->get_data();\n");
   pikescript += ps;
 
   return header + "\n\n" + pikescript + "}";

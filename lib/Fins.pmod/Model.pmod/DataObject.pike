@@ -551,6 +551,9 @@ mapping get_atomic(.DataObjectInstance i)
 mixed get(string field, .DataObjectInstance i)
 {
 
+   if(field == "_id")
+     field = primary_key->name;
+
    if(!fields[field])
    {
      throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));

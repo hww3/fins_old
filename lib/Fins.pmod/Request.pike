@@ -5,6 +5,8 @@ string not_args;
 string controller_path;
 string controller_name;
 string event_name;
+object controller;
+mixed event;
 
 function get_session_by_id = _get_session_by_id;
 

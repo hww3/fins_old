@@ -242,6 +242,24 @@ int controller_updated(object controller, object container, string cn)
   return 0;
 }
 
+//! 
+//! @param controller
+//!   an optional controller for use with relative paths.
+//!
+object get_controller_for_path(string path, object|void controller)
+{
+  if(!controller || path[0] == '/') controller = this->controller;
+
+  foreach(path/"/"; int x; string comp)
+  {
+    controller = controller[comp];
+    if(!controller || !objectp(controller)) return 0;
+  }
+
+  if(!controller || !objectp(controller)) return 0;
+  else return controller;
+}
+
 //!
 string get_path_for_controller(object _controller)
 {
@@ -518,6 +536,7 @@ array get_event(.Request request)
 	controller_updated(controller, this, "controller");
   }
   cc = controller;
+  request->controller = cc;
   request->controller_name = cc->__controller_name;
   function event;
   array args = ({});
@@ -541,6 +560,7 @@ array get_event(.Request request)
 	      not_args += ({"index"});
 	      event = ci;
               request->event_name = "index";
+	      request->event = event;
 	    }
 	    else
 	    {
@@ -579,6 +599,7 @@ array get_event(.Request request)
 	  not_args += ({comp});
 	  event = ci;
           request->event_name = comp;
+          request->event = comp;
 	}    
 	else if(Program.implements(object_program(ci), Fins.FinsController))
 	{ 
@@ -590,6 +611,7 @@ array get_event(.Request request)
 	  }
 
 	  cc = cc[comp];
+          request->controller = cc;
           request->controller_name = cc->__controller_name;
 	}
 	else
@@ -601,6 +623,7 @@ array get_event(.Request request)
       { 
 	not_args += ({"index"});
 	event = ci;
+	request->event = ci;
         request->event_name = "index";
 	args += ({comp});
       }

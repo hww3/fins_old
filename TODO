@@ -1,0 +1,5 @@
+- many-to-many support in scaffolding
+- finish making editors for other datatypes
+- handle changed values better when we finish a pick()
+- fix Fins.Model.find.* for object types that have odd capitalization (such as ACL, etc)
+

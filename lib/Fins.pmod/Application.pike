@@ -344,13 +344,21 @@ string url_for_action(function|object action, array|void args, mapping|void vars
     path = combine_path(path, args*"/");
 
   if(vars)
+    path = add_variables_to_path(path, vars);
+
+  return path;
+}
+
+//!
+public string add_variables_to_path(string path, mapping vars)
+{
+  if(vars)
   {
     array e = ({});
     foreach(vars; string k;string v)
       e += ({(k + "=" + v)});
     path += "?" + (e*"&");
   }
-
   return path;
 }
 

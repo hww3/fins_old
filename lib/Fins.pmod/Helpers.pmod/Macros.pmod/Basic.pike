@@ -6,12 +6,15 @@ string simple_macro_sessionid(Fins.Template.TemplateData data, mapping|void args
   return data->get_request()->misc->session_id;
 }
 
+//! args: controller, action, args 
 //!
+//! any arguments other than those above will be considered variables to 
+//! be added to the url above.
 string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void args)
 {
   object controller;
   object request = data->get_request();
-  string event = args->event;
+  string event = args->action;
 //  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
 
   controller = request->controller;
@@ -20,9 +23,30 @@ string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void ar
   if(!controller) throw(Error.Generic("action_link: controller " + args->controller + " can not be resolved.\n"));
 
   mixed action = controller[event];
-  if(!action) throw(Error.Generic("action_link: event " + args->event + " can not be resolved.\n"));
+  if(!action) throw(Error.Generic("action_link: action " + args->action + " can not be resolved.\n"));
 
-  string url = data->get_request()->fins_app->url_for_action(action, ({}), ([]));
+  array uargs;
+  mapping vars;
+
+  if(args->args)
+    uargs = args->args/"/";
+
+  m_delete(args, "controller");
+  m_delete(args, "action");
+  m_delete(args, "args");
+
+  if(sizeof(args)) 
+  {
+    vars = args;  
+    foreach(args; string k; string v)
+    {
+      v = get_var_value(v, data->get_data()) || "";
+      args[k] = v;
+    }
+// werror("data: %O\n", data->get_data());
+  }
+
+  string url = data->get_request()->fins_app->url_for_action(action, uargs, vars);
 
   return "<a href=\"" + url + "\">";
 }

@@ -13,10 +13,10 @@ object model_object;
 string list_template_string = "<h1><%$type%></h1>"
   "<div class=\"flash-message\"><% flash var=\"msg\" %></div>"
   "<%foreach var=\"items\" val=\"item\"%> ["
-  "<%action_link event=\"delete\"%>delete</a> | "
-  "<%action_link event=\"update\"%>edit</a> | "
-  "<%action_link event=\"display\"%>view</a>] "
-  "<%describe_object var=\"item\"%>"
+  "<%action_link action=\"delete\" id=\"item._id\"%>delete</a> | "
+  "<%action_link action=\"update\" id=\"item._id\"%>edit</a> | "
+  "<%action_link action=\"display\" id=\"item._id\"%>view</a>] "
+  "<%describe_object var=\"item\"%><br/>"
   "<%end%>";
 
 
@@ -268,7 +268,7 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
   }
 
   // FIXME: this could go very wrong...
-  string orig_data = MIME.encode_base64(encode_value(val), 1); 
+  string orig_data = encode_orig_data(val);
 
   rv += "</table>\n";
   rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> ";
@@ -277,6 +277,34 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
   rv += "<input name=\"___fields\" value=\"" + (fields*",") + "\" type=\"hidden\"> ";
   rv += "</form>";
   response->set_data(rv);
+}
+
+static mixed make_encodable_val(mixed val)
+{
+  mixed rval;
+
+  if(objectp(val))
+  {
+    if(rval = val["_id"])
+      return rval;
+    else if(val->_cast) return (string)val;
+    else if(val->format_utc) return val->format_utc();
+  }
+
+  else return val;
+}
+
+static string encode_orig_data(mapping orig)
+{
+  mapping val = ([]);
+
+  foreach(val; string k; mixed v)
+  {
+    val[k] = make_encodable_val(v);
+  }
+
+  MIME.encode_base64(encode_value(val), 1); 
+
 }
 
 public void doupdate(Fins.Request request, Fins.Response response, mixed ... args)

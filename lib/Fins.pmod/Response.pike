@@ -116,7 +116,7 @@
   //! @param args
   //!    an optional array of arguments that will be appended to the request url
   //!
-  public void redirect(string|URI|function|Fins.FinsController to, mixed ... args)
+  public void redirect(string|URI|function|Fins.FinsController to, array|void args, mapping|void vars)
   {
 	string dest;
     response->error = 301;
@@ -136,6 +136,9 @@
     if(args && sizeof(args))
       dest = combine_path(dest, args*"/");
 
+    if(vars)
+      dest = request->fins_app->add_variables_to_path(dest, vars);
+
     response->extra_heads->location = dest;
   }
 
@@ -148,7 +151,7 @@
   //! @param args
   //!    an optional array of arguments that will be appended to the request url
   //!
-  public void redirect_temp(string|URI|function|Fins.FinsController to, mixed ... args)
+  public void redirect_temp(string|URI|function|Fins.FinsController to, array|void args, mapping|void vars)
   {
 	string dest;
     response->error = 302;
@@ -167,7 +170,9 @@
     if(args && sizeof(args))
       dest = combine_path(dest, args*"/");
 
-
+    if(vars)
+      dest = request->fins_app->add_variables_to_path(dest, vars);
+ 
     response->extra_heads->location = dest;
   }
 

@@ -13,9 +13,9 @@ object model_object;
 string list_template_string = "<h1><%$type%></h1>"
   "<div class=\"flash-message\"><% flash var=\"msg\" %></div>"
   "<%foreach var=\"items\" val=\"item\"%> ["
-  "<%action_link action=\"delete\" id=\"item._id\"%>delete</a> | "
+  "<%action_link action=\"display\" id=\"item._id\"%>view</a> | "
   "<%action_link action=\"update\" id=\"item._id\"%>edit</a> | "
-  "<%action_link action=\"display\" id=\"item._id\"%>view</a>] "
+  "<%action_link action=\"delete\" id=\"item._id\"%>delete</a> ] "
   "<%describe_object var=\"item\"%><br/>"
   "<%end%>";
 
@@ -28,6 +28,16 @@ string get_js()
     "window.document.forms[0].action = n;"
     "window.document.forms[0].submit();"
     "}</script>";
+}
+
+static object get_view(function f, string x)
+{
+  object v;
+  mixed e = catch(v = view->get_view(app->get_path_for_action(f, 1)));
+  if(e)
+    v = view->get_string_view(list_template_string);
+
+  return v;
 }
 
 void start()
@@ -46,15 +56,16 @@ public void index(Fins.Request request, Fins.Response response, mixed ... args)
 
 public void list(Fins.Request request, Fins.Response response, mixed ... args)
 {
+  object v;
 
-  object v = view->get_string_view(list_template_string);
+  v = get_view(list, list_template_string);
 
   string rv = "";
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 
-  rv += "<a href=\"" + action_url(new) + "\">New " + make_nice(model_object->instance_name) + "</a><p>";
   object items = model->repository->_find(model_object, ([]));
+
   if(!sizeof(items))
   {
     response->flash("msg", "No " + 
@@ -64,14 +75,6 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
   else
   {
     v->add("items", items);
-    {
-/*
-      rv += "<tr><td><a href=\"" + action_url(display, 0, (["id": item->get_id()])) + "\">view</a> </td> ";
-      rv += " <td> <a href=\"" + action_url(update, 0,  (["id": item->get_id()]))+ "\">edit</a> </td><td>";
-      rv += " <td> <a href=\"" + action_url(delete, 0, (["id": item->get_id()])) + "\">delete</a> </td><td>";
-      rv +=  item->describe() + "<br></td></tr>\n";
-*/
-    }
   }
 
   response->set_view(v);

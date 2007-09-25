@@ -323,20 +323,29 @@ private object lookingfor(object o, object in)
 }
 
 //!
+string get_path_for_action(function|object action, int|void nocontextroot)
+{
+  string path;
+
+    if(functionp(action))
+    {
+      object c = function_object(action);
+      string path1 = get_path_for_controller(c);
+      path = combine_path(nocontextroot?"":context_root, path1, function_name(action));
+    }
+    else
+      path = combine_path(nocontextroot?"":context_root, get_path_for_controller(action));
+
+  return path;
+}
+
+//!
 string url_for_action(function|object action, array|void args, mapping|void vars)
 {
   string path;
   if(!(path = action_path_cache[action]))
   {
-    if(functionp(action))
-    {
-      object c = function_object(action);
-      string path1 = get_path_for_controller(c);
-      path = combine_path(context_root, path1, function_name(action));
-    }
-    else
-      path = combine_path(context_root, get_path_for_controller(action));
-
+    path = get_path_for_action(action);
     action_path_cache[action] = path;
   }
 

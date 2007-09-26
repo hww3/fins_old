@@ -33,6 +33,9 @@ string display_template_string =
   "<%foreach var=\"item\" ind=\"key\" val=\"value\"%>"
   "<tr><td><b><%humanize var=\"key\"%></b></td><td><%describe key=\"key\" var=\"value\"%></td></tr>"
   "<%end %>"
+  "</table>"
+  "<p/>"
+  "<%action_link action=\"list\"%>Return to List</a><p>"
   "</body></html>";
 
 string get_js()

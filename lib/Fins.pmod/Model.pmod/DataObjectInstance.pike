@@ -13,7 +13,7 @@ int initialized;
 
 Iterator _get_iterator()
 {
-  return Mapping.Iterator(get_atomic());
+  return .DataObjectIterator(this);
 }
 
 string _sprintf(mixed ... args)

@@ -42,7 +42,7 @@ string describe_object(object m, string key, object o)
   {
     object model;
     string link;
-    model = o->master_object->context->app;
+    model = o->master_object->context->app->model;
     link = get_view_url(model, o);
     if(link) link = " <a href=\"" + link + "\">view</a>";
     else link = "";

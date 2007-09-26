@@ -1,5 +1,10 @@
 Version 0.1
 
+- Added Scaffolding template support
+- Added setting of key references in scaffold
+- Added some of the macros needed to make Scaffolding templates easier
+- Added an iterator for DataObjectInstances, with proper field ordering
+- Added Application->get_path_for_action()
 - Added template type StringSimple and Application->get_string_view()
 - Added describe_object and action_link macros
 - Added Application->get_controller_for_path()

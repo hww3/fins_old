@@ -6,6 +6,12 @@ string simple_macro_sessionid(Fins.Template.TemplateData data, mapping|void args
   return data->get_request()->misc->session_id;
 }
 
+//! args: var
+string simple_macro_humanize(Fins.Template.TemplateData data, mapping|void args)
+{
+  return Tools.Language.Inflect.humanize(get_var_value(args->var, data->get_data())||"");
+}
+
 //! args: controller, action, args 
 //!
 //! any arguments other than those above will be considered variables to 
@@ -117,6 +123,23 @@ string simple_macro_describe_object(Fins.Template.TemplateData data, mapping|voi
 
   if(objectp(v) && v->describe) return v->describe();
   else return sprintf("%O\n", v);
+}
+
+//! args: var
+string simple_macro_describe(Fins.Template.TemplateData data, mapping|void args)
+{
+  string key = get_var_value(args->key, data->get_data());
+  mixed value = get_var_value(args->var, data->get_data());
+  string rv = "";
+
+    if(stringp(value) || intp(value))
+      rv += value; 
+    else if(arrayp(value))
+      rv += describe_array(0, key, value);
+    else if(objectp(value))
+      rv += describe_object(0, key, value);
+
+  return rv;
 }
 
 //! args: var, format

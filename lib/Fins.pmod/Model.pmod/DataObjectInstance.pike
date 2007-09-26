@@ -11,6 +11,11 @@ int new_object = 0;
 int saved = 0;
 int initialized;
 
+Iterator _get_iterator()
+{
+  return Mapping.Iterator(get_atomic());
+}
+
 string _sprintf(mixed ... args)
 {
   return object_type + "(" + get_descriptor() + ")";

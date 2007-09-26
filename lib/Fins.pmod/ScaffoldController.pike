@@ -10,16 +10,30 @@ string model_component = 0;
 object model_object;
 
 
-string list_template_string = "<h1><%$type%></h1>"
+string list_template_string = 
+  "<html><head><title>Listing <%$type%></title></head>"
+  "<body>"
+  "<h1><%$type%></h1>"
   "<div class=\"flash-message\"><% flash var=\"msg\" %></div>"
   "<%foreach var=\"items\" val=\"item\"%> ["
   "<%action_link action=\"display\" id=\"item._id\"%>view</a> | "
   "<%action_link action=\"update\" id=\"item._id\"%>edit</a> | "
   "<%action_link action=\"delete\" id=\"item._id\"%>delete</a> ] "
   "<%describe_object var=\"item\"%><br/>"
-  "<%end%>";
+  "<%end%>"
+  "</body></html>";
 
-
+string display_template_string =
+  "<html><head><title>Displaying <%$type%></title></head>"
+  "<body>"
+  "<h1>Viewing <%$type%></h1>"
+  "<div class=\"flash-message\"><% flash var=\"msg\" %></div>"
+  "<%action_link action=\"update\" id=\"item._id\"%>Edit</a><p>"
+  "<table>"
+  "<%foreach var=\"item\" ind=\"key\" val=\"value\"%>"
+  "<tr><td><b><%humanize var=\"key\"%></b></td><td><%describe key=\"key\" var=\"value\"%></td></tr>"
+  "<%end %>"
+  "</body></html>";
 
 string get_js()
 {
@@ -35,7 +49,7 @@ static object get_view(function f, string x)
   object v;
   mixed e = catch(v = view->get_view(app->get_path_for_action(f, 1)));
   if(e)
-    v = view->get_string_view(list_template_string);
+    v = view->get_string_view(x);
 
   return v;
 }
@@ -56,11 +70,7 @@ public void index(Fins.Request request, Fins.Response response, mixed ... args)
 
 public void list(Fins.Request request, Fins.Response response, mixed ... args)
 {
-  object v;
-
-  v = get_view(list, list_template_string);
-
-  string rv = "";
+  object v = get_view(list, list_template_string);
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 
@@ -82,37 +92,20 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
 
 public void display(Fins.Request request, Fins.Response response, mixed ... args)
 {
+  object v = get_view(display, display_template_string);
+
   object item = model->repository->find_by_id(model_object, (int)request->variables->id);
-
-  string rv = "";
-
-  object v = view->get_string_view("Hi");
-
-  rv = "<h1>Viewing " + make_nice(model_object->instance_name) + "</h1>\n";
-  if(request->misc->flash && request->misc->flash->msg)
-    rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
-  rv += "<a href=\"" + action_url(update, 0, (["id": request->variables->id])) + "\">edit " + make_nice(model_object->instance_name) + "</a><p>";
-
-  rv += "<table>\n";
+  v->add("type", make_nice(model_object->instance_name));
 
   if(!item)
   {
-    response->set_data(make_nice(model_object->instance_name) + " not found.");
-    return;
+    response->flash("msg", make_nice(model_object->instance_name) + " not found.");
   }
-
-  mapping val = item->get_atomic();
-
-  foreach(model_object->field_order; int key; mixed field)
+  else
   {
-      rv += "<tr><td><b>" + make_nice(field->name) + "</b>: </td><td> " + 
-	      describe(item, field->name, val[field->name]) + "</td></tr>\n"; 
+//    mapping val = item->get_atomic();
+    v->add("item", item);
   }
- 
-  rv += "</table>\n";
-  rv += "<form action=\"" + action_url(list) + "\" method=\"post\">";
-  rv += "<input name=\"___return\" value=\"Return\" type=\"submit\"> ";
-  rv += "</form>";
 
   response->set_view(v);
 }

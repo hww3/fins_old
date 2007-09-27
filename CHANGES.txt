@@ -1,5 +1,18 @@
 Version 0.1
 
+INCOMPATIBLE CHANGES
+
+- Simple template changes: foreach argument "var" can now be a variable 
+    (preceeded by a '$') or a constant string, as with macro variables.
+- Macro syntax: most template macros that accept arguments that are 
+    variables located in the template data (usually, they are arguments 
+    named "var") can now be a constant string (var="somestring") or the 
+    previous behavior when preceeded by a '$' (var="$item.description").
+
+NEW FEATURES AND BUG FIXES
+
+- Fixed Fins.Model.find.* for object types that have odd capitalization;
+    everything is all lowercase now.
 - Added Scaffolding template support
 - Added setting of key references in scaffold
 - Added some of the macros needed to make Scaffolding templates easier

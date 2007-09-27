@@ -442,12 +442,17 @@ class PikeBlock
          throw(Error.Generic(sprintf("PSP format error: invalid foreach syntax in %s at line %d.\n", templatename, start)));
        }
        array ac = ({});
-
-       foreach(a->var/".";;string v)
-        ac += ({ "[\"" + v + "\"]" }); 
+       string start = "";
+       if(a->var[0] == '$')
+       {
+         foreach((a->var[1..])/".";;string v)
+          ac += ({ "[\"" + v + "\"]" });
+          start = "data" + (ac * "");
+       }    
+       else start = "\"" + a->var + "\"";    
        if(!a->ind) a->ind = a->val + "_ind";
 
-       return " catch { foreach(data" + (ac*"") + ";mixed __v; mixed __q) {"
+       return " catch { foreach(" + start + ";mixed __v; mixed __q) {"
          "object __d = __d->clone(); __d->add(\"" + a->val + "\", __q); __d->add(\"" + a->ind + "\", __v); "
          "mapping odata=data; mapping data=odata + ([\"" + a->val + "\":__q, \"" + a->ind + "\":__v]);" ;
        break;

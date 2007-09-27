@@ -25,6 +25,28 @@ static mixed `[](mixed k)
   else return 0;
 }
 
+
+static string string_without_suffix(string k, string s)
+{
+  return k[0..sizeof(k) - (sizeof(s)+1)];
+}
+
+
+static program get_model_component(string ot)
+{
+  mixed m = Fins.Model.get_model_module();
+
+  array x = indices(m);
+  array y = values(m);
+  
+  foreach(x;int i; string v)
+    x[i] = lower_case(v);
+
+  m = mkmapping(x,y);
+
+  return m[ot];
+}
+
 static function get_func(mixed k)
 {
   function f;
@@ -38,39 +60,39 @@ static function get_func(mixed k)
   {
     ot = string_without_suffix(k, "_by_id");
     ot = Tools.Language.Inflect.singularize(ot);
-    ot = String.capitalize(ot);
-    if(p=Fins.Model.get_model_module()[ot])
+//    ot = String.capitalize(ot);
+    if(p=get_model_component(ot))
       return lambda(mixed ... args){ return Fins.Model.find_by_id(p, @args);};
   }
   if(has_suffix(k, "_by_query"))
   {
     ot = string_without_suffix(k, "_by_query");
     ot = Tools.Language.Inflect.singularize(ot);
-    ot = String.capitalize(ot);
-    if(p=Fins.Model.get_model_module()[ot])
+//    ot = String.capitalize(ot);
+    if(p=get_model_component(ot))
       return lambda(mixed ... args){ return Fins.Model.find_by_query(p, @args);};
   }
   else if(has_suffix(k, "_by_alternate"))
   {
     ot = string_without_suffix(k, "_by_alternate");
     ot = Tools.Language.Inflect.singularize(ot);
-    ot = String.capitalize(ot);
-    if(p=Fins.Model.get_model_module()[ot])
+//    ot = String.capitalize(ot);
+    if(p=get_model_component(ot))
       return lambda(mixed ... args){ return Fins.Model.find_by_alternate(p, @args);};
   }
   else if(has_suffix(k, "_all"))
   {
     ot = string_without_suffix(k, "_all");
     ot = Tools.Language.Inflect.singularize(ot);
-    ot = String.capitalize(ot);
-    if(p=Fins.Model.get_model_module()[ot])
+//    ot = String.capitalize(ot);
+    if(p=get_model_component(ot))
       return lambda(){ return Fins.Model.old_find(p, ([]));};
   }
   else
   {
     ot = Tools.Language.Inflect.singularize(k);
-    ot = String.capitalize(ot);
-    if(p=Fins.Model.get_model_module()[ot])
+//    ot = String.capitalize(ot);
+    if(p=get_model_component(ot))
       return lambda(mixed ... args){ return Fins.Model.old_find(p, @args);};
     
   }
@@ -78,8 +100,3 @@ static function get_func(mixed k)
   return f;
 }
 
-
-static string string_without_suffix(string k, string s)
-{
-  return k[0..sizeof(k) - (sizeof(s)+1)];
-}

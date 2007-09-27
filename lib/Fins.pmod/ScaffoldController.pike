@@ -1,6 +1,6 @@
 //!
 //! A controller that impliments CRUD functionality
-//! for a given Model segment.
+//! for a given Model component.
 //!
 
 import Fins;
@@ -14,12 +14,12 @@ string list_template_string =
   "<html><head><title>Listing <%$type%></title></head>"
   "<body>"
   "<h1><%$type%></h1>"
-  "<div class=\"flash-message\"><% flash var=\"msg\" %></div>"
-  "<%foreach var=\"items\" val=\"item\"%> ["
-  "<%action_link action=\"display\" id=\"item._id\"%>view</a> | "
-  "<%action_link action=\"update\" id=\"item._id\"%>edit</a> | "
-  "<%action_link action=\"delete\" id=\"item._id\"%>delete</a> ] "
-  "<%describe_object var=\"item\"%><br/>"
+  "<div class=\"flash-message\"><% flash var=\"$msg\" %></div>"
+  "<%foreach var=\"$items\" val=\"item\"%> ["
+  "<%action_link action=\"display\" id=\"$item._id\"%>view</a> | "
+  "<%action_link action=\"update\" id=\"$item._id\"%>edit</a> | "
+  "<%action_link action=\"delete\" id=\"$item._id\"%>delete</a> ] "
+  "<%describe_object var=\"$item\"%><br/>"
   "<%end%>"
   "</body></html>";
 
@@ -27,11 +27,25 @@ string display_template_string =
   "<html><head><title>Displaying <%$type%></title></head>"
   "<body>"
   "<h1>Viewing <%$type%></h1>"
-  "<div class=\"flash-message\"><% flash var=\"msg\" %></div>"
-  "<%action_link action=\"update\" id=\"item._id\"%>Edit</a><p>"
+  "<div class=\"flash-message\"><% flash var=\"$msg\" %></div>"
+  "<%action_link action=\"update\" id=\"$item._id\"%>Edit</a><p>"
   "<table>"
-  "<%foreach var=\"item\" ind=\"key\" val=\"value\"%>"
-  "<tr><td><b><%humanize var=\"key\"%></b></td><td><%describe key=\"key\" var=\"value\"%></td></tr>"
+  "<%foreach var=\"$item\" ind=\"key\" val=\"value\"%>"
+  "<tr><td><b><%humanize var=\"$key\"%></b></td><td><%describe key=\"$key\" var=\"$value\"%></td></tr>"
+  "<%end %>"
+  "</table>"
+  "<p/>"
+  "<%action_link action=\"list\"%>Return to List</a><p>"
+  "</body></html>";
+
+string update_template_string =
+  "<html><head><title>Editing <%$type%></title></head>"
+  "<body>"
+  "<h1>Editing <%$type%></h1>"
+  "<div class=\"flash-message\"><% flash var=\"$msg\" %></div>"
+  "<table>"
+  "<%foreach var=\"$item\" ind=\"key\" val=\"value\"%>"
+  "<tr><td><b><%humanize var=\"$key\"%></b></td><td><%describe key=\"$key\" var=\"$value\"%></td></tr>"
   "<%end %>"
   "</table>"
   "<p/>"

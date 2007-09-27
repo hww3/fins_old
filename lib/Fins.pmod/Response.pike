@@ -43,10 +43,12 @@
     return response->type;
   }
 
-  //!
-  public int flash(string name, mixed data)
+  //! when only one argument is provided, name is presumed to be "msg".
+  public int flash(string name, mixed|void data)
   {
     if(!request) return 0;
+
+    if(!data) { data = name; name = "msg"; }
 
     if(!request->misc->session_variables->__flash)
       request->misc->session_variables->__flash = ([]);

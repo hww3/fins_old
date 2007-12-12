@@ -2,6 +2,8 @@ Version 0.1
 
 INCOMPATIBLE CHANGES
 
+- FCGI Support requires a recent version of Public.Web.FCGI, as changes
+    in the API of this module changed incompatibly.
 - Simple template changes: foreach argument "var" can now be a variable 
     (preceeded by a '$') or a constant string, as with macro variables.
 - Macro syntax: most template macros that accept arguments that are 

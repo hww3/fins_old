@@ -68,7 +68,7 @@ string simple_macro_capitalize(Fins.Template.TemplateData data, mapping|void arg
 //! if var is not provided, it is assumed to be "msg".
 string simple_macro_flash(Fins.Template.TemplateData data, mapping|void args)
 {
-    if(!args->var) args->var = "msg";
+    if(!args->var) args->var = "$msg";
     return (get_var_value(args->var, data->get_flash())||"");
 }
 

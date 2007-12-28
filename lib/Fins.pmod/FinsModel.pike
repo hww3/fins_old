@@ -71,7 +71,13 @@ void register_types()
 //!
 string get_repo_class()
 {
+  object r;
+
   if(repository == Fins.Model.module) return "Fins.Model.module";
+
+  r = master()->resolv(app->config->app_name + ".Repo");
+
+  if(repository == r) return app->config->app_name + ".Repo";
 
   string s = master()->describe_object(repository);
 

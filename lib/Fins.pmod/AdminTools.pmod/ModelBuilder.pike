@@ -278,24 +278,25 @@ array do_scan()
       // if, after searching all of the tables, we find 2 tables 
       // referenced, it's a join-table, and we can ignore it. otherwise,
       // we should ask.
-      Log.info("We found a table, " + table + " that looks like it might ");
-      Log.info("be a join-table between two other types. ");
-      Log.info("However, it doesn't seem to have the right fields in it ");
-      Log.info("for its name, or its referenced tables are missing.");
-
-      if(has_id(table))
+      if(sizeof(joinedtables) != 2 && !has_id(table))
       {
-        Log.info("It does have a correct ID field, so we assume it is a type");
-        Log.info("that just happens to have an underbar in it.");
-        Log.info("If that's not correct, you can remove the generated class files ");
-        Log.info("from your application's modules directory.");
+        Log.info("*** We found a table, " + table + ", that looks like it might ");
+        Log.info("    be a join-table between two other types. ");
+        Log.info("    However, it doesn't seem to have the right fields in it ");
+        Log.info("    for its name, or its referenced tables are missing.");
+        Log.info("    If this assumption is incorrect, you can fix the schema to resolve the problem");
+        Log.info("    and rerun the scan.");
+      }
+      else if(has_id(table))
+      {
+        Log.info("*** We found a table, " + table + ", that looks like it might ");
+        Log.info("    be a join-table between two other types. ");
+        Log.info("    It does have a correct ID field, so we assume it is a type");
+        Log.info("    that just happens to have an underbar in it.");
+        Log.info("    If that's not correct, you can remove the generated class files ");
+        Log.info("    from your application's modules directory.");
         ta+=({table});
        
-      }
-      else
-      {
-        Log.info("If this assumption is incorrect, you can fix the schema to resolve the problem");
-        Log.info("and rerun the scan.");
       }
 
     }

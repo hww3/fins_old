@@ -16,6 +16,8 @@ mapping irregular_nouns_table_a1 = ([
   "ephemeris": "ephemerides",
   "genie": "genies",
   "money": "moneys",
+  "preference": "preferences",
+  "reference": "references",
   "mongoose": "mongooses",
   "mythos": "mythoi",
   "octupus": "octopuses",
@@ -210,7 +212,7 @@ void create()
   // rules for which the pluralized form is invariant
   add_rule(SuffixReplaceRule("fish", "fish"));
   add_rule(SuffixReplaceRule("ois", "ois"));
-  add_rule(SuffixReplaceRule("fish", "sheep"));
+  add_rule(SuffixReplaceRule("sheep", "sheep"));
   add_rule(SuffixReplaceRule("deer", "deer"));
   add_rule(SuffixReplaceRule("pox", "pox"));
   add_rule(SuffixReplaceRule("itis", "itis"));

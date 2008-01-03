@@ -16,6 +16,8 @@ mapping irregular_nouns_table_a1 = ([
   "ephemeris": "ephemerides",
   "genie": "genies",
   "money": "moneys",
+  "preference": "preferences",
+  "reference": "references",
   "mongoose": "mongooses",
   "mythos": "mythoi",
   "octupus": "octopuses",

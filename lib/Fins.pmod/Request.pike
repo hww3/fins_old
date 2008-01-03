@@ -10,6 +10,14 @@ mixed event;
 
 function get_session_by_id = _get_session_by_id;
 
+static mixed cast(string typen)
+{
+  if(typen == "mapping")
+  {
+    return mkmapping(indices(this), values(this));
+  }
+}
+
 //!
 static mapping _get_session_by_id(string SessionID)
 {

@@ -229,7 +229,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
     }
     else
     {
-      Log.warn("An unexpected response from the application occurred: %O\n", r);
+      Log.debug("Got nothing from the application for the request %O, referrer: %O. Probably means the request passed through an index action unhandled.\n", request, request->referrer);
       if(e) Log.exception("An error occurred while processing the request\n", e);
       mapping response = ([]);
       response->server="FinServe " + my_version;

@@ -27,6 +27,7 @@ void load_model()
    d->repository = repository;
    d->cache = cache;
    d->app = app;
+   d->model = this;
    d->initialize();
 
    context = d;

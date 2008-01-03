@@ -16,6 +16,9 @@ object personality;
 object app;
 
 //!
+object model;
+
+//!
 Sql.Sql sql;
 string sql_url;
 
@@ -42,7 +45,7 @@ string unquote_binary(string s)
 string type()
 {
   string t;
-  catch(t = app->config["model"]["personality"]);
+  catch(t = model->config["model"]["personality"]);
   if(t) return t;
   else return (sprintf("%O", object_program(sql->master_sql))/".")[-1];
 }

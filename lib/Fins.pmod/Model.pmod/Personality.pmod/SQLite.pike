@@ -11,10 +11,10 @@ int initialize()
 
   sql->query("PRAGMA full_column_names=1");
 
-  if((int)(context->app->config["model"]["datadir"]))
+  if((int)(context->model->config["model"]["datadir"]))
   {
     use_datadir = 1;
-    datadir = context->app->config["model"]["datadir"];
+    datadir = context->model->config["model"]["datadir"];
   }
 
   return 1;

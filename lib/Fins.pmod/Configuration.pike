@@ -4,17 +4,27 @@ string config_file;
 static mapping values;
 
 //!
-static void create(string appdir, string _config_file)
+static void create(string appdir, string|mapping _config_file)
 {
   app_dir = appdir;
-  app_name = (appdir/"/")[-1];
-  config_file = _config_file;
-  string fc = Stdio.read_file(config_file);
 
-  // the "spec" says that the file is utf-8 encoded.
-  fc=utf8_to_string(fc);
+  if(appdir)
+    app_name = (appdir/"/")[-1];
 
-  values = Public.Tools.ConfigFiles.Config.read(fc);
+  if(stringp(_config_file))
+  {
+    config_file = _config_file;
+    string fc = Stdio.read_file(config_file);
+
+    // the "spec" says that the file is utf-8 encoded.
+    fc=utf8_to_string(fc);
+
+    values = Public.Tools.ConfigFiles.Config.read(fc);
+  }
+  else if(mappingp(_config_file))
+  {
+    values = _config_file;
+  }
 }
 
 void set_value(string section, string item, mixed value)

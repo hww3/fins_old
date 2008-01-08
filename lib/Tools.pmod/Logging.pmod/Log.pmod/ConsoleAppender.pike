@@ -1,7 +1,9 @@
-inherit .FileAppender;
+inherit .Appender;
 
 object output = Stdio.stdout;
 
-static void create()
+static void create(mapping|void config)
 {
+  if(!config) config = ([]);
+  ::create(config);
 }

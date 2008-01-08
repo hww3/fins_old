@@ -47,7 +47,7 @@ void register_types()
   object im = repository->get_object_module();
   object mm = repository->get_model_module();
 
- werror("mm: %O\n", mm);
+// werror("mm: %O\n", mm);
   foreach(mkmapping(indices(mm), values(mm));string n; program c)
   {
     object d = c(context);
@@ -55,7 +55,7 @@ void register_types()
     if(im && im[n])
     {
 	  di = im[n];
-          if(di && !di->type_name) {werror("%O\n", di);/*di->type_name = n;*/}
+          if(di && !di->type_name) {/*werror("%O\n", di);di->type_name = n;*/}
     }
     else
     {
@@ -166,7 +166,7 @@ void initialize_links()
     }
   }
 
-  werror("possible links left over: %O\n", context->builder->possible_links);
+  Log.debug("possible links left over: %O\n", context->builder->possible_links);
   foreach(context->builder->possible_links;; mapping pl)
   {
     pl->obj->do_add_field(pl->field);

@@ -58,8 +58,17 @@ function named_sprintf_func(string format)
     {
       if(c == '}')
       {
-        xformed += "%s";
-        keys+=({sprintf("(string)d[%O]", current_tag->get())});
+        string tag = current_tag->get();
+        string format;
+        array x = tag / ":";
+        if(sizeof(x) > 1)
+        {
+          tag = x[0];
+          format  = x[1];
+        }
+        if(format) xformed += ("%" + format);
+        else xformed += "%s";
+        keys+=({sprintf((format?"":"(string)") + "d[%O]", tag)});
         in_tag = 0;
       }
       else

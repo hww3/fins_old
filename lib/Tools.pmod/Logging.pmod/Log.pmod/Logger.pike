@@ -41,7 +41,7 @@ static void create(mapping|void config)
 //  if(!config) werror("Logger.create(%O)\n", backtrace());
   if(!config)
   {
-    set_appenders(({ .ConsoleAppender() }));
+    set_appenders(({ .ConsoleAppender(([])) }));
     set_level(DEBUG);
   }
   else configure(config);
@@ -57,6 +57,7 @@ void configure(mapping config)
 
   array appenders = Tools.Logging["get_appenders"](arrayp(config->appender)?config->appender:({config->appender}));
   set_appenders(appenders);
+
 }
 
 public void set_appenders(array a)
@@ -77,8 +78,7 @@ static void do_msg(int level, string m, mixed|void ... extras)
   }
 
   mapping lt = localtime(time());
-//throw(Error.Generic("whee!\n"));
-  appenders->write("%02d:%02d:%02d %s - %s\n", lt->hour, lt->min, lt->sec, log_strs[level], m);
+  appenders->write(lt + (["level": log_strs[level], "msg": m]));
 
 //  stderr->write("%02d:%02d:%02d %s %s - %s\n", lt->hour, lt->min, lt->sec, log_strs[level], 
 //                      function_name(backtrace()[-3][2]), m);
@@ -87,13 +87,13 @@ static void do_msg(int level, string m, mixed|void ... extras)
 //!
 void exception(string msg, object|array exception)
 {
-  msg = msg + "\n%s";
+  msg = "An exception occurred: \n" +  msg + "\n%s";
   string e;
 
   if(objectp(exception))
     e = exception->describe();
   else e = describe_backtrace(exception);
-  appenders->write(sprintf("An exception occurred : " + msg + "\n", e));  
+  do_msg(CRITICAL, sprintf(msg, e));  
 }
 
 //!

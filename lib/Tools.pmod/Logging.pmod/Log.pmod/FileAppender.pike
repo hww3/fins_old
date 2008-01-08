@@ -1,5 +1,5 @@
 inherit Tools.Logging.Log.Logger;
-
+inherit .Appender;
 
 object output;
 
@@ -12,15 +12,6 @@ void create(mapping|void config)
   else
     output = Stdio.File(config->file, "cwa");
 
-//  werror("output: %O\n", output);
+  ::create(config);
 }
 
-mixed write(mixed ... args)
-{
-  return output->write(@args);
-}  
-
-string _sprintf(mixed ... args)
-{
-  return sprintf("appender(%O)", output);
-}

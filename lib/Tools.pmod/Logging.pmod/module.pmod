@@ -97,9 +97,47 @@ Tools.Logging.Log.Logger create_logger(string loggername)
 
 Tools.Logging.Log.Logger create_logger_from_config(string loggername)
 {
-  mapping cx = config_values["logger." + loggername];
+  // get the nearest logger configuration.
+  mapping cx;
+  string my_logger_name;
+
+  if(!(cx = config_values["logger." + loggername]))
+  {
+    array ln = indices(config_values);
+    ln = sort(filter(ln, lambda(string x)
+      {  return has_prefix("logger." + loggername, x + "."); }
+      ));
+
+    if(sizeof(ln)) my_logger_name = ln[-1];
+    cx = config_values[my_logger_name];
+  }
 
   if(!cx) return 0;
+
+  // if the logger we're using doesn't have a level specified, we use the level of the next
+  // lowest specified logger. if one doesn't exist, we use that of the default logger.
+  if(!cx->level)
+  {
+    string nlevel;
+    int gotlevel;
+
+    array x = loggername/".";
+
+    for(int i = sizeof(x)-1; i >= 0; i--)
+    {
+      string y = x[0 .. i] * ".";
+//      werror("checking " + y + "\n");
+      if(has_index(config_values["logger." + y] || ([]), "level"))
+      {
+        nlevel = config_values["logger." + y]->level; 
+        gotlevel=1;
+        // werror("got level %s\n", nlevel); break;
+      }
+    }
+    if(!gotlevel) nlevel = config_values["logger.default"]->level;
+    cx->level = nlevel;
+  }
+  cx->name = loggername;
 
   cx = insert_config_variables(cx);
 

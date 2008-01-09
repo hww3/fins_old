@@ -1,6 +1,12 @@
 //! formats a string using named parameters, in the format
 //! of %{param} where "param" is a key in the data
-//! set being used for replacements.
+//! set being used for replacements. Additionally, if a 
+//! parameter contains a colon (:), anything following the colon
+//! will be considered a formatting option to sprintf for the data.
+//! If no formatting options are specified, the data will be cast 
+//! to a string and be inserted into the final string as if %s were 
+//! passed in @[sprintf](). If formatting options are specified,
+//! the data will be passed as-is.
 //!
 //! @param format
 //!   format string, containing replacement fields in the form
@@ -11,6 +17,7 @@
 //!
 //! @example
 //!  Tools.String.named_sprintf("Welcome, %{name}", (["name": "bob"]));
+//!  Tools.String.named_sprintf("It'll be $%{cash:.2f}", (["cash": 2.44]));
 //!
 string named_sprintf(string format, mapping data)
 {
@@ -86,3 +93,4 @@ function named_sprintf_func(string format)
         sprintf("%O", xformed->get()) + "," + keys*", " + ");}";
   return compile(func)()->p;
 }
+

@@ -34,6 +34,7 @@ mapping strs_log = ([
   "CRITICAL": CRITICAL
 ]);
 
+mapping local_vars = (["pid": getpid(), "host": gethostname() ]);
 
 static void create(mapping|void config)
 {
@@ -78,7 +79,11 @@ static void do_msg(int level, string m, mixed|void ... extras)
   }
 
   mapping lt = localtime(time());
-  appenders->write(lt + (["level": log_strs[level], "msg": m]));
+  lt->year += 1900;
+  lt->mon += 1;
+  lt->timezone /= 3600;
+
+  appenders->write(local_vars + lt + (["level": log_strs[level], "msg": m]));
 
 //  stderr->write("%02d:%02d:%02d %s %s - %s\n", lt->hour, lt->min, lt->sec, log_strs[level], 
 //                      function_name(backtrace()[-3][2]), m);

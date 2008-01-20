@@ -13,6 +13,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added Tools.Mapping.MappingCache, a mapping that forgets entries after a 
+    predefined time.
 - Fixed Fins.Model.find.* for object types that have odd capitalization;
     everything is all lowercase now.
 - Added Scaffolding template support

@@ -127,19 +127,17 @@
       dest = to;
     else if(functionp(to) || (object_program(to) != Standards.URI))
     {
-	  dest = request->fins_app->action_url(to);
-
+	  dest = request->fins_app->url_for_action(to, args, vars);
     }
     else
     {
-	   dest = (string)to;
+      dest = (string)to;
+      if(args && sizeof(args))
+        dest = combine_path(dest, args*"/");
+
+      if(vars)
+        dest = request->fins_app->add_variables_to_path(dest, vars);
     }
-
-    if(args && sizeof(args))
-      dest = combine_path(dest, args*"/");
-
-    if(vars)
-      dest = request->fins_app->add_variables_to_path(dest, vars);
 
     response->extra_heads->location = dest;
   }
@@ -162,19 +160,18 @@
       dest = to;
     else if(functionp(to) || (object_program(to) != Standards.URI))
     {
-	  dest = request->fins_app->action_url(to);
+	  dest = request->fins_app->url_for_action(to, args, vars);
     }
     else
     {
-	   dest = (string)to;
+      dest = (string)to;
+      if(args && sizeof(args))
+        dest = combine_path(dest, args*"/");
+
+      if(vars)
+        dest = request->fins_app->add_variables_to_path(dest, vars);
     }
 
-    if(args && sizeof(args))
-      dest = combine_path(dest, args*"/");
-
-    if(vars)
-      dest = request->fins_app->add_variables_to_path(dest, vars);
- 
     response->extra_heads->location = dest;
   }
 

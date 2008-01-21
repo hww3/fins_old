@@ -9,7 +9,7 @@ static void create(.Criteria c)
 
 string get(string|void name, void|int datao)
 {
-   return "! (" + (ncriteria->get(name, datao)) + ")";
+   return "NOT (" + (ncriteria->get(name, datao)) + ")";
 }
 
 string get_criteria_type()

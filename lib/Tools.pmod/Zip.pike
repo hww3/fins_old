@@ -129,8 +129,13 @@ class LocalFileRecord
 
   long data_offset;
   string data;
-  object fd;
-  
+  object _fd;
+
+  string _sprintf(mixed t)
+  {
+    return "LocalFileRecord(" + filename + ")";
+  }  
+
   void create(int | mapping entry)
   {
     if(mappingp(entry))
@@ -151,12 +156,12 @@ class LocalFileRecord
 
     filename = entry->filename;
     if(objectp(entry->data))
-      fd = entry->data;
+      _fd = entry->data;
     else
-      fd = Stdio.FakeFile(entry->data);
+      _fd = Stdio.FakeFile(entry->data);
 
     object s;
-    if(s = fd->stat())
+    if(s = _fd->stat())
     {
       string unixdata = "";
       unixdata = sprintf(("%-2c" * 2) + ("%-4c" * 2) + ("%-2c" * 2),
@@ -178,7 +183,7 @@ class LocalFileRecord
 
   string encode_central_record(int offset)
   {
-   werror("size: %d, compressed: %d\n", uncomp_size, comp_size);
+   //werror("size: %d, compressed: %d\n", uncomp_size, comp_size);
       return sprintf(
             "%-4c" + "%-2c"*6 + "%-4c"*3 +  "%-2c"*5 + "%-4c"*2,
             0x02014b50, 3 /* UNIX */, ver_2_extract, general_flags,
@@ -196,7 +201,7 @@ class LocalFileRecord
     string cdata;
     string ucdata;
 
-    ucdata = fd->read(0x7fffffff);
+    ucdata = _fd->read(0x7fffffff);
     uncomp_size += sizeof(ucdata);
     crc32 = Gz.crc32(ucdata, crc32);
     cdata = write(ucdata);
@@ -394,6 +399,32 @@ void create( void|string|Stdio.File file )
   EndRecord(); 
 }
 
+void unzip(string todir)
+{
+  string start = "";
+
+  low_unzip(start, todir);
+}
+
+void low_unzip(string start, string todir)
+{
+  foreach(get_dir(start);; string fn)
+  {
+    string rfn = combine_path(start, fn);
+    string s;
+    if(s = read(rfn))
+    {
+      Stdio.write_file(combine_path(todir, rfn), s);
+    }
+    else
+    {
+      mkdir(combine_path(todir, rfn));
+      low_unzip(rfn, todir);
+    }
+  } 
+}
+
+
 //!
 string generate()
 {
@@ -429,8 +460,37 @@ string encode_end_record(int central_size, int central_start_offset, string|void
             (comment?sizeof(comment):0) ) + (comment?comment:"");
 }
 
+//! adds a directory to an archive
+void add_dir(string path, int recurse, string|void archiveroot)
+{
+  object i=Filesystem.System(path);
+
+  if(!archiveroot) archiveroot = "";
+
+  low_add_dir(i, archiveroot, recurse);
+
+}
+
+void low_add_dir(object i, string current_dir, int recurse)
+{
+  foreach(i->get_dir();; string fn)
+  {
+    if(fn == "CVS") continue; // never add CVS data
+    if(i->stat(fn)->isdir())
+    {
+//werror("adding directory " + fn + "\n");
+      if(recurse) low_add_dir(i->cd(fn), current_dir + "/" + fn, recurse);
+    }
+    else
+    {
+//werror("adding file " + fn + "\n");
+      add_file(current_dir + "/" + fn, i->open(fn, "r"));
+    }
+  }
+}
+
 //!
-void add_file(string filename, string|Stdio.File data, int|void stamp, int no_compress)
+void add_file(string filename, string|Stdio.File data, int|void stamp, int|void no_compress)
 {
   mapping entry = ([]);
 

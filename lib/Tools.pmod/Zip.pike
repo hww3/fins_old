@@ -412,12 +412,16 @@ void low_unzip(string start, string todir)
   {
     string rfn = combine_path(start, fn);
     string s;
-    if(s = read(rfn))
+    if(sizeof(rfn) && (rfn[-1] == '/')) continue;
+    else if(s = read(rfn))
     {
+werror("writing file " + rfn + "\n");
       Stdio.write_file(combine_path(todir, rfn), s);
     }
     else
     {
+      if(rfn[-1] == '/') rfn = rfn[..-2];
+werror("making directory " + rfn + "\n");
       mkdir(combine_path(todir, rfn));
       low_unzip(rfn, todir);
     }

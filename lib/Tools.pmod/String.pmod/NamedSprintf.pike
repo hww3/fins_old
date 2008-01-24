@@ -16,8 +16,9 @@
 //!  a mapping with data to be replaced
 //!
 //! @example
-//!  Tools.String.named_sprintf("Welcome, %{name}", (["name": "bob"]));
-//!  Tools.String.named_sprintf("It'll be $%{cash:.2f}", (["cash": 2.44]));
+//! > Tools.String.named_sprintf("Hello, %{name}. Lunch will be $%{cost:.2f}.",
+//!              (["name": "James", "planet": "Mars", "cost": 2.5])); 
+//! (2) Result: "Hello, James. Lunch will be $2.50."
 //!
 string named_sprintf(string format, mapping data)
 {

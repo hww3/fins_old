@@ -76,6 +76,8 @@ void create(.DataModelContext c)
 
    if(post_define && functionp(post_define))
      post_define();
+
+  set_weak_flag(objs, Pike.WEAK);
 }
 
 void set_cacheable(int timeout)
@@ -83,7 +85,10 @@ void set_cacheable(int timeout)
   if(timeout)
     objs = Tools.Mapping.MappingCache(timeout);
   else  
+  {
     objs = ([]);
+    set_weak_flag(objs, Pike.WEAK);
+  }
 }
 
 string describe_value(string key, mixed value, .DataObjectInstance|void i)
@@ -298,12 +303,13 @@ werror("add_ref(%O)\n", o);
   // FIXME: we shouldn't have to do this in more than one location!
   if(!objs[o->get_id()])
   {
-    objs[o->get_id()] = ({0, ([])});
+    mapping m = ([]);
+    objs[o->get_id()] = m;
+    o->object_data_cache = m;
   }
-
-  objs[o->get_id()][0]++;
 }
 
+/*
 void sub_ref(.DataObjectInstance o)
 {
 werror("sub_ref(%O)\n", o);
@@ -318,7 +324,7 @@ werror("sub_ref(%O)\n", o);
     m_delete(objs, o->get_id());
   }
 }
-
+*/
 //!
 void set_instance_name(string _name)
 {
@@ -512,7 +518,7 @@ void load(mixed id, .DataObjectInstance i, int|void force)
   else // guess we need this here, also.
   {
      i->set_initialized(1);
-     i->set_id(primary_key->decode(objs[id][1][primary_key->field_name]));
+     i->set_id(primary_key->decode(objs[id][primary_key->field_name]));
      i->set_new_object(0);
   }
 }
@@ -536,12 +542,12 @@ void low_load(mapping row, .DataObjectInstance i, mapping|void fieldnames)
   }
   if(!objs[id])
   {
-    objs[id] = ({0, ([])});
+    objs[id] = ([]);
   }
 
 
 
-  objs[id][1] = r;
+  objs[id] = r;
 
   return;
 }
@@ -569,9 +575,9 @@ mixed get(string field, .DataObjectInstance i)
      throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
    }
 
-   if(objs[i->get_id()] && has_index(objs[i->get_id()][1], field))
+   if(objs[i->get_id()] && has_index(objs[i->get_id()], field))
    {
-     return fields[field]->decode(objs[i->get_id()][1][field], i);
+     return fields[field]->decode(objs[i->get_id()][field], i);
    }     
 
    else if(i->is_new_object())

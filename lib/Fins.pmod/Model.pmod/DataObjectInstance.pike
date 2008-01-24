@@ -5,7 +5,19 @@
 
 string object_type;
 multiset fields_set = (<>);
+
+// this storage location of changed values local to this instance
 mapping object_data = ([]);
+
+// this storage location of changed values local to this transaction
+mapping object_data_tx = ([]);
+
+// the local storage location of the global cache for data values of this id.
+mapping object_data_cache = ([]); 
+
+// if non-zero, the id of the current transaction. not currently used.
+int transaction_id;
+
 static mixed key_value = UNDEFINED;
 int new_object = 0;
 int saved = 0;
@@ -90,7 +102,7 @@ static void create(mixed|void id, object _object_type)
   else
   {
     master_object->load(id, this);
-    master_object->add_ref(this);
+//    master_object->add_ref(this);
   }
 
 
@@ -123,7 +135,7 @@ void refresh()
    .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object);  
 
     master_object->load(id, new_object);
-    master_object->add_ref(new_object);
+//    master_object->add_ref(new_object);
    return new_object;
 }
 
@@ -268,6 +280,7 @@ int `==(mixed a)
   else return 0;
 }
 
+/*
 static void destroy()
 {
   if(master_object) 
@@ -277,3 +290,4 @@ static void destroy()
     werror("ERROR! No Master object on instance destroy!\n");
   }
 }
+*/

@@ -31,14 +31,13 @@ mapping default_values = ([]);
 //!
 .Field alternate_key;
 
-
 //!
 .DataModelContext context;
 
 object my_undef = .Undefined;
 
 //!
-mapping objs = ([]);
+mapping|Tools.Mapping.MappingCache  objs = ([]);
 
 //!
 mapping fields = ([]);
@@ -77,6 +76,14 @@ void create(.DataModelContext c)
 
    if(post_define && functionp(post_define))
      post_define();
+}
+
+void set_cacheable(int timeout)
+{
+  if(timeout)
+    objs = Tools.Mapping.MappingCache(timeout);
+  else  
+    objs = ([]);
 }
 
 string describe_value(string key, mixed value, .DataObjectInstance|void i)
@@ -133,7 +140,7 @@ void set_operator(int oper_type)
 //!  a @[Fins.Errors.Validation] object that can be used to aggregate error messages
 //!  by using the add() method.
 //! @param i
-//!  the DataInstanceObject being created or updated.
+//!  the @[DataInstanceObject] being created or updated.
 //!
 void validate(mapping changes, Fins.Errors.Validation errors, .DataObjectInstance i);
 
@@ -148,7 +155,7 @@ void validate(mapping changes, Fins.Errors.Validation errors, .DataObjectInstanc
 //!  a @[Fins.Errors.Validation] object that can be used to aggregate error messages
 //!  by using the add() method.
 //! @param i
-//!  the DataInstanceObject being created or updated.
+//!  the @[DataInstanceObject] being created or updated.
 //!
 void validate_on_update(mapping changes, Fins.Errors.Validation errors, .DataObjectInstance i);
 
@@ -163,7 +170,7 @@ void validate_on_update(mapping changes, Fins.Errors.Validation errors, .DataObj
 //!  a @[Fins.Errors.Validation] object that can be used to aggregate error messages
 //!  by using the add() method.
 //! @param i
-//!  the DataInstanceObject being created or updated.
+//!  the @[DataInstanceObject] being created or updated.
 //!
 void validate_on_create(mapping changes, Fins.Errors.Validation errors, .DataObjectInstance i);
 
@@ -286,6 +293,8 @@ void has_many(string other_type, string|void my_name, string|void other_field)
 
 void add_ref(.DataObjectInstance o)
 {
+werror("add_ref(%O)\n", o);
+
   // FIXME: we shouldn't have to do this in more than one location!
   if(!objs[o->get_id()])
   {
@@ -297,6 +306,7 @@ void add_ref(.DataObjectInstance o)
 
 void sub_ref(.DataObjectInstance o)
 {
+werror("sub_ref(%O)\n", o);
   if(!o->is_initialized()) return;
 
   if(!objs[o->get_id()]) return;

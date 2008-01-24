@@ -3,3 +3,4 @@
 - handle changed values better when we finish a pick()
 - add inherited datatypes to Model
 - add cached objects to Model
+- add transaction support to Model

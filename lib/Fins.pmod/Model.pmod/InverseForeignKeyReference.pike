@@ -22,7 +22,9 @@ static void create(string _name, string _otherobject, string _otherkey, .Criteri
 mixed decode(string value, void|.DataObjectInstance i) 
 { 
   if(!unique)
+  {
     return .ObjectArray(this, i);
+  }
   else
   {
     array r = Fins.Model.old_find(otherobject, ([ otherkey : (int) i->get_id()]), criteria);

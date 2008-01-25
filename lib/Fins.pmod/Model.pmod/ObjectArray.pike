@@ -6,6 +6,8 @@ int changed;
 
 static void create(.Field f, object parent)
 {
+
+
   field = f; 
   parentobject = parent;
   otherobject = parent->master_object->context->repository["get_object"](field->otherobject);

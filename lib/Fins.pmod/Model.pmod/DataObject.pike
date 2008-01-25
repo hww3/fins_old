@@ -298,14 +298,14 @@ void has_many(string other_type, string|void my_name, string|void other_field)
 
 void add_ref(.DataObjectInstance o)
 {
-werror("add_ref(%O)\n", o);
+// werror("add_ref(%O)\n", o);
 
   // FIXME: we shouldn't have to do this in more than one location!
   if(!objs[o->get_id()])
   {
     mapping m = ([]);
-    objs[o->get_id()] = m;
     o->object_data_cache = m;
+    objs[o->get_id()] = m;
   }
 }
 
@@ -461,7 +461,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
     item->set_id(primary_key->decode(row[fn]));
     item->set_new_object(0);
     low_load(row, item, _fieldnames);
-    add_ref(item);
+//    add_ref(item);
     results+= ({ item  });
   }
 
@@ -520,13 +520,15 @@ void load(mixed id, .DataObjectInstance i, int|void force)
      i->set_initialized(1);
      i->set_id(primary_key->decode(objs[id][primary_key->field_name]));
      i->set_new_object(0);
+     i->object_data_cache = objs[i->get_id()];
   }
 }
 
 void low_load(mapping row, .DataObjectInstance i, mapping|void fieldnames)
 {
   mixed id = i->get_id();
-  mapping r = ([]);
+  if(!objs[id]) objs[id] = ([]);
+  mapping r = objs[id];
   int n = 0;
   foreach(fields; string fn; .Field f)
   {
@@ -540,15 +542,7 @@ void low_load(mapping row, .DataObjectInstance i, mapping|void fieldnames)
     r[f->name] = row[fn];
     n++;
   }
-  if(!objs[id])
-  {
-    objs[id] = ([]);
-  }
-
-
-
-  objs[id] = r;
-
+  i->object_data_cache = r;
   return;
 }
 
@@ -566,7 +560,6 @@ mapping get_atomic(.DataObjectInstance i)
 
 mixed get(string field, .DataObjectInstance i)
 {
-
    if(field == "_id")
      field = primary_key->name;
 

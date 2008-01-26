@@ -47,11 +47,28 @@ static program get_model_component(string ot)
   return m[ot];
 }
 
+static object get_object_component(string ot)
+{
+  mixed m = Fins.Model.get_object_module();
+
+  array x = indices(m);
+  array y = values(m);
+  
+  foreach(x;int i; string v)
+    x[i] = lower_case(v);
+
+  m = mkmapping(x,y);
+
+  return m[ot];
+}
+
+
 static function get_func(mixed k)
 {
   function f;
   string ot;
   program p;
+  int i;
 
   // we only like strings.
   if(!stringp(k)) return 0;
@@ -80,6 +97,26 @@ static function get_func(mixed k)
     if(p=get_model_component(ot))
       return lambda(mixed ... args){ return Fins.Model.find_by_alternate(p, @args);};
   }
+  else if(has_suffix(k, "_by_alt"))
+  {
+    ot = string_without_suffix(k, "_by_alt");
+    ot = Tools.Language.Inflect.singularize(ot);
+//    ot = String.capitalize(ot);
+    if(p=get_model_component(ot))
+      return lambda(mixed ... args){ return Fins.Model.find_by_alternate(p, @args);};
+  }
+/*
+  else if((i = search(k, "_by_")) != -1)
+  {
+    object q;
+    ot = k[0..(i-1)];
+    ot = Tools.Language.Inflect.singularize(ot);
+werror("ot: %O, %O\n", get_model_component(ot)->master_object, k[(i+4)..]);
+    if((p = get_model_component(ot)) && (q = get_object_component(ot))->alternate_key && (k[(i+4) ..] == lower_case(q->alternate_key->name)))
+      return lambda(mixed ... args){ return Fins.Model.find_by_alternate(p, @args);};
+
+  }
+*/
   else if(has_suffix(k, "_all"))
   {
     ot = string_without_suffix(k, "_all");

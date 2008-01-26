@@ -130,6 +130,14 @@ void refresh()
 }
 
 //!
+.DataObjectInstance find_by_alternate(mixed id)
+{
+   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object);  
+    master_object->load_alternate(id, new_object);
+    return new_object;
+}
+
+//!
 .DataObjectInstance find_by_id(int id)
 {
    .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object);  

@@ -13,6 +13,7 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added Tools.Zip, with support for reading and writing basic Zip files.
 - Added Tools.Mapping.MappingCache, a mapping that forgets entries after a 
     predefined time.
 - Fixed Fins.Model.find.* for object types that have odd capitalization;

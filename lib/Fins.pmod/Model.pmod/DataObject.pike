@@ -507,10 +507,52 @@ void load(mixed id, .DataObjectInstance i, int|void force)
      {
        	throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
      }
-     else
-       if(context->debug) werror("got results from query: %s\n", query);
+//     else
+//       if(context->debug) werror("got results from query: %s\n", query);
 
      i->set_id(id);
+     i->set_new_object(0);
+     i->set_initialized(1);
+     low_load(result[0], i, _fieldnames);
+  }
+  else // guess we need this here, also.
+  {
+     i->set_initialized(1);
+     i->set_id(primary_key->decode(objs[id][primary_key->field_name]));
+     i->set_new_object(0);
+     i->object_data_cache = objs[i->get_id()];
+  }
+}
+
+void load_alternate(mixed id, .DataObjectInstance i, int|void force)
+{
+   if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
+   {
+     mapping _fieldnames = ([]);
+     array _fields = ({});
+
+     foreach(fields;; .Field f)
+     {
+       if(!f->field_name) continue;
+       string mfn = (f->get_table?f->get_table():table_name) + "__" + f->field_name;
+       _fieldnames[f] = mfn;
+       _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name + " AS " + mfn});
+     }  
+     string query = sprintf(single_select_query, (_fields * ", "), 
+       table_name, alternate_key->field_name, alternate_key->encode(id));
+
+     if(context->debug) werror("QUERY: %O\n", query);
+
+     array result = context->sql->query(query);
+
+     if(sizeof(result) != 1)
+     {
+       	throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
+     }
+//     else
+//       if(context->debug) werror("got results from query: %s\n", query);
+
+     i->set_id(primary_key->decode(result[0][primary_key->field_name]));
      i->set_new_object(0);
      i->set_initialized(1);
      low_load(result[0], i, _fieldnames);
@@ -543,6 +585,8 @@ void low_load(mapping row, .DataObjectInstance i, mapping|void fieldnames)
     n++;
   }
   i->object_data_cache = r;
+  if(alternate_key)
+    objs[r[alternate_key->name]] = r;
   return;
 }
 
@@ -567,10 +611,11 @@ mixed get(string field, .DataObjectInstance i)
    {
      throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
    }
+   int id = i->get_id();
 
-   if(objs[i->get_id()] && has_index(objs[i->get_id()], field))
+   if(objs[id] && has_index(objs[id], field))
    {
-     return fields[field]->decode(objs[i->get_id()][field], i);
+     return fields[field]->decode(objs[id][field], i);
    }     
 
    else if(i->is_new_object())
@@ -578,8 +623,21 @@ mixed get(string field, .DataObjectInstance i)
      return i->object_data[field];
    }
 
+   load(id, i, 0);
+
+   if(objs[id] && has_index(objs[id], field))
+   {
+     return fields[field]->decode(objs[id][field], i);
+   }     
+   else 
+   {
+     werror("Error finding data for id %O; Here's the cache: %O\n", id, objs);
+     throw(Error.Generic("get failed on object without a data cache.\n"));
+   }
+
+/*
    string query = sprintf(single_select_query, fields[field]->field_name, table_name, 
-     primary_key->field_name, primary_key->encode(i->get_id()), i);
+     primary_key->field_name, primary_key->encode(id), i);
 
       if(context->debug) werror("QUERY: %O\n", query);
 
@@ -587,13 +645,14 @@ mixed get(string field, .DataObjectInstance i)
 
    if(sizeof(result) != 1)
    {
-     throw(Error.Generic("Unable to obtain information for " + instance_name + " id " + i->get_id() + "\n"));
+     throw(Error.Generic("Unable to obtain information for " + instance_name + " id " + id + "\n"));
    }
    else 
    {
 //	  werror("R: %O, %O\n", result[0], fields[field]->field_name);
      return fields[field]->decode(result[0][fields[field]->field_name], i);
    }
+*/
 }
 
 int set_atomic(mapping values, int|void no_validation, .DataObjectInstance i)

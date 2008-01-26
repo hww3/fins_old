@@ -137,7 +137,7 @@ array find_by_query(string|program|object ot, string query)
    if(!o->alternate_key)
      throw(Error.Generic("Object type " + ot + " does not have an alternate key.\n"));
 
-   return old_find(o, ([o->alternate_key->name: id]))[0];
+   return get_instance(o->instance_name)(UNDEFINED)->find_by_alternate(id);
 }
 
 //!

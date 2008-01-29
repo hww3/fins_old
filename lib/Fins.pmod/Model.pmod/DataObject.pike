@@ -42,6 +42,10 @@ mapping|Tools.Mapping.MappingCache  objs = ([]);
 //!
 mapping fields = ([]);
 
+static  array _fields = ({});
+static  mapping _fieldnames = ([]);
+static  mapping _fieldnames_low = ([]);
+static  string _fields_string = "";
 //!
 mapping relationships = ([]);
 
@@ -312,7 +316,7 @@ void add_ref(.DataObjectInstance o)
 /*
 void sub_ref(.DataObjectInstance o)
 {
-werror("sub_ref(%O)\n", o);
+//werror("sub_ref(%O)\n", o);
   if(!o->is_initialized()) return;
 
   if(!objs[o->get_id()]) return;
@@ -381,17 +385,41 @@ void add_field(.Field f)
    {
      relationships[f->name] = f;
    }
+
+   gen_fields();
 }
 
-array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
+void gen_fields()
 {
-  string query;
-  array(object(.DataObjectInstance)) results = ({});
+  string fn;
 
-  array _fields = ({});
-  array _where = ({});
-  array _tables = ({table_name});
-  mapping _fieldnames = ([]);
+  _fields = ({});
+  _fieldnames = ([]);
+  _fieldnames_low = ([]);
+     foreach(fields;; .Field f)
+     {
+       string mfn = (f->get_table?f->get_table():table_name) + "__" + f->field_name;
+
+       if(f->field_name)
+       {
+         _fieldnames[f] = mfn;
+         _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name + " AS " + mfn});
+       }
+
+      if(!f->field_name)
+      {
+        if(f->get_table)
+          fn = f->get_table()  + "." + f->field_name;
+        else 
+          fn = table_name + "." + f->field_name;
+      }
+      else
+        fn = mfn;
+      _fieldnames_low[f->name] = fn;
+
+   }      
+
+/*
   foreach(fields;; .Field f)
    if(f->field_name)
    {
@@ -399,6 +427,19 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
       _fields += ({ table_name + "." + f->field_name + " AS " + mfn});
       _fieldnames += ([f:mfn]);
    }
+*/
+   _fields_string = (_fields * ", ");
+}
+
+array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
+{
+  string query;
+  array(object(.DataObjectInstance)) results = ({});
+
+  array _where = ({});
+  array _tables = ({table_name});
+
+  //werror("%O via %O (%O, %O, %O)", Tools.Function.this_function(), backtrace()[-4][2], qualifiers, criteria, i);
 
   foreach(qualifiers; mixed name; mixed q)
   {
@@ -431,11 +472,11 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
   }      
 
   if(_where && sizeof(_where)) 
-    query = sprintf(multi_select_query, (_fields * ", "), 
+    query = sprintf(multi_select_query, _fields_string, 
       (Array.uniq(_tables) * ", "), (_where * default_operator));
 
   else
-    query = sprintf(multi_select_nowhere_query, (_fields * ", "), 
+    query = sprintf(multi_select_nowhere_query, _fields_string, 
       table_name);
 
   // criteria always overrides default sorting.
@@ -450,7 +491,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
     query += (" " + _default_sort_order_cached);
   }
 
-  if(context->debug) werror("QUERY: %O\n", query);
+  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
   
   array qr = context->sql->query(query);
 
@@ -460,7 +501,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
     object item = object_program(i)(UNDEFINED, this);
     item->set_id(primary_key->decode(row[fn]));
     item->set_new_object(0);
-    low_load(row, item, _fieldnames);
+    low_load(row, item, /*_fieldnames*/);
 //    add_ref(item);
     results+= ({ item  });
   }
@@ -486,9 +527,10 @@ void load(mixed id, .DataObjectInstance i, int|void force)
 
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
+
+/*
      mapping _fieldnames = ([]);
      array _fields = ({});
-
      foreach(fields;; .Field f)
      {
        if(!f->field_name) continue;
@@ -496,10 +538,12 @@ void load(mixed id, .DataObjectInstance i, int|void force)
        _fieldnames[f] = mfn;
        _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name + " AS " + mfn});
      }      
-     string query = sprintf(single_select_query, (_fields * ", "), 
+
+*/
+     string query = sprintf(single_select_query, (_fields_string), 
        table_name, primary_key->field_name, primary_key->encode(id));
 
-     if(context->debug) werror("QUERY: %O\n", query);
+     if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
 
      array result = context->sql->query(query);
 
@@ -513,7 +557,7 @@ void load(mixed id, .DataObjectInstance i, int|void force)
      i->set_id(id);
      i->set_new_object(0);
      i->set_initialized(1);
-     low_load(result[0], i, _fieldnames);
+     low_load(result[0], i, /*_fieldnames*/);
   }
   else // guess we need this here, also.
   {
@@ -528,6 +572,8 @@ void load_alternate(mixed id, .DataObjectInstance i, int|void force)
 {
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
+     Log.debug("load_alternate(%O, %O): loading from database.", id, i);
+/*
      mapping _fieldnames = ([]);
      array _fields = ({});
 
@@ -538,10 +584,12 @@ void load_alternate(mixed id, .DataObjectInstance i, int|void force)
        _fieldnames[f] = mfn;
        _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name + " AS " + mfn});
      }  
-     string query = sprintf(single_select_query, (_fields * ", "), 
+*/
+     string query = sprintf(single_select_query, (_fields_string), 
        table_name, alternate_key->field_name, alternate_key->encode(id));
 
-     if(context->debug) werror("QUERY: %O\n", query);
+  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
+
 
      array result = context->sql->query(query);
 
@@ -552,10 +600,12 @@ void load_alternate(mixed id, .DataObjectInstance i, int|void force)
 //     else
 //       if(context->debug) werror("got results from query: %s\n", query);
 
-     i->set_id(primary_key->decode(result[0][primary_key->field_name]));
+     //werror("RESULT: %O, %O\n", result[0], _fieldnames);
+
+     i->set_id(primary_key->decode(result[0][_fieldnames[primary_key]]));
      i->set_new_object(0);
      i->set_initialized(1);
-     low_load(result[0], i, _fieldnames);
+     low_load(result[0], i, /*_fieldnames*/);
   }
   else // guess we need this here, also.
   {
@@ -566,23 +616,36 @@ void load_alternate(mixed id, .DataObjectInstance i, int|void force)
   }
 }
 
-void low_load(mapping row, .DataObjectInstance i, mapping|void fieldnames)
+void low_load(mapping row, .DataObjectInstance i, /*mapping|void fieldnames*/)
 {
   mixed id = i->get_id();
   if(!objs[id]) objs[id] = ([]);
   mapping r = objs[id];
   int n = 0;
-  foreach(fields; string fn; .Field f)
+  // NOTE: are we shooting ourselves in the foot by doing this?
+  /*
+  if(fieldnames)
   {
-    string fn;
-    if(fieldnames && fieldnames[f] && f->field_name)
-      fn = fieldnames[f];
-    else if(f->get_table)
-      fn = f->get_table()  + "." + f->field_name;
-    else 
-      fn = table_name + "." + f->field_name;
-    r[f->name] = row[fn];
-    n++;
+    foreach(fields; string fn; .Field f)
+    {
+      string fn;
+      if(fieldnames && fieldnames[f] && f->field_name)
+        fn = fieldnames[f];
+      else if(f->get_table)
+        fn = f->get_table()  + "." + f->field_name;
+       else 
+        fn = table_name + "." + f->field_name;
+      r[f->name] = row[fn];
+      n++;
+    }
+  }
+  else
+  */
+  {
+    foreach(_fieldnames_low; string fn; string fnl)
+    {  
+       r[fn] = row[fnl];
+    }
   }
   i->object_data_cache = r;
   if(alternate_key)
@@ -639,7 +702,7 @@ mixed get(string field, .DataObjectInstance i)
    string query = sprintf(single_select_query, fields[field]->field_name, table_name, 
      primary_key->field_name, primary_key->encode(id), i);
 
-      if(context->debug) werror("QUERY: %O\n", query);
+  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
 
    mixed result = context->sql->query(query);
 
@@ -751,7 +814,7 @@ int set(string field, mixed value, int|void no_validation, .DataObjectInstance i
 
      string update_query = sprintf(single_update_query, table_name, fields[field]->field_name, new_value, primary_key->name, key_value);
      i->set_saved(1);
-     if(context->debug) werror("QUERY: %O\n", update_query);
+  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), update_query);
      context->sql->query(update_query);
      load(i->get_id(), i, 1);   
    }
@@ -816,7 +879,7 @@ int delete(int|void force, .DataObjectInstance i)
 
    string delete_query = sprintf(single_delete_query, table_name, primary_key->name, key_value);
 
-   if(context->debug) werror("QUERY: %O\n", delete_query);
+  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), delete_query);
    context->sql->query(delete_query);
    m_delete(objs, i->get_id());
    destruct(i);
@@ -964,7 +1027,7 @@ static int commit_changes(multiset fields_set, mapping object_data, int|void no_
          string values_clause = "(" + (qvalues * ", ") + ")";
 
          query = sprintf(insert_query, table_name, fields_clause, values_clause);
-         if(context->debug) werror("QUERY: %O\n", query);
+  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
       }
       else
       {
@@ -979,7 +1042,7 @@ static int commit_changes(multiset fields_set, mapping object_data, int|void no_
          set_clause = (set * ", ");
          
          query = sprintf(multi_update_query, table_name, set_clause, primary_key->field_name, primary_key->encode(update_id));
-         if(context->debug) werror("QUERY: %O\n", query);
+  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
       }
       context->sql->query(query);
 }

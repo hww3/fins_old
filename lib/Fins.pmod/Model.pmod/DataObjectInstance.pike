@@ -30,7 +30,7 @@ Iterator _get_iterator()
 
 string _sprintf(mixed ... args)
 {
-  return object_type + "(" + get_descriptor() + ")";
+  return object_type + "(" + get_descriptor() + "/" + key_value + ")";
 }
 
 string describe_value(string key, mixed value)

@@ -30,6 +30,7 @@ Fins.Helpers.Filters.Compress _gzfilter;
 static mapping processors = ([]);
 static mapping controller_path_cache = ([]);
 static mapping action_path_cache = ([]);
+static mapping event_cache = ([]);
 
 // breakpointing support
 Stdio.Port breakpoint_port;
@@ -41,6 +42,9 @@ object bp_lock = Thread.Mutex();
 object breakpoint_hilfe;
 object bpbe;
 object bpbet;
+int cache_events = 1;
+
+static int exp = 24 * 10;
 
 //!
 static void create(.Configuration _config)
@@ -50,6 +54,9 @@ static void create(.Configuration _config)
 
   if(config["app"] && config["app"]["context_root"])
     context_root = config["app"]["context_root"];
+
+  cache_events = (int)config["controller"]["cache_events"];
+  exp = (int)config["app"]["static_expire_period"] || (24*10);
 
   load_breakpoint();
   load_cache();
@@ -588,7 +595,8 @@ array get_event(.Request request)
       }
       else
       {
-	// what should we do?
+	// if we have an event, we should consider the empty component as a //, where the empty
+        // argument component may be significant.
 	if(event)
     	{
 	  args+=({comp}); 
@@ -600,18 +608,22 @@ array get_event(.Request request)
     // ok, the component was not empty.
     else
     {
+      // if we already have the event, we just tack on to the arguments.
       if(event)
       {
 	args+=({comp});
       }
+      // if we don't already have the event, but cc[comp] is a function, that's our event.
       else if(cc && (ci = cc[comp]) && functionp(ci))
       {
 	not_args += ({comp});
 	event = ci;
         request->controller_path += ("/" + comp);
       }
+      // if we have a controller, and cc[comp] is an object, we check to see what kind of object.
       else if(cc && ci && objectp(ci))
       {
+        // if it's a Runner, well, that's as good as an event for us.
 	if(Program.implements(object_program(ci), Fins.Helpers.Runner))
 	{
 	  not_args += ({comp});
@@ -619,6 +631,7 @@ array get_event(.Request request)
           request->event_name = comp;
           request->event = comp;
 	}    
+        // if it's a controller, we make it our current controller and continue with the next component.
 	else if(Program.implements(object_program(ci), Fins.FinsController))
 	{ 
 	  not_args += ({comp});
@@ -637,6 +650,7 @@ array get_event(.Request request)
 	  throw(Error.Generic("Component " + comp + " is not a Controller.\n"));
 	}
       }
+      // otherwise, if it's an index function, we make it the event and add the component as an arg.
       else if(cc && (ci = cc["index"]))
       { 
 	not_args += ({"index"});
@@ -673,6 +687,8 @@ array get_event(.Request request)
 
   request->not_args = not_args * "/";
   if(!sizeof(request->controller_path)) request->controller_path = "/";
+
+  event_cache[request->controller_path] = event;
 
   if(sizeof(args))
     return ({event, @args});
@@ -711,8 +727,8 @@ array get_event(.Request request)
     return response;
   }
 
-  response->set_header("Cache-Control", "max-age=" + (3600*24));
-  response->set_header("Expires", (Calendar.Second() + (3600*48))->format_http());
+  response->set_header("Cache-Control", "max-age=" + (3600*exp));
+  response->set_header("Expires", (Calendar.Second() + (3600*exp*2))->format_http());
   response->set_type(Protocols.HTTP.Server.filename_to_type(basename(fn)));
   response->set_file(Stdio.File(fn));
 

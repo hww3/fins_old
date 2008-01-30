@@ -6,7 +6,7 @@ import Tools.Logging;
 object __fin_serve;
 string context_root = "";
 
-//!
+//! The root Controller object
 .FinsController controller;
 
 //!
@@ -46,7 +46,8 @@ int cache_events = 1;
 
 static int exp = 24 * 10;
 
-//!
+//! constructor for the Fins application. It is normally not necessary to override this method,
+//! as @[start]() will be called immediately from this method.
 static void create(.Configuration _config)
 {
   config = _config;
@@ -73,7 +74,7 @@ static void create(.Configuration _config)
 }
 
 //! this method will be called after the cache, model, view and 
-//! controller have been loaded.
+//! controller have been loaded. this is the recommended extension point for application startup.
 void start()
 {
 }
@@ -117,6 +118,8 @@ static void load_processor(string proc)
   processor->start();
 }
 
+//! returns the processor object for a given protocol. typically used with integration processors such as 
+//! @[StompProcessor].
 public object get_processor(string protocol)
 {
   return processors[protocol];
@@ -152,16 +155,6 @@ static void load_view()
   else Log.debug("No view defined!");
 }
 
-//! loads the controller, providing support for auto-reload of
-//! updated controller classes.
-//!
-//! @example
-//!  Fins.FinsController foo;
-//!
-//!  void start()
-//!  {
-//!    foo = load_controller("foo_controller");
-//!  } 
 static object low_load_controller(string controller_name)
 {
   program c;
@@ -200,6 +193,17 @@ static object low_load_controller(string controller_name)
   return o;
 }
 
+//! loads the controller, providing support for auto-reload of
+//! updated controller classes. normally, a controller will call its local
+//! @[FinsController.load_controller]() method.
+//!
+//! @example
+//!  Fins.FinsController foo;
+//!
+//!  void start()
+//!  {
+//!    foo = load_controller("foo_controller");
+//!  } 
 static void load_controller()
 {
   Log.debug("%O->load_controller()", this);
@@ -249,9 +253,12 @@ int controller_updated(object controller, object container, string cn)
   return 0;
 }
 
+//! gets the controller object which will handle a given path,  not
+//! including any context root.
 //! 
 //! @param controller
-//!   an optional controller for use with relative paths.
+//!   an optional controller for use with relative paths. if provided, the path will be calculated
+//!   relative to this controller in the virutal filespace.
 //!
 object get_controller_for_path(string path, object|void controller)
 {
@@ -267,7 +274,11 @@ object get_controller_for_path(string path, object|void controller)
   else return controller;
 }
 
+//! get the path associated with a controller object
 //!
+//! @returns
+//!  the path to the controller relative to the root of the
+//!  application. does not include any context root.
 string get_path_for_controller(object _controller)
 {
   string path;
@@ -306,7 +317,7 @@ string get_path_for_controller(object _controller)
   return path;
 }
 
-//!
+//! find the controller which contains this controller object.
 object find_parent_controller(object c)
 {
   object parent = lookingfor(c, controller);
@@ -329,7 +340,12 @@ private object lookingfor(object o, object in)
   return 0;
 }
 
+//! get the path for a given controller object or handler method.
 //!
+//! @param action
+//!   a controller or handler method
+//! @param nocontextroot
+//!   if true, do not prepend the application's context root to the path
 string get_path_for_action(function|object action, int|void nocontextroot)
 {
   string path;
@@ -346,7 +362,16 @@ string get_path_for_action(function|object action, int|void nocontextroot)
   return path;
 }
 
+//! get a fully formatted path string for an action
 //!
+//! @param action
+//!   a controller or handler method
+//!
+//! @param args
+//!   optional arguments to be passed as path info 
+//!
+//! @param vars
+//!    optional variables to be passed as part of the query string
 string url_for_action(function|object action, array|void args, mapping|void vars)
 {
   string path;
@@ -378,7 +403,9 @@ public string add_variables_to_path(string path, mapping vars)
   return path;
 }
 
-//!
+//! main request handling method. passes http requests to the internal
+//! http request handler and other types of request to external 
+//! processors, if defined in the application configuration.
 public mixed handle_request(.Request request)
 {
   object processor;
@@ -697,7 +724,7 @@ array get_event(.Request request)
 
 }
 
-//!
+//! handle a request for a static file; used internally by @[handle_http]()
 .Response static_request(.Request request)
 {
   string fn = Stdio.append_path(static_dir, request->not_query[7..]);
@@ -755,7 +782,7 @@ array get_event(.Request request)
   return response;
 }
 
-//! trigger a breakpoint in execution
+//! trigger a breakpoint in execution, if breakpointing is enabled.
 //! @param desc
 //!   description of breakpoint, to be passed to breakpoint client
 //! @param state
@@ -865,4 +892,3 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
   }
 
 }
-

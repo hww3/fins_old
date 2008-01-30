@@ -53,8 +53,8 @@ static void create(.Configuration _config)
   config = _config;
   static_dir = Stdio.append_path(config->app_dir, "static");
 
-  if(config["app"] && config["app"]["context_root"])
-    context_root = config["app"]["context_root"];
+  if(config["application"] && config["application"]["context_root"])
+    context_root = config["application"]["context_root"];
 
   cache_events = (int)config["controller"]["cache_events"];
   exp = (int)config["application"]["static_expire_period"] || (24*10);
@@ -127,13 +127,12 @@ public object get_processor(string protocol)
 
 static void load_breakpoint()
 {
-  if(config["app"] && (int)config["app"]["breakpoint"])
+  if(config["application"] && (int)config["application"]["breakpoint"])
   {
     bpbe = Pike.Backend();
     bpbet = Thread.Thread(lambda(){ do { catch(bpbe()); } while (1); });
 
-    if((int)config["app"]["breakpoint_port"]) breakpoint_port_no = 
-                                             (int)config["app"]["breakpoint_port"];
+    if((int)config["application"]["breakpoint_port"]) breakpoint_port_no = (int)config["application"]["breakpoint_port"];
     Log.info("Starting Breakpoint Server on port %d.", breakpoint_port_no);
     breakpoint_port = Stdio.Port(breakpoint_port_no, handle_breakpoint_client);
     breakpoint_port->set_backend(bpbe);
@@ -372,6 +371,15 @@ string get_path_for_action(function|object action, int|void nocontextroot)
 //!
 //! @param vars
 //!    optional variables to be passed as part of the query string
+//!
+//! @example
+//! > mixed action = application->controller->space->index;
+//! > action;
+//! (1) Result: app_controller.pike()->index
+//! > application->url_for_action(action, 0, (["variable": 1]));
+//! (2) Result: "/space/index?variable=1"
+
+//!
 string url_for_action(function|object action, array|void args, mapping|void vars)
 {
   string path;
@@ -790,12 +798,16 @@ array get_event(.Request request)
 //!
 public void breakpoint(string desc, mapping state)
 {
-  if(config["app"] && config["app"]["breakpoint"])
+  if(config["application"] && config["application"]["breakpoint"])
   {
     do_breakpoint(desc, state, backtrace());
-    return;
   }
-  else return;
+  else
+  {
+    Log.debug("breakpoints disabled, skipping breakpoint set from %O",
+                 backtrace()[-2][2]);
+  }
+  return;
 }
 
 private void do_breakpoint(string desc, mapping state, array bt)

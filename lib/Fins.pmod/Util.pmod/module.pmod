@@ -18,7 +18,8 @@ string get_path_for_module(object o)
 	
 	if(o->is_resolv_joinnode)
 	{
-		return o->joined_modules[0]->dirname;
+            mixed d = o->joined_modules;
+		return d[0]->dirname;
 	}
 	else
 	 return get_path_for_program(object_program(o));

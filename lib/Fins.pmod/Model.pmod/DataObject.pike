@@ -46,6 +46,7 @@ static  array _fields = ({});
 static  mapping _fieldnames = ([]);
 static  mapping _fieldnames_low = ([]);
 static  string _fields_string = "";
+
 //!
 mapping relationships = ([]);
 

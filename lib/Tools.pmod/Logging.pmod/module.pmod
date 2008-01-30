@@ -8,6 +8,7 @@ static array _rk;
 static array _rv;
 
 object default_logger = Tools.Logging.Log.Logger();
+
 //! 
 //!  configuration file is standard ini-style.
 //!
@@ -194,6 +195,7 @@ mapping insert_config_variables(mapping c)
     if(_rk)
  	  foreach(c; string k; string v)
 	  {
+		if(v)
 	 	 c[k] = replace(v, _rk, _rv);
 	  }
 	//werror("%O\n", c);

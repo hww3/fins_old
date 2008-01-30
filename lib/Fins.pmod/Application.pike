@@ -56,7 +56,7 @@ static void create(.Configuration _config)
     context_root = config["app"]["context_root"];
 
   cache_events = (int)config["controller"]["cache_events"];
-  exp = (int)config["app"]["static_expire_period"] || (24*10);
+  exp = (int)config["application"]["static_expire_period"] || (24*10);
 
   load_breakpoint();
   load_cache();

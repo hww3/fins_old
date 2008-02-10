@@ -715,9 +715,9 @@ array get_event(.Request request)
   {
     return ({__fin_serve->new_session});
   }
-  else if(sizeof(cc->__before_filters) || sizeof(cc->__after_filters))
+  else if(sizeof(cc->__before_filters) || sizeof(cc->__after_filters) || sizeof(cc->__around_filters))
   {
-     event = FilterRunner(event, cc->__before_filters, cc->__after_filters);
+     event = FilterRunner(event, cc->__before_filters, cc->__after_filters, cc->__around_filters);
   }
 
   request->not_args = not_args * "/";
@@ -849,7 +849,10 @@ private void breakpoint_read(int id, string data)
 {
 }
 
-private class FilterRunner(mixed event, array before_filters, array after_filters)
+// this is the "helper" runner that handles filters for a given event. 
+// we could probably do a fair amount with respect to optimization; right now
+// everything is handled dynamically, for each request.
+private class FilterRunner(mixed event, array before_filters, array after_filters, array around_filters)
 {
   inherit .Helpers.Runner;
 
@@ -883,7 +886,20 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
       }
     }
 
-    event(request, response, @args);
+    if(around_filters && sizeof(around_filters))
+	{
+		function rr;
+		foreach(around_filters;; mixed f)
+		{
+			if(!rr) rr = lambda(){event(request, response, @args);};
+			rr = gen_fun(rr, f, request, response, @args);
+		}
+		
+    	rr();
+	}
+	
+	else
+		event(request, response, @args);
 
     response->render();
 
@@ -902,5 +918,22 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
     }
 
   }
+
+  function gen_fun(function q, object|function f, object id, object response, mixed ... args)
+	{
+		return lambda()
+			{	
+				if(objectp(f))
+				{
+				//	werror("calling around filter with %O, %O, %O", id, response, args);
+					f->filter(q, id, response, @args);
+				}	
+				else
+				{
+				//	werror("calling around filter with %O, %O, %O", id, response, args);
+					f(q, id, response, @args);
+				}				
+			};
+	}
 
 }

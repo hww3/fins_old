@@ -102,7 +102,7 @@ mixed validate(mixed value, void|.DataObjectInstance i)
 
 mixed from_form(mapping value, void|.DataObjectInstance i)
 {
-  object c = Calendar.dwim_day(sprintf("%04d-02d-02d", (int)value->year_no, 
+  object c = Calendar.dwim_day(sprintf("%04d-%02d-%02d", (int)value->year_no, 
                 (int)value->month_no, (int)value->month_day));
 	return c;
 }

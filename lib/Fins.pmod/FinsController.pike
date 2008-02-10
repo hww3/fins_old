@@ -29,6 +29,7 @@ string __controller_name;
 
 array __before_filters = ({});
 array __after_filters = ({});
+array __around_filters = ({});
 
 //! loads the controller, providing support for auto-reload of
 //! updated controller classes.
@@ -90,10 +91,37 @@ static object load_controller(string controller_name)
 //!
 //!  int filter(object request, object response, mixed ... args)
 //!
+//!   a filter should return a true value if the filter was a success. otherwise, false (zero)
+//!   should be returned, and the request will not be handled further. returning false indicates
+//!   the filter wishes to perform a redirect or render function in order to preempt the request.
 static void before_filter(function|object filter)
 {
   __before_filters += ({ filter });
 }
+
+//! adds a filter to be run both before and after the event method for a request.
+//! 
+//! @param filter
+//!   either an object that provides a method "filter" or a function. either the 
+//!   function "filter" in the object, or the method itself should have the following
+//!   signature:
+//!
+//!  int filter(function yield, object request, object response, mixed ... args)
+//!
+//!   at the point in the filter processing that the event should be called, yield() should be 
+//!   called without arguments.
+//!
+//!   a filter should return a true value if the filter was a success. otherwise, false (zero)
+//!   should be returned, and the request will not be handled further. returning false indicates
+//!   the filter wishes to perform a redirect or render function in order to preempt the request.
+//!
+//!   around filters may be nested, in which case the first added around filter will be called closest
+//!   to the event in the controller, and subsequent filters will be called surrounding it.
+static void around_filter(function|object filter)
+{
+  __around_filters += ({ filter });
+}
+
 
 //! adds a filter to be run after the event method for a request is called.
 //! 
@@ -104,6 +132,9 @@ static void before_filter(function|object filter)
 //!
 //!  int filter(object request, object response, mixed ... args)
 //!
+//!   a filter should return a true value if the filter was a success. otherwise, false (zero)
+//!   should be returned, and the request will not be handled further. returning false indicates
+//!   the filter wishes to perform a redirect or render function in order to preempt the request.
 static void after_filter(function|object filter)
 {
   __after_filters += ({ filter });

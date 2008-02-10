@@ -21,6 +21,8 @@ string list_template_string =
   "<%action_link action=\"delete\" id=\"$item._id\"%>delete</a> ] "
   "<%describe_object var=\"$item\"%><br/>"
   "<%end%>"
+  "<p>"
+  "[ <%action_link action=\"new\"%>new</a> ] "
   "</body></html>";
 
 string display_template_string =

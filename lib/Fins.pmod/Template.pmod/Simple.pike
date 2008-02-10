@@ -481,7 +481,7 @@ class PikeBlock
        string rx = "";
        function f = context->view->get_simple_macro(cmd);
        if(!f)
-         throw(Error.Generic(sprintf("PSP format error: invalid command at line %d.\n", start)));
+         throw(Error.Generic(sprintf("PSP format error: invalid command at line %d.\n", (int)start)));
 
        macros_used[cmd] ++;
 

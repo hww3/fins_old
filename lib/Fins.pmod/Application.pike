@@ -856,6 +856,45 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
 {
   inherit .Helpers.Runner;
 
+	int has_around = 0;
+	int has_before = 0;
+	int has_after = 0;
+
+	function rr;
+	
+  static void create()
+  {
+    if(before_filters && sizeof(before_filters))
+	{
+		has_before = 1;
+	}
+	
+    if(after_filters && sizeof(after_filters))
+	{
+		has_after = 1;
+	}
+	
+    if(around_filters && sizeof(around_filters))
+	{
+		has_around = 1;
+	}
+	
+  }
+
+  void run_around(Fins.Request request, Fins.Response response, mixed ... args)
+	{
+		function rr;
+		if(!rr)
+		{
+			foreach(around_filters;; mixed f)
+			{
+				if(!rr) rr = lambda(){event(request, response, @args);};
+				rr = gen_fun(rr, f, request, response, @args);
+			}
+		}		
+		rr();
+	}
+
   static mixed `()(Fins.Request request, Fins.Response response, mixed ... args)
   {
     run(request, response, @args);
@@ -872,51 +911,48 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
 
   void run(Fins.Request request, Fins.Response response, mixed ... args)
   {
-    foreach(before_filters;; function|object filter)
+	if(has_before)
     {
-      if(objectp(filter))
-      { 
-        if(!filter->filter(request, response, @args))
-          return;
-      }
-      else if(functionp(filter))
-      {
-        if(!filter(request, response, @args))
-          return;
-      }
-    }
-
-    if(around_filters && sizeof(around_filters))
-	{
-		function rr;
-		foreach(around_filters;; mixed f)
-		{
-			if(!rr) rr = lambda(){event(request, response, @args);};
-			rr = gen_fun(rr, f, request, response, @args);
-		}
-		
-    	rr();
+		foreach(before_filters;; function|object filter)
+    	{
+      		if(objectp(filter))
+      		{ 
+        		if(!filter->filter(request, response, @args))
+          		return;
+      		}
+      		else if(functionp(filter))
+      		{
+        		if(!filter(request, response, @args))
+          		return;
+      		}
+    	}
 	}
 	
+	if(has_around) 
+	{
+    	run_around(request, response, @args);
+	}	
 	else
 		event(request, response, @args);
 
     response->render();
 
-    foreach(after_filters;; function|object filter)
-    {
-      if(objectp(filter))
-      { 
-        if(!filter->filter(request, response, @args))
-          return;
-      }
-      else if(functionp(filter))
-      {
-        if(!filter(request, response, @args))
-          return;
-      }
-    }
-
+	if(has_after)
+	{
+    	foreach(after_filters;; function|object filter)
+    	{
+      		if(objectp(filter))
+      		{ 
+        		if(!filter->filter(request, response, @args))
+          		return;
+      		}
+      		else if(functionp(filter))
+      		{
+        		if(!filter(request, response, @args))
+          		return;
+      		}
+    	}
+	}
   }
 
   function gen_fun(function q, object|function f, object id, object response, mixed ... args)

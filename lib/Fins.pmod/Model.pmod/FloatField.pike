@@ -7,6 +7,20 @@ string name;
 
 constant type = "Float";
 
+string get_editor_string(void|string value, void|.DataObjectInstance i)
+{
+  if(!value && zero_type(value)) value = "";
+
+  if(i)
+  {
+    return ("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value + "\">" "<input type=\"text\" size=\"" + len + "\" name=\"" + name + "\" value = \"" + value + "\">");
+  }
+  else
+  {
+    return ("<input type=\"text\" size=\"" + len + "\" name=\"" + name + "\" value = \"\">"); 
+  }
+}
+
 void create(string _name, int _len, int(0..1) _null, int|void _default)
 {
    name = _name;

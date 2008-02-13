@@ -42,8 +42,7 @@ object bp_lock = Thread.Mutex();
 object breakpoint_hilfe;
 object bpbe;
 object bpbet;
-int cache_events = 1;
-
+int controller_autoreload, cache_events;
 static int exp = 24 * 10;
 
 //! constructor for the Fins application. It is normally not necessary to override this method,
@@ -58,6 +57,13 @@ static void create(.Configuration _config)
 
   cache_events = (int)config["controller"]["cache_events"];
   exp = (int)config["application"]["static_expire_period"] || (24*10);
+
+  controller_autoreload = (int)(config["controller"]["reload"]);
+ 
+  if(controller_autoreload)
+    Log.info("Automatic reload of controllers is enabled.");
+  else if(cache_events)
+    Log.info("Event caching is enabled.");
 
   load_breakpoint();
   load_cache();
@@ -590,19 +596,48 @@ string make_btargs(array args)
 array get_event(.Request request)
 {
   .FinsController cc;
-
-  if((int)(config["controller"]["reload"]))
-  {
-	controller_updated(controller, this, "controller");
-  }
-  cc = controller;
-  request->controller = cc;
-  request->controller_name = cc->__controller_name;
+  int is_index = 0;
   function event;
   array args = ({});
   array not_args = ({});
-  array r = request->not_query/"/";
   mixed ci;
+  string req;
+  req = request->not_query;
+  if(req[0] == '/')
+    req = req[1..];
+  array r = req/"/";
+
+  if(controller_autoreload)
+  {
+	controller_updated(controller, this, "controller");
+  }
+  else if(cache_events)
+  {
+	//#if 0
+	  for(int x = sizeof(r)-1; x >= 0; x--)
+	  {
+		mixed e,ev;
+		req = r[0..x] * "/";
+	//	werror("is " + req + " in the cache?\n");
+		if(e = event_cache[req])
+		{
+			array args = r[x+1..];
+			[ev, request->not_args, request->controller_path, request->controller, request->event_name]	= e;
+			request->event = ev;
+			request->controller_name = request->controller->__controller_name;
+//			werror (" ... yes, args are %O\n", args);
+			if(sizeof(args))
+	  	      return ({ ev, @args });
+			else return ({ ev });
+		}
+	  }
+	//#endif	
+  }
+
+  cc = controller;
+  request->controller = cc;
+  request->controller_name = cc->__controller_name;
+
 
   // first, let's find the right function to call.
   foreach(r; int i; string comp)
@@ -617,6 +652,7 @@ array get_event(.Request request)
   	    if(event) ; // do nothing
 	    else if(cc && (ci = cc["index"]))
 	    {
+		  is_index = 1;
 	      not_args += ({"index"});
 	      event = ci;
               request->event_name = "index";
@@ -671,14 +707,14 @@ array get_event(.Request request)
 	{ 
 	  not_args += ({comp});
           request->controller_path += ("/" + comp);
-	  if((int)config["controller"]["reload"])
+	  if(controller_autoreload)
 	  {            
 	    controller_updated(ci, cc, comp);
 	  }
 
 	  cc = cc[comp];
-          request->controller = cc;
-          request->controller_name = cc->__controller_name;
+      request->controller = cc;
+      request->controller_name = cc->__controller_name;
 	}
 	else
 	{
@@ -688,15 +724,16 @@ array get_event(.Request request)
       // otherwise, if it's an index function, we make it the event and add the component as an arg.
       else if(cc && (ci = cc["index"]))
       { 
-	not_args += ({"index"});
-	event = ci;
-	request->event = ci;
+		is_index = 1;
+		not_args += ({"index"});
+		event = ci;
+		request->event = ci;
         request->event_name = "index";
-	args += ({comp});
+		args += ({comp});
       }
       else
       {
-	throw(Error.Generic("Component " + comp + " does not exist.\n"));
+		throw(Error.Generic("Component " + comp + " does not exist.\n"));
       }
     }
   }
@@ -723,8 +760,15 @@ array get_event(.Request request)
   request->not_args = not_args * "/";
   if(!sizeof(request->controller_path)) request->controller_path = "/";
 
-  event_cache[request->controller_path] = event;
-
+  // we don't cache index method hits, as the first arg past it could 
+  // cause a different method to be hit from that controller.
+//#if 0
+  if(!is_index)
+{
+//	werror("storing event %O in cache for %O\n", event, not_args*"/");
+    event_cache[not_args * "/"] = ({event, request->not_args, request->controller_path, request->controller, request->event_name});
+}
+//#endif
   if(sizeof(args))
     return ({event, @args});
 

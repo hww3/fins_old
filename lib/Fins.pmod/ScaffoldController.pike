@@ -542,7 +542,7 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
   response->set_data(rv);
 }
 
-string make_nice(string v)
+static string make_nice(string v)
 {
   return Tools.Language.Inflect.humanize(v);
 }
@@ -550,7 +550,7 @@ string make_nice(string v)
 string make_value_editor(string key, void|mixed value, void|object o)
 {
 werror("make_value_editor(%O=%O)\n", key, model_object->fields[key]);
-  if(model_object->fields[key]->is_shadow && !model_object->fields[key]->get_editor_string())
+  if(model_object->fields[key]->is_shadow && !model_object->fields[key]->get_editor_string)
   {
 werror("no editor for shadow field " + key + "\n");
 	if(o)

@@ -913,6 +913,11 @@ private class FilterRunner
 	
   static void create(mixed _event, array _before_filters, array _after_filters, array _around_filters)
   {
+    event = _event;
+    before_filters = _before_filters;
+    after_filters = _after_filters;
+    around_filters = _around_filters;
+
     if(before_filters && sizeof(before_filters))
 	{
 		has_before = 1;

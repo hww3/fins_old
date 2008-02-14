@@ -83,6 +83,8 @@ void add_object_type(.DataObject t, program i)
 //!
 object get_scaffold_controller(object model_component)
 {
+  werror("get_scaffold_controller(%O) in %O\n", model_component, scaffold_controllers);
+
   return scaffold_controllers[model_component];
 }
 

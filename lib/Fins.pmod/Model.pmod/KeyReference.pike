@@ -68,7 +68,7 @@ string get_editor_string(mixed|void value, void|.DataObjectInstance i)
 {
   string desc = "";
   object sc = context->app->model->repository->get_scaffold_controller(context->app->model->repository->get_object(otherobject));
-
+werror("value for keyreference is %O, scaffold controller is %O\n", value, sc);
   if(!value) desc = "not set";
   else 
   {
@@ -83,16 +83,13 @@ string get_editor_string(mixed|void value, void|.DataObjectInstance i)
   }
 
 werror("other object is %O\n", otherobject);
-  sc = context->app->model->repository->get_scaffold_controller(
-          context->app->model->repository->get_object(otherobject));
-
   if(sc && sc->pick_one)
   {
     desc += sprintf(" <a href='javascript:fire_select(%O)'>select</a>",
       context->app->url_for_action(sc->pick_one, ({}), (["selected_field": name, "for": i->master_object->instance_name,"for_id": i->get_id()]))
      );
   }
-
+werror("returning %O\n", desc);
   return desc;
 }
   

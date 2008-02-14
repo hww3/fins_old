@@ -67,7 +67,7 @@ string update_template_string =
   <body>
   <h1>Editing <%$type%></h1>
   <div class=\"flash-message\"><% flash var=\"$msg\" %></div>
-  <form action=\"<% action_url action=\"doupdate\" method=\"post\" %>\">
+  <form action=\"<% action_url action=\"doupdate\" %>\" method=\"post\">
   <table>
   <%foreach var=\"$field_order\" ind=\"key\" val=\"value\"%>
   <tr><td><b><%humanize var=\"$value.name\"%></b></td><td><%field_editor item=\"$item\" field=\"$value\" orig=\"$orig\"%></td></tr>
@@ -98,7 +98,7 @@ string new_template_string =
   <body>
   <h1>Creating <%$type%></h1>
   <div class=\"flash-message\"><% flash var=\"$msg\" %></div>
-  <form action=\"<% action_url action=\"donew\" method=\"post\" %>\">
+  <form action=\"<% action_url action=\"donew\" %>\" method=\"post\">
   <table>
   <%foreach var=\"$field_order\" ind=\"key\" val=\"value\"%>
   <tr><td><b><%humanize var=\"$value.name\"%></b></td><td><%field_editor item=\"$item\" field=\"$value\" orig=\"$orig\"%></td></tr>
@@ -184,7 +184,7 @@ public void do_pick(Request id, Response response, mixed ... args)
   if(!(id->variables->for && id->variables->for_id))
   {
     response->set_data("error: invalid data.");
-    return;	
+    return;
   }
 
   object sc = model->repository->get_scaffold_controller(model->repository->get_object(id->variables["for"]));
@@ -204,6 +204,8 @@ public void do_pick(Request id, Response response, mixed ... args)
 
 public void pick_one(Request id, Response response, mixed ... args)
 {
+werror("data: %O\n", id->variables);
+
   object rv = String.Buffer();
 
   if(!(id->variables->for && id->variables->for_id && id->variables->selected_field))
@@ -557,7 +559,7 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
   array fields = ({});
   mapping orig = ([]);
 
-  object v = get_view(list, update_template_string);
+  object v = get_view(list, new_template_string);
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 
@@ -572,7 +574,8 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
   }
 
   v->add("field_order", model_object->field_order);
-  v->add("orig_data", orig_data);
+  v->add("orig", orig);
+  v->add("item", no);
   v->add("fields", fields*",");
 
   response->set_view(v);
@@ -599,11 +602,13 @@ werror("no editor for shadow field " + key + "\n");
     else return 0;
   }
   else if(model_object->fields[key]->get_editor_string)
-	if(o)
+  {
+    if(o)
       return model_object->fields[key]->get_editor_string(value, o);
 	else return model_object->fields[key]->get_editor_string();
 //  else if(stringp(value) || intp(value))
 //    return "<input type=\"text\" name=\"" + key + "\" value=\"" + value + "\">";
+  }
   else 
     return sprintf("%O", value);
 }

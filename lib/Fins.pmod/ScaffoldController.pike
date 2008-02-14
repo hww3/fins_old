@@ -82,6 +82,37 @@ string update_template_string =
   <%action_link action=\"list\"%>Return to List</a><p>
   </body></html>";
 
+//! Contains default contents of the template used for creating items
+//! in this scaffolding. You may override the use of this string by creating 
+//! a template file. store the template file in your templates directory under
+//! controller/path/new.phtml. For example, if your scaffold controller
+//! is mounted at /widgets/, you would store the overriding template file in
+//! templates/widgets/new.phtml.
+string new_template_string =
+#  "<html><head><title>Creating <%$type%></title>
+   <script type=\"text/javascript\">function fire_select(n){
+    window.document.forms[0].action = n;
+    window.document.forms[0].submit();
+    }</script>
+  </head>
+  <body>
+  <h1>Creating <%$type%></h1>
+  <div class=\"flash-message\"><% flash var=\"$msg\" %></div>
+  <form action=\"<% action_url action=\"donew\" method=\"post\" %>\">
+  <table>
+  <%foreach var=\"$field_order\" ind=\"key\" val=\"value\"%>
+  <tr><td><b><%humanize var=\"$value.name\"%></b></td><td><%field_editor item=\"$item\" field=\"$value\" orig=\"$orig\"%></td></tr>
+  <%end %>
+  </table>
+  <input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> 
+  <input name=\"___save\" value=\"Save\" type=\"submit\"> 
+  <input name=\"___fields\" value=\"<%$fields%>\" type=\"hidden\">
+  </form>
+  <p/>
+  <%action_link action=\"list\"%>Return to List</a><p>
+  </body></html>";
+
+
 static object get_view(function f, string x)
 {
   object v;
@@ -525,38 +556,26 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
 {
   array fields = ({});
   mapping orig = ([]);
-  object rv = String.Buffer();
-  rv += 
-#"<script type=\"text/javascript\">function fire_select(n){
-   window.document.forms[0].action = n;
-   window.document.forms[0].submit();
-   }</script>
-  ";
-  rv += "<h1>Creating new " + model_object->instance_name + "</h1>\n";
-  if(request->misc->flash && request->misc->flash->msg)
-    rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
-  rv += "<form action=\"" + action_url(donew) + "\" method=\"post\">";
-  rv += "<table>\n";
+
+  object v = get_view(list, update_template_string);
+
+  v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 
   object no = Fins.Model.new(model_object->instance_name);
 
   decode_old_values(request->variables, orig);
 
   foreach(model_object->field_order; int key; mixed value)
-  {	
+ {	
 	if(value->is_primary_key) continue;
-	  string ed = make_value_editor(value->name, orig[value->name]||UNDEFINED, no);
-      if(ed)
-        rv += "<tr><td><b>" + make_nice(value->name) + "</b>: </td><td> " + ed + "</td></tr>\n"; 
 	fields += ({value->name});
   }
 
-  rv += "</table>\n";
-  rv += "<input name=\"___fields\" value=\"" + (fields*",") + "\" type=\"hidden\"> ";
-  rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> ";
-  rv += "<input name=\"___save\" value=\"Save\" type=\"submit\">";
-  rv += "</form>";
-  response->set_data(rv);
+  v->add("field_order", model_object->field_order);
+  v->add("orig_data", orig_data);
+  v->add("fields", fields*",");
+
+  response->set_view(v);
 }
 
 static string make_nice(string v)

@@ -21,7 +21,8 @@ string simple_macro_field_editor(Fins.Template.TemplateData data, mapping|void a
 		throw(Fins.Errors.Template("No original data for field_editor macro in " + arguments->orig + ".\n"));
 	}
 	  
-	string ed = request->controller->make_value_editor(field->name, orig[field->name] || item[field->name], item);
+	string ed = request->controller->make_value_editor(field->name, 
+														orig[field->name] || (item?item[field->name]:UNDEFINED), item);
 	
 	if(ed)
 	  return ed;

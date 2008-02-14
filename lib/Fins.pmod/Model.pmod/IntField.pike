@@ -68,7 +68,15 @@ mixed validate(mixed value, void|.DataObjectInstance i)
      return .Undefined;
    }
 
-   if(!intp(value))
+  else if(stringp(value))
+  {
+    int v;
+    if(!sscanf(value, "%d", v))
+      throw(Error.Generic("Cannot set " + name + " using " + basetype(value) + ".\n"));
+    else return v;
+  }
+
+  else if(!intp(value))
    {
       throw(Error.Generic("Cannot set " + name + " using " + basetype(value) + ".\n"));
    }

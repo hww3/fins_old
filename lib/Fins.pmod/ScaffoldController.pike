@@ -58,7 +58,7 @@ string display_template_string =
 //! is mounted at /widgets/, you would store the overriding template file in
 //! templates/widgets/update.phtml.
 string update_template_string =
-  "<html><head><title>Editing <%$type%></title>
+#  "<html><head><title>Editing <%$type%></title>
    <script type=\"text/javascript\">function fire_select(n){
     window.document.forms[0].action = n;
     window.document.forms[0].submit();
@@ -70,16 +70,13 @@ string update_template_string =
   <form action=\"<% action_url action=\"doupdate\" method=\"post\" %>\">
   <table>
   <%foreach var=\"$field_order\" ind=\"key\" val=\"value\"%>
-  <tr><td><b><%humanize var=\"$key\"%></b></td><td><%field_editor item=\"$item\" field=\"$value\" orig=\"$orig\"%></td></tr>
+  <tr><td><b><%humanize var=\"$value.name\"%></b></td><td><%field_editor item=\"$item\" field=\"$value\" orig=\"$orig\"%></td></tr>
   <%end %>
   </table>
-  </table>\n
   <input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> 
   <input name=\"___orig_data\" value=\"<%$orig_data%>\" type=\"hidden\">
   <input name=\"___save\" value=\"Save\" type=\"submit\"> 
   <input name=\"___fields\" value=\"<%$fields%>\" type=\"hidden\">
-  </form>";
-
   </form>
   <p/>
   <%action_link action=\"list\"%>Return to List</a><p>
@@ -290,11 +287,6 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
   // FIXME: this could go very wrong...
   string orig_data = encode_orig_data(item->get_atomic());
 
-  v->add("orig", orig);
-  v->add("field_order", model_object->field_order);
-  v->add("orig_data", orig_data);
-  v->add("fields", fields);
-
   array fields = ({});
 
   foreach(model_object->field_order; int key; mixed value)
@@ -304,6 +296,14 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
       fields += ({value->name});
     }
   }
+
+  v->add("item", item);
+  v->add("orig", orig);
+  v->add("field_order", model_object->field_order);
+  v->add("orig_data", orig_data);
+  v->add("fields", fields*",");
+
+  response->set_view(v);
 }
 
 static mixed make_encodable_val(mixed val)
@@ -367,7 +367,7 @@ e=catch{
   array inds = indices(request->variables);
 
   int should_update;
-
+werror("fields: %O\n", request->variables->___fields);
   foreach(request->variables->___fields/","; int ind; string field)
   {
      // we don't worry about the primary key.

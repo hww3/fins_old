@@ -896,7 +896,7 @@ private void breakpoint_read(int id, string data)
 // this is the "helper" runner that handles filters for a given event. 
 // we could probably do a fair amount with respect to optimization; right now
 // everything is handled dynamically, for each request.
-private class FilterRunner(mixed event, array before_filters, array after_filters, array around_filters)
+private class FilterRunner
 {
   inherit .Helpers.Runner;
 
@@ -905,8 +905,13 @@ private class FilterRunner(mixed event, array before_filters, array after_filter
 	int has_after = 0;
 
 	function rr;
+
+        mixed event;
+        array before_filters;
+        array after_filters;
+        array around_filters;
 	
-  static void create()
+  static void create(mixed _event, array _before_filters, array _after_filters, array _around_filters)
   {
     if(before_filters && sizeof(before_filters))
 	{

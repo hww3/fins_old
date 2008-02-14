@@ -1,10 +1,10 @@
+inherit .Base;
 
 //! args: item, field, orig
 //! where format is a Calendar object format type; default is ext_ymd.
 string simple_macro_field_editor(Fins.Template.TemplateData data, mapping|void arguments)
 {
 	object request = data->get_request();
-  
     if(!Program.implements(object_program(request->controller), Fins.ScaffoldController))
 	{
 		throw(Fins.Errors.Template("Cannot use field_editor macro outside of a Scaffold Controller.\n"));

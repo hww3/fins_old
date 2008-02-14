@@ -57,6 +57,51 @@ string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void ar
   return "<a href=\"" + url + "\">";
 }
 
+//! args: controller, action, args 
+//!
+//! any arguments other than those above will be considered variables to 
+//! be added to the url above.
+string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void args)
+{
+  object controller;
+  object request = data->get_request();
+  string event = args->action;
+//  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
+
+  controller = request->controller;
+  if(args->controller)
+    controller = data->get_request()->fins_app->get_controller_for_path(args->controller, controller);
+  if(!controller) throw(Error.Generic("action_link: controller " + args->controller + " can not be resolved.\n"));
+
+  mixed action = controller[event];
+  if(!action) throw(Error.Generic("action_link: action " + args->action + " can not be resolved.\n"));
+
+  array uargs;
+  mapping vars;
+
+  if(args->args)
+    uargs = args->args/"/";
+
+  m_delete(args, "controller");
+  m_delete(args, "action");
+  m_delete(args, "args");
+
+  if(sizeof(args)) 
+  {
+    vars = args;  
+    foreach(args; string k; string v)
+    {
+      v = get_var_value(v, data->get_data()) || "";
+      args[k] = v;
+    }
+// werror("data: %O\n", data->get_data());
+  }
+
+  string url = data->get_request()->fins_app->url_for_action(action, uargs, vars);
+
+  return url;
+}
+
 
 //! args: var
 string simple_macro_capitalize(Fins.Template.TemplateData data, mapping|void args)
@@ -143,21 +188,3 @@ string simple_macro_describe(Fins.Template.TemplateData data, mapping|void args)
 
   return rv;
 }
-
-//! args: var, format
-//! where format is a Calendar object format type; default is ext_ymd.
-string simple_macro_format_date(Fins.Template.TemplateData data, mapping|void arguments)
-{
-  if(arguments->var)
-  {
-    object p = get_var_value(arguments->var, data->get_data());
-
-    if(!p) return "";
-
-    if(! arguments->format) arguments->format="ext_ymd";
-
-    return p["format_" + arguments->format]();
-
-  }
-}
-

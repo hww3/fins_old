@@ -9,59 +9,81 @@ import Tools.Logging;
 string model_component = 0;
 object model_object;
 
-
+//! Contains default contents of the template used for displaying a list of items
+//! in this scaffolding. You may override the use of this string by creating 
+//! a template file. store the template file in your templates directory under
+//! controller/path/list.phtml. For example, if your scaffold controller
+//! is mounted at /widgets/, you would store the overriding template file in
+//! templates/widgets/list.phtml.
 string list_template_string = 
-  "<html><head><title>Listing <%$type%></title></head>"
-  "<body>"
-  "<h1><%$type%></h1>"
-  "<div class=\"flash-message\"><% flash var=\"$msg\" %></div>"
-  "<%foreach var=\"$items\" val=\"item\"%> ["
-  "<%action_link action=\"display\" id=\"$item._id\"%>view</a> | "
-  "<%action_link action=\"update\" id=\"$item._id\"%>edit</a> | "
-  "<%action_link action=\"delete\" id=\"$item._id\"%>delete</a> ] "
-  "<%describe_object var=\"$item\"%><br/>"
-  "<%end%>"
-  "<p>"
-  "[ <%action_link action=\"new\"%>new</a> ] "
-  "</body></html>";
+#"<html><head><title>Listing <%$type%></title></head>
+  <body>
+  <h1><%$type%></h1>
+  <div class=\"flash-message\"><% flash var=\"$msg\" %></div>
+  <%foreach var=\"$items\" val=\"item\"%> [ 
+  <%action_link action=\"display\" id=\"$item._id\"%>view</a> | 
+  <%action_link action=\"update\" id=\"$item._id\"%>edit</a> | 
+  <%action_link action=\"delete\" id=\"$item._id\"%>delete</a> ] 
+  <%describe_object var=\"$item\"%><br/>
+  <%end%>
+  <p>
+  [ <%action_link action=\"new\"%>new</a> ] 
+  </body></html>";
 
+//! Contains default contents of the template used for displaying items
+//! in this scaffolding. You may override the use of this string by creating 
+//! a template file. store the template file in your templates directory under
+//! controller/path/display.phtml. For example, if your scaffold controller
+//! is mounted at /widgets/, you would store the overriding template file in
+//! templates/widgets/display.phtml.
 string display_template_string =
-  "<html><head><title>Displaying <%$type%></title></head>"
-  "<body>"
-  "<h1>Viewing <%$type%></h1>"
-  "<div class=\"flash-message\"><% flash var=\"$msg\" %></div>"
-  "<%action_link action=\"update\" id=\"$item._id\"%>Edit</a><p>"
-  "<table>"
-  "<%foreach var=\"$item\" ind=\"key\" val=\"value\"%>"
-  "<tr><td><b><%humanize var=\"$key\"%></b></td><td><%describe key=\"$key\" var=\"$value\"%></td></tr>"
-  "<%end %>"
-  "</table>"
-  "<p/>"
-  "<%action_link action=\"list\"%>Return to List</a><p>"
-  "</body></html>";
+#"<html><head><title>Displaying <%$type%></title></head>
+  <body>
+  <h1>Viewing <%$type%></h1>
+  <div class=\"flash-message\"><% flash var=\"$msg\" %></div>
+  <%action_link action=\"update\" id=\"$item._id\"%>Edit</a><p>
+  <table>
+  <%foreach var=\"$item\" ind=\"key\" val=\"value\"%>
+  <tr><td><b><%humanize var=\"$key\"%></b></td><td><%describe key=\"$key\" var=\"$value\"%></td></tr>
+  <%end %>
+  </table>
+  <p/>
+  <%action_link action=\"list\"%>Return to List</a><p>
+  </body></html>";
 
+//! Contains default contents of the template used for editing items
+//! in this scaffolding. You may override the use of this string by creating 
+//! a template file. store the template file in your templates directory under
+//! controller/path/update.phtml. For example, if your scaffold controller
+//! is mounted at /widgets/, you would store the overriding template file in
+//! templates/widgets/update.phtml.
 string update_template_string =
-  "<html><head><title>Editing <%$type%></title></head>"
-  "<body>"
-  "<h1>Editing <%$type%></h1>"
-  "<div class=\"flash-message\"><% flash var=\"$msg\" %></div>"
-  "<table>"
-  "<%foreach var=\"$item\" ind=\"key\" val=\"value\"%>"
-  "<tr><td><b><%humanize var=\"$key\"%></b></td><td><%describe key=\"$key\" var=\"$value\"%></td></tr>"
-  "<%end %>"
-  "</table>"
-  "<p/>"
-  "<%action_link action=\"list\"%>Return to List</a><p>"
-  "</body></html>";
+  "<html><head><title>Editing <%$type%></title>
+   <script type=\"text/javascript\">function fire_select(n){
+    window.document.forms[0].action = n;
+    window.document.forms[0].submit();
+    }</script>
+  </head>
+  <body>
+  <h1>Editing <%$type%></h1>
+  <div class=\"flash-message\"><% flash var=\"$msg\" %></div>
+  <form action=\"<% action_url action=\"doupdate\" method=\"post\" %>\">
+  <table>
+  <%foreach var=\"$field_order\" ind=\"key\" val=\"value\"%>
+  <tr><td><b><%humanize var=\"$key\"%></b></td><td><%field_editor item=\"$item\" field=\"$value\" orig=\"$orig\"%></td></tr>
+  <%end %>
+  </table>
+  </table>\n
+  <input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> 
+  <input name=\"___orig_data\" value=\"<%$orig_data%>\" type=\"hidden\">
+  <input name=\"___save\" value=\"Save\" type=\"submit\"> 
+  <input name=\"___fields\" value=\"<%$fields%>\" type=\"hidden\">
+  </form>";
 
-string get_js()
-{
-  
-  return "<script type=\"text/javascript\">function fire_select(n){"
-    "window.document.forms[0].action = n;"
-    "window.document.forms[0].submit();"
-    "}</script>";
-}
+  </form>
+  <p/>
+  <%action_link action=\"list\"%>Return to List</a><p>
+  </body></html>";
 
 static object get_view(function f, string x)
 {
@@ -249,6 +271,10 @@ public void decode_old_values(mapping variables, mapping orig)
 
 public void update(Fins.Request request, Fins.Response response, mixed ... args)
 {
+  object v = get_view(list, update_template_string);
+
+  v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
+  
   mapping orig = ([]);
 
   object item = model->repository->find_by_id(model_object, (int)request->variables->id);
@@ -261,37 +287,23 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
 
   decode_old_values(request->variables, orig);
 
-  object rv = String.Buffer();
-  rv += get_js();
-  rv += "<h1>Editing " + make_nice(model_object->instance_name) + "</h1>\n";
-  if(request->misc->flash && request->misc->flash->msg)
-    rv += "<i>" + request->misc->flash->msg + "</i><p>\n";
-  rv += "<form action=\"" + action_url(doupdate) + "\" method=\"post\">";
-  rv += "<table>\n";
+  // FIXME: this could go very wrong...
+  string orig_data = encode_orig_data(item->get_atomic());
 
-  mapping val = item->get_atomic();
+  v->add("orig", orig);
+  v->add("field_order", model_object->field_order);
+  v->add("orig_data", orig_data);
+  v->add("fields", fields);
+
   array fields = ({});
 
   foreach(model_object->field_order; int key; mixed value)
   {	
-	string ed = make_value_editor(value->name, orig[value->name] || val[value->name], item);
-    if(ed)
+    if(model_object->primary_key->name != value->name)
     {
-      rv += "<tr><td><b>" + make_nice(value->name) + "</b>: </td><td> " + ed + "</td></tr>\n"; 
       fields += ({value->name});
     }
   }
-
-  // FIXME: this could go very wrong...
-  string orig_data = encode_orig_data(val);
-
-  rv += "</table>\n";
-  rv += "<input name=\"___cancel\" value=\"Cancel\" type=\"submit\"> ";
-  rv += "<input name=\"___orig_data\" value=\"" + orig_data + "\" type=\"hidden\"> ";
-  rv += "<input name=\"___save\" value=\"Save\" type=\"submit\"> ";
-  rv += "<input name=\"___fields\" value=\"" + (fields*",") + "\" type=\"hidden\"> ";
-  rv += "</form>";
-  response->set_data(rv);
 }
 
 static mixed make_encodable_val(mixed val)
@@ -514,7 +526,12 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
   array fields = ({});
   mapping orig = ([]);
   object rv = String.Buffer();
-  rv += get_js();
+  rv += 
+#"<script type=\"text/javascript\">function fire_select(n){
+   window.document.forms[0].action = n;
+   window.document.forms[0].submit();
+   }</script>
+  ";
   rv += "<h1>Creating new " + model_object->instance_name + "</h1>\n";
   if(request->misc->flash && request->misc->flash->msg)
     rv += "<i>" + request->misc->flash->msg + "</i><p>\n";

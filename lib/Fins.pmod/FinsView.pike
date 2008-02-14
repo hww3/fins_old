@@ -3,6 +3,7 @@ import Fins;
 inherit FinsBase : base;
 inherit Fins.Helpers.Macros.JavaScript;
 inherit Fins.Helpers.Macros.Basic;
+inherit Fins.Helpers.Macros.Scaffolding;
 
 //! the default class to be used for templates in this application
 program default_template = Fins.Template.Simple;

@@ -32,9 +32,7 @@ static void load_macros()
 {
   foreach(glob("simple_macro_*", indices(this)); ; string mf)
   {
-//#ifdef DEBUG
     Log.debug("loading macro %O", mf[13..]);
-//#endif
     add_simple_macro(mf[13..], this[mf]);
   }
 }
@@ -91,7 +89,6 @@ public Template.View low_get_view(program templateType, string tn)
   d->set_data((["config": config])); 
 
   return Template.View(t, d);
-
 }
 
 public Template.View get_string_view(string ts)
@@ -157,14 +154,3 @@ public int flush_templates()
   templates = ([]);
 }
 
-//!
-string macro_capitalize(.Template.TemplateData data, string|void args)
-{
-  return String.capitalize(data->get_data()[args]||"");
-}
-
-//!
-string macro_flash(.Template.TemplateData data, string|void args)
-{
-  return (data->get_flash()[args]||"");
-}

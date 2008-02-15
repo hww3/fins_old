@@ -12,6 +12,12 @@ string simple_macro_humanize(Fins.Template.TemplateData data, mapping|void args)
   return Tools.Language.Inflect.humanize(get_var_value(args->var, data->get_data())||"");
 }
 
+//! args: 
+string simple_macro_dump_data(Fins.Template.TemplateData data, mapping|void args)
+{
+  return sprintf("%O\n", mkmapping(indices(data->get_data()), values(data->get_data())));
+}
+
 //! args: controller, action, args 
 //!
 //! any arguments other than those above will be considered variables to 

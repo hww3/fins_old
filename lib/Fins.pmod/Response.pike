@@ -212,6 +212,8 @@
          f+=(request->misc->flash);
        if(request && request->misc->session_variables->__flash)
          f+=(request->misc->session_variables->__flash);
+
+       template_data->add("session", request->misc->session_variables);
        template_data->set_flash(f);
        template_data->set_request(request);
 

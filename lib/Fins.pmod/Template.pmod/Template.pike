@@ -55,7 +55,7 @@ static string load_template(string templatename, void|object compilecontext)
 
   if(!template || !sizeof(template))
    {
-     throw(Fins.Errors.Template("Template does not exist or is empty: " + templatename));
+     throw(Fins.Errors.Template("Template does not exist or is empty: " + templatename + "\n"));
    }
    return template;
 }

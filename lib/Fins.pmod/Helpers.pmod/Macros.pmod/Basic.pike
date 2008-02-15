@@ -64,6 +64,7 @@ string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void ar
 string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void args)
 {
   object controller;
+//werror("******* action_url\n");
   object request = data->get_request();
   string event = args->action;
 //  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
@@ -75,12 +76,12 @@ string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void arg
 
   mixed action = controller[event];
   if(!action) throw(Error.Generic("action_link: action " + args->action + " can not be resolved.\n"));
-
+//werror("********* action: %O\n", action);
   array uargs;
-  mapping vars;
+  mapping vars = ([]);
 
   if(args->args)
-    uargs = args->args/"/";
+    uargs = get_var_value(args->args, data->get_data())/"/";
 
   m_delete(args, "controller");
   m_delete(args, "action");
@@ -92,7 +93,7 @@ string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void arg
     foreach(args; string k; string v)
     {
       v = get_var_value(v, data->get_data()) || "";
-      args[k] = v;
+      vars[k] = v;
     }
 // werror("data: %O\n", data->get_data());
   }

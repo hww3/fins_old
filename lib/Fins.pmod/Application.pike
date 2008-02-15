@@ -271,6 +271,7 @@ object get_controller_for_path(string path, object|void controller)
 
   foreach(path/"/"; int x; string comp)
   {
+    if(!comp || !sizeof(comp)) continue;
     controller = controller[comp];
     if(!controller || !objectp(controller)) return 0;
   }

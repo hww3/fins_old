@@ -2,6 +2,11 @@ inherit .FinsController;
 import Tools.Logging;
 Fins.Template.Template __layout;
 int __checked_layouts; 
+
+//! set this flag to true to turn off notices for events which have no 
+//! corresponding template file.
+int __quiet;
+
 //!
 //!  Implements a controller which automatically provides a view based on
 //!  the position of the request within the tree
@@ -103,7 +108,8 @@ private class DocRunner(mixed req)
     Fins.Template.View lview;
 
     mixed e = catch(lview = view->get_view(request->not_args));
-    if(e) Log.exception("An error occurred while loading the template " + request->not_args + "\n", e);
+    if(e && !quiet) Log.exception("An error occurred while loading the template " + request->not_args + "\n"
+       "To turn these notices off, set the __quiet flag in your DocController instances.", e);
     if(layout && lview)
       lview->set_layout(layout);
     if(lview)

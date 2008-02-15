@@ -1,7 +1,7 @@
 inherit .FinsController;
 import Tools.Logging;
 Fins.Template.Template __layout;
-
+int __checked_layouts; 
 //!
 //!  Implements a controller which automatically provides a view based on
 //!  the position of the request within the tree
@@ -49,9 +49,10 @@ static mixed `[](mixed a)
 object __get_layout(object request)
 {
   if(__layout) return __layout;
-
+  if(__checked_layouts && !request->pragma["no-cache"]) return 0;
   mixed e;
   object l;
+  __checked_layouts = 1;
   array paths = ({
   });
 
@@ -105,11 +106,10 @@ private class DocRunner(mixed req)
     if(e) Log.exception("An error occurred while loading the template " + request->not_args + "\n", e);
     if(layout && lview)
       lview->set_layout(layout);
-    req(request, response, lview, args);    
     if(lview)
       response->set_view(lview);
+    req(request, response, lview, args);    
 
     return;
-
   }
 }

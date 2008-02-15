@@ -1,10 +1,3 @@
-/*
-#if defined(SCRIPTRUNNER)
-#elseif defined(CAUDIUM)
-#elseif defined(ROXEN)
-#else
-*/
-
 inherit Fins.Request;
 inherit Protocols.HTTP.Server.Request;
 
@@ -30,4 +23,10 @@ void parse_request()
 //!
 string remoteaddr = "";
 
-//#endif
+void flatten_headers()
+{  
+  ::flatten_headers();
+
+  if(request_headers->pragma)
+    pragma |= (multiset)(request_headers->pragma/",");
+}

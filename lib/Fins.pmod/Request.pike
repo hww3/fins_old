@@ -24,6 +24,8 @@ static mapping _get_session_by_id(string SessionID)
   return ([]);
 }
 
+multiset (string) pragma    = (< >);
+
 //!
 string get_compress_encoding()
 {

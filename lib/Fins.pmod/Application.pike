@@ -385,7 +385,6 @@ string get_path_for_action(function|object action, int|void nocontextroot)
 //! (1) Result: app_controller.pike()->index
 //! > application->url_for_action(action, 0, (["variable": 1]));
 //! (2) Result: "/space/index?variable=1"
-
 //!
 string url_for_action(function|object action, array|void args, mapping|void vars)
 {

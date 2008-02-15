@@ -6,7 +6,13 @@
 import Fins;
 inherit Fins.FinsController;
 import Tools.Logging;
+
+//! this should be the name of your object type and is used to link this
+//! controller to the model. For auto-configured models, this is normally
+//! a capitalized singular version of your table. For example, if your
+//! table is called "users", this would be "User".
 string model_component = 0;
+
 object model_object;
 
 //! Contains default contents of the template used for displaying a list of items
@@ -59,7 +65,7 @@ string display_template_string =
 //! templates/widgets/update.phtml.
 string update_template_string =
 #  "<html><head><title>Editing <%$type%></title>
-   <script type=\"text/javascript\">function fire_select(n){
+   <script type=text/javascript>function fire_select(n){
     window.document.forms[0].action = n;
     window.document.forms[0].submit();
     }</script>
@@ -90,7 +96,7 @@ string update_template_string =
 //! templates/widgets/new.phtml.
 string new_template_string =
 #  "<html><head><title>Creating <%$type%></title>
-   <script type=\"text/javascript\">function fire_select(n){
+   <script type=text/javascript>function fire_select(n){
     window.document.forms[0].action = n;
     window.document.forms[0].submit();
     }</script>

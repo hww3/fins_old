@@ -43,6 +43,7 @@ object breakpoint_hilfe;
 object bpbe;
 object bpbet;
 int controller_autoreload, cache_events;
+Standards.URI my_url;
 static int exp = 24 * 10;
 
 //! constructor for the Fins application. It is normally not necessary to override this method,
@@ -366,6 +367,20 @@ string get_path_for_action(function|object action, int|void nocontextroot)
       path = combine_path(nocontextroot?"":context_root, get_path_for_controller(action));
 
   return path;
+}
+
+Standards.URI get_my_url()
+{
+  string url;
+
+  if(my_url) return Standards.URI(my_url);
+  
+  if(config["web"] && (url = config["web"]["url"]))
+  {
+    my_url = Standards.URI(url);
+    return Standards.URI(my_url);
+  }
+  else return 0;
 }
 
 //! get a fully formatted path string for an action

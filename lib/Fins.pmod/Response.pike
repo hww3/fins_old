@@ -108,8 +108,101 @@
   {
     response->error = 304;
   }
-  
+
+  //! generate our "best guess" url based on the request.
+  public Standards.URI divine_url(Fins.Request req)
+  {
+    string host, prot;
+
+    prot = "http";
+
+    // are we Caudium/Roxen?
+    if(req->conf)
+      return Standards.URI(req->conf->query("MyWorldLocation"));
+
+    if(req["request_headers"]["host"])
+    {
+      host = req["request_headers"]["host"];
+    }
+    else
+    {
+      string port = "";
+      if(req->server_port)
+      {
+	int p = req->server_port->portno;
+        if(p != 80) port = ":" + p;
+        if(object_program(req->server_port->port) == Protocols.HTTP.Server.SSLPort)
+          prot = "https";
+      }
+      host = gethostname() + port;
+    }
+
+    return Standards.URI(prot + "://" + host + "/");
+  }
+
+  public string get_redirect_url(string|URI|function|Fins.FinsController to, array|void args, mapping|void vars)
+  {
+    string dest;
+    if(functionp(to) || (object_program(to) != Standards.URI))
+    {
+	  dest = request->fins_app->url_for_action(to, args, vars);
+          dest = absolutify_url(dest);
+    }
+    else
+    {
+      if(stringp(to))
+      {
+        dest = absolutify_url(to, args);
+      }
+      else
+      {
+        if(args && sizeof(args))
+          to = Standards.URI(combine_path(to->path, args*"/"), to);
+        dest = (string)to;
+      }
+
+
+      if(vars)
+        dest = request->fins_app->add_variables_to_path(dest, vars);
+    }
+    return dest;
+  }
+
+  string absolutify_url(string to, array|void args)
+  {
+    if(to[0] == '/')
+    {
+      object u;
+      u = request->fins_app->get_my_url();
+      if(!u)
+      {
+        u = divine_url(request);
+      }
+      u->path = combine_path(u->path, to);
+      if(args && sizeof(args))
+        u = Standards.URI(combine_path(u->path, args*"/"), to);
+        to = (string)u;
+    }
+
+    return to;
+  }
+
   //! perform a redirection
+  //!
+  //! in the event a relative url is passed as the to argument, 
+  //! this method will attempt to convert it to an absolute url
+  //! using the following algorithm:
+  //!
+  //! - if using Caudium or Roxen as the host container, MyWorldLocation
+  //!    from the current virtual server will be used
+  //! - if the web->url attribute has been provided in the application
+  //!    configuration file, this url will be used as the base.
+  //! - if the request is HTTP/1.1, the current host header will be
+  //!    used
+  //! - if FinServe is used, the protocol will be determined based on
+  //!    the protocol of the responding port.
+  //! - if all else fails, a relative url will be passed (not complying 
+  //!    with the HTTP specification).
   //!
   //! @param to
   //!   a string, Standards.URI object or an action (event or controller)
@@ -123,27 +216,16 @@
 	string dest;
     response->error = 301;
 
-    if(stringp(to))
-      dest = to;
-    else if(functionp(to) || (object_program(to) != Standards.URI))
-    {
-	  dest = request->fins_app->url_for_action(to, args, vars);
-    }
-    else
-    {
-      dest = (string)to;
-      if(args && sizeof(args))
-        dest = combine_path(dest, args*"/");
-
-      if(vars)
-        dest = request->fins_app->add_variables_to_path(dest, vars);
-    }
+    dest = get_redirect_url(to, args, vars);
 
     response->extra_heads->location = dest;
   }
 
   //! perform a temporary redirection
   //!
+  //!  see @[redirect] for details of the technique used to generate
+  //!   absolute URLs.
+  //! 
   //! @param to
   //!   a string, Standards.URI object or an action (event or controller)
   //!   that will be redirected to
@@ -156,22 +238,7 @@
 	string dest;
     response->error = 302;
 
-    if(stringp(to))
-      dest = to;
-    else if(functionp(to) || (object_program(to) != Standards.URI))
-    {
-	  dest = request->fins_app->url_for_action(to, args, vars);
-    }
-    else
-    {
-      dest = (string)to;
-      if(args && sizeof(args))
-        dest = combine_path(dest, args*"/");
-
-      if(vars)
-        dest = request->fins_app->add_variables_to_path(dest, vars);
-    }
-
+    dest = get_redirect_url(to, args, vars);
     response->extra_heads->location = dest;
   }
 

@@ -243,7 +243,16 @@
   }
 
 
+  //! sets the response value for this request
+  //!
+  //! if an HTTP response code has been set, this method will not alter it,
+  //! if one has not been set, this method will default the response code to 200 (Response OK).
+  //!
   //! using this method will clear any template set.
+  //! 
+  //! @param args
+  //!   if provided, data will be assumed to be a @[sprintf]() format string, and will be used
+  //!   to format @[args].
   public void set_data(string|String.Buffer data, mixed ... args)
   {
     if(objectp(data)) data = (string)data;
@@ -256,13 +265,20 @@
     response->file = 0;
   }
 
+  //! sets the response value for this request
   //!
+  //! if an HTTP response code has been set, this method will not alter it,
+  //! if one has not been set, this method will default the response code to 200 (Response OK).
+  //!
+  //! using this method will clear any template set.
+  //! 
   public void set_file(Stdio.File file)
   {
     response->file = file;
     if(!response->error)
       response->error = 200;
     response->data = 0;
+    template = 0;
   }
 
   //! 

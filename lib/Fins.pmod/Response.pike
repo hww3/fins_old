@@ -143,7 +143,7 @@
   public string get_redirect_url(string|URI|function|Fins.FinsController to, array|void args, mapping|void vars)
   {
     string dest;
-    if(functionp(to) || (object_program(to) != Standards.URI))
+    if(functionp(to) || (objectp(to) && (object_program(to) != Standards.URI)))
     {
 	  dest = request->fins_app->url_for_action(to, args, vars);
           dest = absolutify_url(dest);

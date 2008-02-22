@@ -410,7 +410,7 @@ string url_for_action(function|object action, array|void args, mapping|void vars
     action_path_cache[action] = path;
   }
 
-  if(args)
+  if(arrayp(args))
     path = combine_path(path, args*"/");
 
   if(vars)

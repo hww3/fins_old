@@ -22,6 +22,8 @@ object model;
 Sql.Sql sql;
 string sql_url;
 
+int id = random(time());
+
 string _sprintf(mixed ... args)
 {
   return "DataModelContext(" + sql->host_info() + ")";
@@ -65,4 +67,19 @@ int initialize()
   personality = p(sql, this);
 
   personality->initialize();
+}
+
+//! copy this DataModelContext object and opens a new sql connection.
+DataModelContext clone()
+{
+	DataModelContext d = object_program(this)();
+	d->repository = repository;
+	d->cache = cache;
+	d->app = app;
+	d->model = model;
+	d->sql_url = sql_url;
+	d->sql = Sql.Sql(sql_url);
+	d->initialize();
+	
+	return d;
 }

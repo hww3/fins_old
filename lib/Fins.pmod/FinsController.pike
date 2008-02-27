@@ -148,7 +148,7 @@ static void create(.Application a)
   ::create(a);
 
   if(functionp(start))
-    start();
+    call_out(start, 0);
 }
 
 //! the preferred method from which controllers are loaded.

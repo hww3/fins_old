@@ -37,6 +37,16 @@ private class XMLRPCRunner(object obj, function indexer)
     return 0;
   }
 
+  string get_name()
+  {
+    return "";
+  }
+
+  object get_controller()
+  {
+    return obj;
+  }
+
   static int(0..1) _is_type(string bt)
   {
     if(bt=="function")

@@ -288,14 +288,18 @@ object get_controller_for_path(string path, object|void controller)
 //!  application. does not include any context root.
 string get_path_for_controller(object _controller)
 {
+
+  //werror("get_path_for_controller(%O)\n", _controller); 
   string path;
   array pcs = ({});
   if(controller_path_cache[_controller])
     return controller_path_cache[_controller];
-
+//werror("not in cache.\n");
   if(controller == _controller)
-    path = "/";
-
+  {
+    path = "/"; 
+    //werror("have the root.\n");
+  }
   else
   {
     array x = ({_controller});
@@ -310,6 +314,9 @@ string get_path_for_controller(object _controller)
       c = p;
       i++;
     } while(i < 100);
+
+    //werror("array is %O\n", x);
+
     foreach(x;int i; object pc)
     {
       if(pc == controller) pcs += ({""});
@@ -318,7 +325,7 @@ string get_path_for_controller(object _controller)
 
    path = reverse(pcs)*"/";
   }  
-
+//werror("figured path: %O\n", path);
 
   controller_path_cache[_controller] = path;
   return path;
@@ -334,6 +341,8 @@ object find_parent_controller(object c)
 
 private object lookingfor(object o, object in)
 {
+  if(o == in) return 0;
+  //werror("looking for %O in %O\n", o, in);
   foreach(indices(in);int i; mixed x)
   {
     if(in[x] == o) return in;
@@ -356,6 +365,8 @@ private object lookingfor(object o, object in)
 string get_path_for_action(function|object action, int|void nocontextroot)
 {
   string path;
+//werror("get_path_for_action(%O)\n", action);
+    if(!action) return "";
 
     if(functionp(action))
     {
@@ -363,9 +374,18 @@ string get_path_for_action(function|object action, int|void nocontextroot)
       string path1 = get_path_for_controller(c);
       path = combine_path(nocontextroot?"":context_root, path1, function_name(action));
     }
+    else if(Program.implements(object_program(action), Fins.Helpers.Runner))
+    {
+//werror("have a runner\n");
+      string path1 = get_path_for_controller(action->get_controller());
+//werror("controller path: %O\n", path1);
+//werror("action name: %O\n", action->get_name());
+      path = combine_path(nocontextroot?"":context_root, path1, action->get_name());
+    }
     else
+    {
       path = combine_path(nocontextroot?"":context_root, get_path_for_controller(action));
-
+    }
   return path;
 }
 
@@ -404,6 +424,9 @@ Standards.URI get_my_url()
 string url_for_action(function|object action, array|void args, mapping|void vars)
 {
   string path;
+
+//werror("cache: %O\n", action_path_cache);
+
   if(!(path = action_path_cache[action]))
   {
     path = get_path_for_action(action);
@@ -925,6 +948,18 @@ private class FilterRunner
         array before_filters;
         array after_filters;
         array around_filters;
+
+  string get_name()
+  {
+    if(event->get_name) return event->get_name();
+    else return function_name(event);
+  }
+
+  Fins.FinsController get_controller()
+  {
+    if(event->get_controller) return event->get_controller();
+    else return function_object(event);
+  }
 	
   static void create(mixed _event, array _before_filters, array _after_filters, array _around_filters)
   {

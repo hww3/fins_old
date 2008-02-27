@@ -378,7 +378,7 @@ class PikeBlock
     else if(has_prefix(contents, "<%$"))
     {
       string expr = String.trim_all_whites(contents[3..strlen(contents)-3]);
-      string i = "catch{";
+      string i = "catch{ mixed expr; ";
       string f = "};";
       array e = expr/".";
 
@@ -389,7 +389,7 @@ class PikeBlock
         expr += "[\"" + ep + "\"]";
       }
 
-      return(i + "\n// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\nbuf->add((string)(" + expr + "));" + f);
+      return(i + "\n// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\nexpr = " + expr + "; buf->add((string)(!zero_type(expr)?expr:\"\"));" + f);
     }
 
     else

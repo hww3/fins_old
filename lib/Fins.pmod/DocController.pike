@@ -36,14 +36,20 @@ int __quiet;
 //!
 //!  additionally you may simply use Template.View->set_layout() instead, in your own non DocController apps.
 
+mapping __vc = ([]);
+
 static mixed `[](mixed a)
 {
   mixed v; 
+
+  if(v = __vc[a])
+    return v;
+
   if(v = ::`[](a, 2))
   {
     if(objectp(v)) return v;
     else if(functionp(v))
-      return DocRunner(v);
+      return (__vc[a] = DocRunner(v));
   }
   else 
   {
@@ -84,7 +90,7 @@ object __get_layout(object request)
   return l;
 }
 
-private class DocRunner(mixed req)
+private class DocRunner(function req)
 {
   inherit .Helpers.Runner;
 
@@ -92,6 +98,16 @@ private class DocRunner(mixed req)
   {
     run(request, response, @args);
     return 0;
+  }
+
+  Fins.FinsController get_controller()
+  {
+    return function_object(req);
+  }
+
+  string get_name()
+  {
+    return function_name(req);
   }
 
   static int(0..1) _is_type(string bt)
@@ -108,7 +124,7 @@ private class DocRunner(mixed req)
     Fins.Template.View lview;
 
     mixed e = catch(lview = view->get_view(request->not_args));
-    if(e && !quiet) Log.exception("An error occurred while loading the template " + request->not_args + "\n"
+    if(e && !__quiet) Log.exception("An error occurred while loading the template " + request->not_args + "\n"
        "To turn these notices off, set the __quiet flag in your DocController instances.", e);
     if(layout && lview)
       lview->set_layout(layout);

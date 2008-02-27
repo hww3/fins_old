@@ -62,7 +62,7 @@ int autosave = 1;
 
 string instance_name = "";
 string table_name = "";
-mapping new_object_data = ([]);
+//mapping new_object_data = ([]);
 array field_order = ({});
 
 //!

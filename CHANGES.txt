@@ -13,6 +13,16 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- FinsController->start() is now called as a callout in order to allow
+    the root of the controller tree to populate first. 
+- Simple template/PSP behavior change: if the result of a variable 
+    replacement is not found (ie, has a zero_type() as in a mapping without 
+    the requested index), the substitution will return an empty string rather 
+    than a zero (0).
+- Extended the Runner interface so that actions that return Runners (like 
+    DocController and filters work properly with url_for_action and friends.
+- Controllers that return runners must retain identity for a given action 
+    in order for url_for_action to work properly.
 - Response.redirect() generates proper absolute URLs in most cases now 
     (the exception being HTTP/1.0 requests in standalone mode and 
      possibly FCGI/SCGI requests).

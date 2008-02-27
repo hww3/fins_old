@@ -70,9 +70,9 @@ int initialize()
 }
 
 //! copy this DataModelContext object and opens a new sql connection.
-DataModelContext clone()
+object clone()
 {
-	DataModelContext d = object_program(this)();
+	object d = object_program(this)();
 	d->repository = repository;
 	d->cache = cache;
 	d->app = app;

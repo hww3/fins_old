@@ -1,5 +1,5 @@
 
-
+//! publish a message
 void publish(string destination, string body, mapping|void properties)
 {
 	object p = this->app->get_processor("JMS");

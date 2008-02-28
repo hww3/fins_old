@@ -3,44 +3,56 @@ inherit Fins.Request;
 constant low_protocol = "JMS";
 
 object low_message;
+
+//! contains all of the properties of this message
 mapping headers;
+
+//! contains the contents of the message
 string body;
 
+//! returns the JMS correlation ID header
 string get_correlation_id()
 {
 	return (string)low_message->getJMSCorrelationID();
 }
 
+//! returns the JMS message ID
 string get_message_id()
 {
 	return (string)low_message->getJMSMessageID();
 }
 
+//! returns the JMS message type
 string get_type()
 {
 	return (string)low_message->getJMSType();
 }
 
+//! returns the JMS timestamp
 int get_timestamp()
 {
 	return (int)low_message->getJMSTimestamp();
 }
 
+//! returns the JMS delivery mode for this message
 int get_delivery_mode()
 {
 	return (int)low_message->getJMSDeliveryMode();
 }
 
+//! returns the JMS priority for this message
 int get_priority()
 {
 	return (int)low_message->getJMSPriority();
 }
 
+//! returns the JMS redelivery status for this message
 int get_redelivered()
 {
 	return (int)low_message->getJMSRedelivered();
 }
 
+//! returns a URI object describing the destination this message was sent to
 Standards.URI get_destination()
 {
 	object d = low_message->getJMSDestination();
@@ -52,6 +64,7 @@ Standards.URI get_destination()
 	else return 0;
 }
 
+//! returns a URI object describing the reply-to destination for this message
 Standards.URI get_reply_to()
 {
 	object d = low_message->getJMSReplyTo();
@@ -63,11 +76,13 @@ Standards.URI get_reply_to()
 	else return 0;
 }
 
+//! acknowledge the message (for situations where this is required)
 void acknowledge()
 {
 	low_message->acknowledge();
 }
 
+//!
 static void create(object|void message)
 {
   if(message)
@@ -83,7 +98,7 @@ static void create(object|void message)
   }
 }
 
-
+//!
 mapping generate_headers(object message)
 {
 	mapping headers = ([]);

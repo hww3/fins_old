@@ -1,3 +1,5 @@
+import Tools.Logging;
+
 //!
 //! a simple memory cache object
 //!
@@ -7,7 +9,7 @@ static mapping(string:array) values = ([]);
 
 static void create()
 {
-  call_out(cleanup, 60);
+  call_out(cleanup, random(60) + 60);
 }
 
 //! remove a cache entry
@@ -15,7 +17,7 @@ static void create()
 //! @param key
 //!   key of the item we wish to remove
 //! @returns
-//!   1 on succeful delte of the item, 0 otherwise.
+//!   1 on successful delete of the item, 0 otherwise.
 int clear(string key)
 {
   if(values[key] || !zero_type(values[key]))
@@ -85,6 +87,6 @@ void cleanup()
     }
   }
   if(cleaned)
-    werror("FinsCache(): cleaned " + cleaned + " objects.\n");
-  call_out(cleanup, 60);
+    Log.info("FinsCache(): cleaned " + cleaned + " objects.\n");
+  call_out(cleanup, random(60) + 60);
 }

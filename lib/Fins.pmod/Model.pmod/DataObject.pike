@@ -432,6 +432,14 @@ void gen_fields()
    _fields_string = (_fields * ", ");
 }
 
+//! perform a query
+//!
+//! @param qualifiers
+//!   a mapping containing a series of field -> value pairs.
+//!   if the value of a given field -> value pair is a @[Criteria] object,
+//!   the criteria object will determine the type of comparison made for 
+//!   the field, otherwise the criteria will be an equality comparison on the
+//!   value (as in the SQL: field1='value' if the field field1 were a string type)
 array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 {
   string query;

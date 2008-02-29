@@ -166,7 +166,7 @@ void initialize_links()
     }
   }
 
-  Log.debug("possible links left over: %O\n", context->builder->possible_links);
+  Log.debug("possible links left over: %O", context->builder->possible_links);
   foreach(context->builder->possible_links;; mapping pl)
   {
     pl->obj->do_add_field(pl->field);

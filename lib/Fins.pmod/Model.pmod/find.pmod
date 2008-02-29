@@ -10,16 +10,25 @@
 //! users_by_query( string where clause )
 //!
 
+object model = Fins.Model.module;
+
+//!
+void set_repository(object m)
+{
+	model = m;
+}
+
 static mapping funcs = ([]);
 
 optional mixed `()( mixed ... args )
 {
-  return Fins.Model.old_find(@args);
+  return model->old_find(@args);
 }
 
 static mixed `[](mixed k)
 {
   function f;
+  if(k == "_set_model") return set_model;
   if(f=funcs[k]) return f;
   else if(f=get_func(k)) return funcs[k]=f;
   else return 0;
@@ -34,7 +43,7 @@ static string string_without_suffix(string k, string s)
 
 static program get_model_component(string ot)
 {
-  mixed m = Fins.Model.get_model_module();
+  mixed m = model->get_model_module();
 
   array x = indices(m);
   array y = values(m);
@@ -49,7 +58,7 @@ static program get_model_component(string ot)
 
 static object get_object_component(string ot)
 {
-  mixed m = Fins.Model.get_object_module();
+  mixed m = model->get_object_module();
 
   array x = indices(m);
   array y = values(m);
@@ -79,7 +88,7 @@ static function get_func(mixed k)
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
-      return lambda(mixed ... args){ return Fins.Model.find_by_id(p, @args);};
+      return lambda(mixed ... args){ return model->find_by_id(p, @args);};
   }
   if(has_suffix(k, "_by_query"))
   {
@@ -87,7 +96,7 @@ static function get_func(mixed k)
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
-      return lambda(mixed ... args){ return Fins.Model.find_by_query(p, @args);};
+      return lambda(mixed ... args){ return model->find_by_query(p, @args);};
   }
   else if(has_suffix(k, "_by_alternate"))
   {
@@ -95,7 +104,7 @@ static function get_func(mixed k)
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
-      return lambda(mixed ... args){ return Fins.Model.find_by_alternate(p, @args);};
+      return lambda(mixed ... args){ return model->find_by_alternate(p, @args);};
   }
   else if(has_suffix(k, "_by_alt"))
   {
@@ -103,7 +112,7 @@ static function get_func(mixed k)
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
-      return lambda(mixed ... args){ return Fins.Model.find_by_alternate(p, @args);};
+      return lambda(mixed ... args){ return model->find_by_alternate(p, @args);};
   }
 /*
   else if((i = search(k, "_by_")) != -1)
@@ -123,14 +132,14 @@ werror("ot: %O, %O\n", get_model_component(ot)->master_object, k[(i+4)..]);
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
-      return lambda(){ return Fins.Model.old_find(p, ([]));};
+      return lambda(){ return model->old_find(p, ([]));};
   }
   else
   {
     ot = Tools.Language.Inflect.singularize(k);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
-      return lambda(mixed ... args){ return Fins.Model.old_find(p, @args);};
+      return lambda(mixed ... args){ return model->old_find(p, @args);};
     
   }
 

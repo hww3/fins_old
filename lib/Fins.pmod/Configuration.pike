@@ -9,7 +9,7 @@ static void create(string appdir, string|mapping _config_file)
   app_dir = appdir;
 
   if(appdir)
-    app_name = ((appdir/"/")-(""))[-1];
+    app_name = ((appdir/"/")-({""}))[-1];
 
   if(stringp(_config_file))
   {

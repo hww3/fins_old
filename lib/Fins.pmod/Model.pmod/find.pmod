@@ -28,12 +28,16 @@ optional mixed `()( mixed ... args )
 static mixed `[](mixed k)
 {
   function f;
-  if(k == "_set_model") return set_model;
+//  if(k == "_set_model") return set_model;
   if(f=funcs[k]) return f;
   else if(f=get_func(k)) return funcs[k]=f;
   else return 0;
 }
 
+static void set_model()
+{
+	
+}
 
 static string string_without_suffix(string k, string s)
 {

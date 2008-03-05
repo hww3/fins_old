@@ -6,6 +6,15 @@ string simple_macro_sessionid(Fins.Template.TemplateData data, mapping|void args
   return data->get_request()->misc->session_id;
 }
 
+//! args id, string
+string simple_macro_LOCALE(Fins.Template.TemplateData data, mapping|void args)
+{
+	object r = data->get_request();
+	
+//	werror("project: %O, language: %O", r->get_project(), r->get_lang());
+	return Locale.translate(r->get_project(), r->get_lang(), (int)args["id"], args["string"]);
+}
+
 //! args: var
 string simple_macro_humanize(Fins.Template.TemplateData data, mapping|void args)
 {
@@ -16,6 +25,12 @@ string simple_macro_humanize(Fins.Template.TemplateData data, mapping|void args)
 string simple_macro_dump_data(Fins.Template.TemplateData data, mapping|void args)
 {
   return sprintf("%O\n", mkmapping(indices(data->get_data()), values(data->get_data())));
+}
+
+//! args: 
+string simple_macro_dump_id(Fins.Template.TemplateData data, mapping|void args)
+{
+  return sprintf("%O\n", mkmapping(indices(data->get_request()), values(data->get_request())));
 }
 
 //! args: controller, action, args 

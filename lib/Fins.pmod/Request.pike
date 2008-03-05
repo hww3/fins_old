@@ -98,6 +98,14 @@ void set_lang(string lang) {
   }
 }
 
+string _locale_project = "application";
+
+//! returns the default 
+string get_project()
+{
+	return _locale_project;
+}
+
 //! returns a 3 letter iso 639 language code based on accept-language headers
 //!
 //! @note

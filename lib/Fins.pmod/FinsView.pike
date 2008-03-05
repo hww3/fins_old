@@ -105,6 +105,9 @@ public Template.View get_view(string tn)
 public Template.Template low_get_template(program templateType, string templateName, void|object context, int|void is_layout)
 {
   object t;
+
+//werror("low_get_template(%O, %O, %O, %O)\n", templateType, templateName, context, is_layout);
+
   if(!context) 
   {
     context = default_context();
@@ -120,7 +123,7 @@ public Template.Template low_get_template(program templateType, string templateN
     templates[templateType] = ([]);
   }
 
-  if(!templates[templateType][templateName])
+  if(!(t = templates[templateType][templateName]))
   {
     t = templateType(templateName, context, is_layout);
 
@@ -132,7 +135,7 @@ public Template.Template low_get_template(program templateType, string templateN
     templates[templateType][templateName] = t;
   }
 
-  return templates[templateType][templateName];
+  return t;
 
 }
 

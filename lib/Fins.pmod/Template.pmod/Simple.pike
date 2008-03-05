@@ -229,6 +229,7 @@ array render_psp(array(Block) contents, string pikescript, string header, object
       mixed ren = e->render(compilecontext);
       if(arrayp(ren))
         [pikescript, header] = render_psp(ren, pikescript, header, compilecontext);
+	  else pikescript += ren;
     }
     else
       pikescript += e->render(compilecontext);
@@ -549,10 +550,27 @@ class PikeBlock
        return process_include(exp, compilecontext);
        break;
 
+	 case "project":
+	   return process_project(exp, compilecontext);
+       break;
+
      default:
        throw(Error.Generic("PSP format error: unknown directive " + keyword + " in " + templatename + ".\n"));
  
    }
+ }
+
+ string|array(Block) process_project(string exp, object|void compilecontext)
+ {
+	string project;
+	
+	 int r = sscanf(exp, "%*sname=\"%s\"%*s", project);
+
+	   if(r != 3) 
+	     throw(Error.Generic("PSP format error: unknown project format in " + templatename + ".\n"));
+//		werror("project is %O\n", backtrace() );
+	 return "__d->get_request()->_locale_project = \"" + project + "\";";
+	
  }
 
  // we don't handle absolute includes yet.

@@ -52,6 +52,8 @@ static void create(.Configuration _config)
 {
   config = _config;
   static_dir = Stdio.append_path(config->app_dir, "static");
+werror(Stdio.append_path(config->app_dir, "translations/%L/%P.xml") + "\n");
+   Locale.set_default_project_path(Stdio.append_path(config->app_dir, "translations/%L/%P.xml"));
 
   if(config["application"] && config["application"]["context_root"])
     context_root = config["application"]["context_root"];

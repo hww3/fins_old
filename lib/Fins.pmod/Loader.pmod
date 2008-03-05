@@ -25,6 +25,7 @@ Fins.Application load_app(string app_dir, string config_name)
   Log.info("Preparing to load application " + config->app_name + ".");
 
   object o;
+
   if(o = master()->resolv(config->app_name + ".Model"))
     Fins.Model.set_model_module(o);
   if(o = master()->resolv(config->app_name + ".Objects"))

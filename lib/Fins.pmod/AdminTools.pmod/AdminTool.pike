@@ -26,6 +26,10 @@ int main(int argc, array argv)
        meth = Fins.AdminTools.FinServe;       
        break;
 
+     case "extract_locale":
+       meth = Fins.AdminTools.LocaleExtractor;       
+       break;
+
      case "model":
        meth = Fins.AdminTools.ModelBuilder;       
        break;

@@ -24,7 +24,7 @@ static mapping _get_session_by_id(string SessionID)
   return ([]);
 }
 
-multiset (string) pragma    = (< >);
+multiset (string) pragma = (< >);
 
 //!
 string get_compress_encoding()
@@ -98,11 +98,12 @@ void set_lang(string lang) {
   }
 }
 
-string _locale_project = "application";
+string _locale_project;
 
 //! returns the default 
 string get_project()
 {
+  if(!_locale_project) _locale_project = fins_app->config->app_name;
 	return _locale_project;
 }
 

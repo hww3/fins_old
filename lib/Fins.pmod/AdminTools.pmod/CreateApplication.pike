@@ -2,6 +2,15 @@ import Tools.Logging;
 
 string newappname;
 
+string locale_contents = 
+#"<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>
+<project name=\"__APPNAME__\">
+ <baselang>eng</baselang>
+ <xmlpath>translations/%L/__APPNAME__.xml</xmlpath>
+ <nocopy/>
+</project>
+";
+
 string config_contents = 
 #"# this is a Fins Application configuration file.
 #
@@ -117,7 +126,7 @@ int run()
   cd(newappname);
   
   // now, let's create the subfolders.
-  foreach(({"classes", "config", "modules", "templates", "static", "logs", "bin"});; string dir)
+  foreach(({"classes", "config", "modules", "templates", "static", "logs", "bin", "translations", "translations/eng"});; string dir)
     mkdir(dir);
  
   // now, we create the configfiles, one each for dev, test, prod.
@@ -128,6 +137,8 @@ int run()
     Stdio.write_file(tier + ".cfg", customize("#\n# this is the configuration for " + upper_case(tier) + ".\n#\n" + config_contents));
     Stdio.write_file("log_" + tier + ".cfg", customize("#\n# this is the logging configuration for " + upper_case(tier) + ".\n#\n" + log_config_contents));
   }
+
+  Stdio.write_file("locale.xml", customize(locale_contents));
 
   cd("../classes");
   Stdio.write_file("application.pike", customize(application_contents));

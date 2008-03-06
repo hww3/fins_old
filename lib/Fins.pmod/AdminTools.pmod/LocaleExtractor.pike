@@ -37,48 +37,64 @@ void update_xml_sourcefiles(array filelist) {
     int new = 0;
     int ignoretag = 0;
     int no_of_ids = 0;
+    mapping m = copy_value(args);
     Parser.HTML xml_parser = Parser.HTML();
     xml_parser->case_insensitive_tag(1);
     xml_parser->add_quote_tag("!--", lambda() {return 0;}, "--");
     xml_parser->add_quote_tag("%", 
              lambda(object p, string c, mixed ... e)
              {
-               if(c[0] == '!') // we have a declaration.
+//werror("have a psp tag: %O\n", c);
+               if(c[0] == '@') // we have a declaration.
                {
                  c = String.trim_whites(c[1..]);
                  string cmd;
-                 sscanf("%s %s", c, cmd, c);
+                 sscanf(c, "%s %s", cmd, c);
                  if(cmd == "project")
                  {
                    string project;
-                   if(sscanf("%*sproject=\"%s\"%*s", c, project) != 3)
+                   if(sscanf(c, "%*sname=\"%s\"%*s", project) != 3)
                    {
-                     throw(Error.Generic("Project declaration must include project name.\n"));
+                     exit(1, "Project declaration must include project name.\n");
                    }
-		   args->project = project;
+                   if(m->project && (project != m->project))
+                   {
+                     ignoretag = 1;
+                   }
+                   else
+                   {
+                     ignoretag = 0;
+                   }
                  } 
                }
-               else
+               else if(c[0]!='!') // ok, we have a regular template construct.
                {
-               }
-               return 0;
-             },
-        "%");
-
-    xml_parser->		
-      add_container("translate",
-		    // This is the string container
-		    lambda(object foo, mapping m, string c) {
-		      if(m->project && m->project!="") {
-			if(m->project!=args->project)
-			  return 0; // Tag belongs to another project
-			// else correct project, proceed
-		      } else // No proj specified
-			if(ignoretag)
-			  return 0; // Check if last proj was another
+                 c = String.trim_whites(c[0..]);
+                 string cmd;
+//werror("cmd: %O\n", c);
+                 sscanf(c, "%s %s", cmd, c);
+                 if(cmd == "LOCALE")
+                 {
+                   if(ignoretag) 
+                   {
+                     werror("skipping tag as it's out of our project.\n");
+                     return 0;
+                   }
+//werror("have a LOCALE command\n");
+		   foreach((<"id", "string">); string k;)
+                   {
+                     string before,after,v;
+                     if(sscanf(c, "%s" + k + "=\"%s\"%s", before, v, after) == 3)
+                     {
+                       m[k] = v;
+                       c = before + after;
+                     }
+                   }
+//werror("m: %O\n", m);
+                   if(!m->string) { werror("malformed LOCALE string.\n"); return 0; }
 		      string|int id = m->id;
 		      if((int)id) id = (int)id;
-		      string fstr = c;
+		      string fstr = m["string"];
 		      int updated = 0;
 		      if (String.trim_whites(fstr)=="")
 			return 0;         // No need to store empty strings
@@ -89,6 +105,7 @@ void update_xml_sourcefiles(array filelist) {
 			else
 			  id = make_id();     // New string --> Get new id
 			// Mark that we have a new id here
+//werror("new localizaion\n");
 			updated = ++new;
 		      } else {
 			// Verify old id
@@ -122,14 +139,21 @@ void update_xml_sourcefiles(array filelist) {
 		      if(String.trim_whites(fstr)!="")
 			r_ids[fstr] = id;               // Store text:id
 		      if(updated) {
-			string ret="<translate id=\""+id+"\"";
-			foreach(indices(m)-({"id"}), string param)
+			string ret="<%LOCALE id=\""+id+"\"";
+/*			foreach(indices(m)-({"id"}), string param)
 			  ret+=" "+param+"=\""+m[param]+"\"";
-		        return ({ ret+">"+c+"</translate>" });
+*/
+		        return ({ ret+" string=\""+m->string+"\"%>" });
 		      }
 		      // Not updated, do not change
 		      return 0;
-		    });
+                 }
+               }
+               return 0;
+             },
+        "%");
+
+
     xml_parser->feed(data)->finish();
 
     // Done parsing, rebuild sourcefile if needed
@@ -166,9 +190,8 @@ void update_xml_sourcefiles(array filelist) {
 // ------------------------ The main program --------------------------
 
 void create(array(string) argv) {
-
   // Parse arguments
-  argv=argv[1..sizeof(argv)-1];
+  argv=argv[..sizeof(argv)-1];
   for(int i=0; i<sizeof(argv); i++) {
     if(argv[i][0]!='-') {
       files += ({argv[i]});
@@ -182,12 +205,12 @@ void create(array(string) argv) {
     }
     args[argv[i][1..]] = 1;
   }
-
 }
 
 int run()
 {
   // Get name of outfile (something like project_eng.xml)
+// werror("args: %O\n", args);
   string xml_name=args->out;
 
   // Read configfile
@@ -233,6 +256,7 @@ int run()
       update_xml_sourcefiles( ({ filename }) );
 
   // Save all strings to outfile xml
+//werror("args: %O\n", args);
   if(!xml_name)
     if(args->project && args->project!="")
       xml_name = args->project+"_eng.xml";

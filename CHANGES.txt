@@ -13,6 +13,13 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added L10n support in template files using <%@project name="project"%>
+    and <%LOCALE id="n" string="string to translate"%>
+- New applications have a locale extractor configuration automatically 
+    created as config/locale.xml, and translation strings folder structure 
+    in translations/. 
+- New Locale Extractor added (pike -x fins extract_locale) with support for
+    Simple templates.
 - FinsController->start() is now called as a callout in order to allow
     the root of the controller tree to populate first. 
 - Simple template/PSP behavior change: if the result of a variable 

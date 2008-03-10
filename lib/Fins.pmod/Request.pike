@@ -119,10 +119,14 @@ string get_lang()
   // we need to figure out the language.
   //  else
   {
-    string lang = "eng";
+    string lang;
     string lh;
     array al = ({});
     array aq = ({});
+
+    // if we've specified a language, use it, otherwie, we default to english.
+    if(catch(lang = fins_app->config->get_value("application","default_language")))
+      lang = "eng";
 
     if(this->request_headers["accept-language"])
       lh = this->request_headers["accept-language"];

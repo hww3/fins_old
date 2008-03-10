@@ -144,11 +144,15 @@ static void after_filter(function|object filter)
 //!  method to load up your controllers.
 static void create(.Application a)
 {  
+  Log.debug("%O->create()", this);
   __last_load = time();
   ::create(a);
 
   if(functionp(start))
+  {
+  //  Log.debug("scheduling startup of controller %O.\n", this);
     call_out(start, 0);
+  }
 }
 
 //! the preferred method from which controllers are loaded.

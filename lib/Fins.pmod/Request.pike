@@ -1,6 +1,7 @@
 constant low_protocol = "NONE";
 object fins_app;
 
+string current_lang;
 string not_args;
 string controller_path;
 string controller_name;
@@ -113,7 +114,20 @@ string get_project()
 //! this value is cached for the life of the session
 string get_lang()
 {
-  if(this->misc->session_variables->__lang)
+  if(!current_lang)
+    current_lang = low_get_lang();
+  
+  return current_lang;
+}
+
+string low_get_lang()
+{
+  // if we've already calculated the language, and the headers are
+  // still coming in the same as when we made the decision, don't
+  // recalculate the language.
+  if(this->misc->session_variables->__lang &&  
+      (this->misc->session_variables->__lang_header == 
+         this->request_headers["accept-language"]))
     return this->misc->session_variables->__lang;
 
   // we need to figure out the language.
@@ -167,6 +181,7 @@ string get_lang()
     werror("SELECTED LANGUAGE: %O\n", lang);
 #endif
     this->misc->session_variables->__lang = lang;
+    this->misc->session_variables->__lang_header = lh;
     return lang;
   }
 }

@@ -36,7 +36,7 @@ string simple_macro_dump_id(Fins.Template.TemplateData data, mapping|void args)
 //! args: name
 string simple_macro_available_languages(Fins.Template.TemplateData data, mapping|void args)
 {
-    data->get_data()[args->name] = app->get_languages();	
+    data->get_data()[args->name] = data->get_request()->fins_app->get_languages();	
 	return "";
 }
 

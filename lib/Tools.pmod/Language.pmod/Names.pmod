@@ -48,11 +48,13 @@ constant iso639_2 = ([
  "ro": "rum",
  "ru": "rus",
  "sl": "slv",
+ "es": "spa" // instead of castellano
  ]);
 
 //!
 constant iso639_2_native = 
 ([
+	"eng" : "English",
 	"dut" : "Nederlands",
 	"fin" : "Suomi",
 	"ces" : "Čeština",
@@ -70,6 +72,7 @@ constant iso639_2_native =
 	"swe" : "Svenska",
 	"abk" : "Аҧсуа",
 	"aar" : "Afaraf",
+	"spa" : "Español"
 	
 ]);
 	

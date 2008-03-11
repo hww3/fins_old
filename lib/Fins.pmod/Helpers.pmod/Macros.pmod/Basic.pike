@@ -33,6 +33,14 @@ string simple_macro_dump_id(Fins.Template.TemplateData data, mapping|void args)
   return sprintf("%O\n", mkmapping(indices(data->get_request()), values(data->get_request())));
 }
 
+//! args: name
+string simple_macro_available_languages(Fins.Template.TemplateData data mapping|void args)
+{
+    data->get_data()[args->name] = app->get_languages();	
+	return "";
+}
+
+
 //! args: controller, action, args 
 //!
 //! any arguments other than those above will be considered variables to 

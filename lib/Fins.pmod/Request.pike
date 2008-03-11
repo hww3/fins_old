@@ -201,47 +201,4 @@ array map_languages(array languages)
   return out;
 }
 
-mapping iso639_2 =   
-([
- "ab": "abk",
- "aa": "aar",
- "af": "afr",
- "sq": "alb",
- "am": "amh",
- "ar": "ara",
- "hy": "arm",   
- "as": "asm",
- "ay": "aym",
- "az": "aze",  
- "ba": "bak",
- "eu": "baq",
- "bn": "ben",
- "bh": "bih",
- "bi": "bis",
- "be": "bre",
- "bg": "bul",
- "my": "bur",
- "be": "bel",
- "ca": "cat",
- "zh": "chi",
- "co": "cos",
- "hr": "cro", // we made this one up :)
- "cs": "ces",
- "da": "dan",
- "nl": "dut",
- "dz": "dzo",
- "en": "eng",
- "eo": "epo",
- "et": "est", 
- "fo": "fao",
- "fj": "fij",
- "fi": "fin",
- "fr": "fra",
- "fy": "fry",
- "gl": "glg",
- "ka": "geo",
- "de": "deu",
- "el": "ell",
- "kl": "kal",
- "sv": "swe",
- ]);
+mapping iso639_2 = Language.Names.iso639_2;

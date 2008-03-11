@@ -18,6 +18,12 @@ void parse_request()
 
   not_query = replace(not_query, "+", " ");
   referrer = request_headers["referer"];
+
+  if(variables["_lang"])
+  {
+    set_lang(variables["_lang"]);
+    m_delete(variables, "_lang");
+  }
 }
 
 //!

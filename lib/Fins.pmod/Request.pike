@@ -93,10 +93,10 @@ void set_lang(string lang) {
       this->misc->session_variables->__lang == lang;
   }
   else if (sizeof(lang) == 3) {
-    mapping backwards = mkmapping(values(iso639_2), indices(iso639_2));
-    if (backwards[lang])
-      this->misc->session_variables->__lang == backwards[lang];
+    string l = search(iso639_2, lang);
+    if(l) this->misc->session_variables->__lang == lang;
   }
+
 }
 
 string _locale_project;

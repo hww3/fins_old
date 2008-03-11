@@ -263,4 +263,11 @@ void create(object fcgir)
 
   if(misc->len && method == "POST")
     decode_post(); // We have a post.. Decode it.
+
+  // handle language setting early on
+  if(variables["_lang"])
+  {
+    set_lang(variables["_lang"]);
+    m_delete(variables, "_lang");
+  }
 }

@@ -33,6 +33,8 @@ string simple_macro_dump_id(Fins.Template.TemplateData data, mapping|void args)
   return sprintf("%O\n", mkmapping(indices(data->get_request()), values(data->get_request())));
 }
 
+//! populate a data field with a mapping containing available language codes (keys) and native names (values)
+//!
 //! args: name
 string simple_macro_available_languages(Fins.Template.TemplateData data, mapping|void args)
 {

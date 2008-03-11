@@ -201,4 +201,4 @@ array map_languages(array languages)
   return out;
 }
 
-mapping iso639_2 = Language.Names.iso639_2;
+mapping iso639_2 = Tools.Language.Names.iso639_2;

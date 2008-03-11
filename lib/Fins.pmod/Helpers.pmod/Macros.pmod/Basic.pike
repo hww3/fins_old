@@ -38,7 +38,7 @@ string simple_macro_dump_id(Fins.Template.TemplateData data, mapping|void args)
 //! args: name
 string simple_macro_available_languages(Fins.Template.TemplateData data, mapping|void args)
 {
-    data->get_data()[args->name] = data->get_request()->fins_app->get_languages();	
+    data->get_data()[args->name] = data->get_request()->fins_app->available_languages();	
 	return "";
 }
 
@@ -48,11 +48,11 @@ string simple_macro_available_languages(Fins.Template.TemplateData data, mapping
 string simple_macro_language_selector(Fins.Template.TemplateData data, mapping|void args)
 {
 	String.Buffer buf = String.Buffer();
- 	mapping l = data->get_request()->fins_app->get_languages();	
+ 	mapping l = data->get_request()->fins_app->available_languages();	
 
-	buf += "<form id=\"language_form\">\n"
+	buf += "<form id=\"language_form\">\n";
 	buf += "<select name=\"_lang\" ";
-	buf += "onChange=\"javascript:document.getElementById(\"language_form\").submit();\""
+	buf += "onChange=\"javascript:document.getElementById(\"language_form\").submit();\"";
 	buf += ">\n";
 
 	foreach(l; string k; string v)

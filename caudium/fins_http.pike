@@ -1,4 +1,4 @@
-inherit "protocols/http";
+inherit "protocols/http" : http;
 inherit Fins.Request;
 
 constant low_protocol = "HTTP";
@@ -16,3 +16,15 @@ static mapping _get_session_by_id(string SessionID)
 
 function get_session_by_id = _get_session_by_id;
 
+
+void handle_request()
+{  
+  // handle the language setting as early as possible.
+  if(variables["_lang"])
+  {
+    set_lang(variables["_lang"]);
+    m_delete(variables, "_lang");
+  }
+
+  http::handle_request();
+}

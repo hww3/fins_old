@@ -1,3 +1,4 @@
+#charset utf-8
 //!
 constant iso639_2 = ([
  "ab": "abk",

@@ -51,7 +51,7 @@ constant iso639_2 = ([
  ]);
 
 //!
-constant iso639_native = 
+constant iso639_2_native = 
 ([
 	"dut" : "Nederlands",
 	"fin" : "Suomi",

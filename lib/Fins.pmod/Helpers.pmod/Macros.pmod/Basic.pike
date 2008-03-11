@@ -52,7 +52,7 @@ string simple_macro_language_selector(Fins.Template.TemplateData data, mapping|v
 
 	buf += "<form id=\"language_form\">\n";
 	buf += "<select name=\"_lang\" ";
-	buf += "onChange=\"javascript:document.getElementById(\"language_form\").submit();\"";
+	buf += "onChange=\"document.getElementById('language_form').submit();\"";
 	buf += ">\n";
 
 	foreach(l; string k; string v)

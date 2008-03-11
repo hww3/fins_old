@@ -42,6 +42,30 @@ string simple_macro_available_languages(Fins.Template.TemplateData data, mapping
 	return "";
 }
 
+//! produce a drop down language selector
+//!
+//! args:
+string simple_macro_language_selector(Fins.Template.TemplateData data, mapping|void args)
+{
+	String.Buffer buf = String.Buffer();
+ 	mapping l = data->get_request()->fins_app->get_languages();	
+
+	buf += "<form id=\"language_form\">\n"
+	buf += "<select name=\"_lang\" ";
+	buf += "onChange=\"javascript:document.getElementById(\"language_form\").submit();\""
+	buf += ">\n";
+
+	foreach(l; string k; string v)
+	{
+		buf += "<option value=\"" + k + "\">" + v + "</option>\n";
+	}
+
+	buf += "</select>\n</form>\n";
+
+	return buf->get();
+}
+
+
 
 //! args: controller, action, args 
 //!

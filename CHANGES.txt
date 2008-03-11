@@ -13,6 +13,14 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added <%available languages name="varname"%> and <%language_selector%>
+    macros for generating custom and standard language selectors, 
+    respectively.
+- All of the *Request objects treat the presence of a _lang variable 
+    specially as a way to set the LOCALE manually (instead of using 
+    browser headers) for this to work, request->get_lang() must be called 
+    on the page that receives the request with _lang variable, which is 
+    any page that uses a localized string, or the language macros.
 - Added L10n support in template files using <%@project name="project"%>
     and <%LOCALE id="n" string="string to translate"%>
 - New applications have a locale extractor configuration automatically 

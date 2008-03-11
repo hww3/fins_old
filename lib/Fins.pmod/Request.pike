@@ -90,13 +90,12 @@ string get_compress_encoding()
 void set_lang(string lang) {
   if (sizeof(lang) == 2) {
     if (iso639_2[lang])
-      this->misc->session_variables->__lang == lang;
+      this->misc->set_lang = iso639_2[lang];
   }
   else if (sizeof(lang) == 3) {
     string l = search(iso639_2, lang);
-    if(l) this->misc->session_variables->__lang == lang;
+    if(l) this->misc->set_lang = lang;
   }
-
 }
 
 string _locale_project;
@@ -122,13 +121,26 @@ string get_lang()
 
 string low_get_lang()
 {
+
+  // if we've explicitly set a language (using the _lang variable, 
+  //! see HTTPRequest and friends,) write it here.
+  if (this->misc->set_lang)
+  {
+//werror("low_get_lang(): setting language %O with header %O.\n", this->misc->set_lang,  this->request_headers["accept-language"]);
+    this->misc->session_variables->__lang = this->misc->set_lang;
+    this->misc->session_variables->__lang_header = 
+          this->request_headers["accept-language"];
+    m_delete(this->misc, "set_lang");
+    return this->misc->session_variables->__lang;
+  }
   // if we've already calculated the language, and the headers are
   // still coming in the same as when we made the decision, don't
   // recalculate the language.
-  if(this->misc->session_variables->__lang &&  
+  else if(this->misc->session_variables->__lang &&  
       (this->misc->session_variables->__lang_header == 
          this->request_headers["accept-language"]))
     return this->misc->session_variables->__lang;
+
 
   // we need to figure out the language.
   //  else

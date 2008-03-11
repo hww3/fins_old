@@ -3,6 +3,18 @@ inherit Protocols.HTTP.Server.Request;
 
 string referrer = "";
 constant low_protocol = "HTTP";
+
+void parse_post()
+{
+  ::parse_post();
+
+  if(variables["_lang"])
+  {
+    set_lang(variables["_lang"]);
+    m_delete(variables, "_lang");
+  }
+}
+
 void parse_request()
 {
   ::parse_request();
@@ -18,12 +30,6 @@ void parse_request()
 
   not_query = replace(not_query, "+", " ");
   referrer = request_headers["referer"];
-
-  if(variables["_lang"])
-  {
-    set_lang(variables["_lang"]);
-    m_delete(variables, "_lang");
-  }
 }
 
 //!

@@ -38,6 +38,8 @@ string simple_macro_dump_id(Fins.Template.TemplateData data, mapping|void args)
 //! args: name
 string simple_macro_available_languages(Fins.Template.TemplateData data, mapping|void args)
 {
+    // we do this to force a language update, if it hasn't happened already.
+    string lang = data->get_request()->get_lang();
     data->get_data()[args->name] = data->get_request()->fins_app->available_languages();	
 	return "";
 }
@@ -48,15 +50,22 @@ string simple_macro_available_languages(Fins.Template.TemplateData data, mapping
 string simple_macro_language_selector(Fins.Template.TemplateData data, mapping|void args)
 {
 	String.Buffer buf = String.Buffer();
+
+    // we do this to force a language update, if it hasn't happened already.
+    string lang = data->get_request()->get_lang();
  	mapping l = data->get_request()->fins_app->available_languages();	
 
 	buf += "<form id=\"language_form\">\n";
+        buf += "<input type=\"hidden\" name=\"qd\" value=\"" + time() + "\">";
 	buf += "<select name=\"_lang\" ";
 	buf += "onChange=\"document.getElementById('language_form').submit();\"";
 	buf += ">\n";
 
 	foreach(l; string k; string v)
 	{
+           if(k == lang)
+		buf += "<option selected=\"1\" value=\"" + k + "\">" + v + "</option>\n";
+           else
 		buf += "<option value=\"" + k + "\">" + v + "</option>\n";
 	}
 

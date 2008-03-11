@@ -627,6 +627,12 @@ string make_btargs(array args)
   return a;
 }
 
+//!
+mapping available_languages()
+{
+  return Tools.Language.Names.iso639_2_native & Locale.list_languages(config->app_name);
+}
+
 //! Given a request object, this method will find the appropriate event method
 //! to call.
 //!

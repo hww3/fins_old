@@ -7,21 +7,25 @@ void create(object _template, object _data)
 	data = _data;
 }
 
+//! sets the layout file for the contained template
 void set_layout(string|object path) 
 {
   template->set_layout(path);
 }
 
+//! adds a data item to this view
 void add(string name, mixed var)
 {
 	data->add(name, var);
 }
 
+//! gets the data contained in this view
 mixed get_data()
 {
 	return data->get_data();
 }
 
+//! renders the template in this view using data contained in this view object.
 string render()
 {
 	return template->render(data);

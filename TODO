@@ -1,3 +1,4 @@
+- add support for localized templates localized strings
 - many-to-many support in scaffolding
 - finish making editors for other datatypes
 - handle changed values better when we finish a pick()

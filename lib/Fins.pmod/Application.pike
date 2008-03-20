@@ -50,6 +50,9 @@ static int exp = 24 * 10;
 //! as @[start]() will be called immediately from this method.
 static void create(.Configuration _config)
 {
+	
+	// the first phase is to set up the various paths, get some configuration values
+	// and set up the l10n system for our app.
   config = _config;
   static_dir = Stdio.append_path(config->app_dir, "static");
 werror(Stdio.append_path(config->app_dir, "translations/%L/%P.xml") + "\n");
@@ -68,6 +71,7 @@ werror(Stdio.append_path(config->app_dir, "translations/%L/%P.xml") + "\n");
   else if(cache_events)
     Log.info("Event caching is enabled.");
 
+  // next, let's load up the various components of our application.
   load_breakpoint();
   load_cache();
   load_model();
@@ -88,6 +92,8 @@ void start()
 {
 }
 
+// determines whether there are any processor classes defined in
+// the application's configuration file and if present, loads them.
 static void load_processors()
 {
   if(config["processors"] && config["processors"]["class"])
@@ -103,6 +109,7 @@ static void load_processors()
   }
 }
 
+// load a processor class, and place it in the processors mapping.
 static void load_processor(string proc)
 {
   object processor;
@@ -230,6 +237,7 @@ static void load_controller()
   else Log.debug("No controller defined!");
 }
 
+// instantiates the model class defined in the configuration file
 static void load_model()
 {
   string modclass = (config["model"] ? config["model"]["class"] : 0);
@@ -241,6 +249,7 @@ static void load_model()
   else Log.debug("No model defined!");
 }
 
+// checks to see if a given controller object has been updated on disk 
 int controller_updated(object controller, object container, string cn)
 {
   if (!controller || !controller->__controller_source) return 0;

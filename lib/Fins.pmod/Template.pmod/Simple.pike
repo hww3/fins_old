@@ -455,7 +455,7 @@ class PikeBlock
 
        return " catch { foreach(" + start + ";mixed __v; mixed __q) {"
          "object __d = __d->clone(); __d->add(\"" + a->val + "\", __q); __d->add(\"" + a->ind + "\", __v); "
-         "mapping odata=data; mapping data=odata + ([\"" + a->val + "\":__q, \"" + a->ind + "\":__v]);" ;
+         "mapping data = __d->get_data(); data[\"" + a->val + "\"]=__q; data[\"" + a->ind + "\"] = __v;" ;
        break;
 
      case "end":

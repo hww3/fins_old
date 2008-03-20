@@ -1,6 +1,12 @@
+//! the full path to the application directory
 string app_dir;
+
+//! name of the application; usually the last element of the full path to the application.
 string app_name;
+
+//! the path to the configuration file in use
 string config_file;
+
 static mapping values;
 
 //!
@@ -27,6 +33,7 @@ static void create(string appdir, string|mapping _config_file)
   }
 }
 
+//! sets a value in the configuration
 void set_value(string section, string item, mixed value)
 {
   if(!values[section])
@@ -86,7 +93,7 @@ array get_value_array(string section, string item)
   else return ({ values[section][item] }); 
 }
 
-//!
+//! easy accessor for an entire configuration section
 mixed `[](string arg)
 {
   //      werror("GOT %O\n", arg);

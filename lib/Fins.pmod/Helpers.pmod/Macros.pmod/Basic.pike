@@ -1,5 +1,25 @@
 inherit .Base;
 
+//! completely untested.
+//! assign var to val
+//! args: var, val
+string simple_macro_assign(Fins.Template.TemplateData data, mapping|void args)
+{
+	mixed d = data->get_data();
+	mixed val = get_var_value(args->var, d);
+	d[args["name"]] = val;
+  return "";
+}
+
+
+//! completely untested.
+string simple_macro_aindex(Fins.Template.TemplateData data, mapping|void args)
+{
+	mixed d = data->get_data();
+	mixed val = get_var_value(args->var, d);
+	return(d[(int)get_var_value(args["ind"], d)]);
+}
+
 //!
 string simple_macro_sessionid(Fins.Template.TemplateData data, mapping|void args)
 {

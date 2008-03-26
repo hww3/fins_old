@@ -1,5 +1,7 @@
 inherit .Template;
 
+constant TEMPLATE_EXTENSION = ".phtml";
+
 constant TYPE_SCRIPTLET = 1;
 constant TYPE_DECLARATION = 2;
 constant TYPE_INLINE = 3;
@@ -39,7 +41,7 @@ static void create(string _templatename,
 
    if(_is_layout) is_layout = 1;
    auto_reload = (int)(context->application->config["view"]["reload"]);
-   templatename = _templatename + ".phtml";
+   templatename = _templatename + TEMPLATE_EXTENSION;
 
    reload_template();
 }

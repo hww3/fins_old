@@ -2,9 +2,58 @@ inherit .Simple;
 
 constant TEMPLATE_EXTENSION = ".ep";
 
+string header = 
+#"
+void _yield()
+{
+  if(is_layout)
+  {
+    if(__view) __view->render(buf, __d);
+  }
+  else throw(Error.Generic(\"invalid yield in non-layout template.\n\"));
+}
+";
+
 string _sprintf(mixed ... args)
 {
   return "ePike(" + templatename + ")";
+}
+
+
+string parse_psp(string file, string realname, object|void compilecontext)
+{
+  // now, let's render some pike!
+
+  array(Block) contents = psp_to_blocks(file, realname, compilecontext);
+  string ps, h;
+ 
+  [ps, h] = render_psp(contents, "", "", compilecontext);
+
+  header += ("int is_layout = " + is_layout + ";\n");
+
+  foreach(macros_used; string macroname ;)
+  {
+    header += ("function __macro_" + macroname + ";");
+    initialization += ("__macro_" + macroname + " = __context->view->get_simple_macro(\"" + macroname + "\");");
+  }
+
+  header += h;
+  pikescript+=("object __context; static void create(object context){__context = context; " + initialization + 
+#"}
+  void render(String.Buffer buf, Fins.Template.TemplateData __d,object|void __view){
+	mapping data = __d->get_data();
+	function yield=lambda()
+	  { 
+		if(is_layout)
+		{
+			if(__view) __view->render(buf, __d);
+		}
+  		else throw(Error.Generic(\"invalid yield in non-layout template.\n\"));
+	};"
+	);
+  pikescript += ps;
+
+  return header + "\n\n" + pikescript + "}";
 }
 
 class PikeBlock
@@ -53,7 +102,7 @@ class PikeBlock
     else
     {
       string expr = String.trim_all_whites(contents[2..strlen(contents)-3]);
-      return "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\n" + pikeify(expr) + "\n";
+      return "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\n" + expr + "\n";
     }
   }
 

@@ -28,6 +28,10 @@ array contents = ({});
 program compiled_template;
 multiset macros_used = (<>);
 
+string pikescript = "";
+string header = "";
+string initialization = "";
+
 string _sprintf(mixed ... args)
 {
   return "SimpleTemplate(" + templatename + ")";
@@ -195,9 +199,6 @@ array(Block) psp_to_blocks(string file, string realfile, void|object compilecont
 string parse_psp(string file, string realname, object|void compilecontext)
 {
   // now, let's render some pike!
-  string pikescript = "";
-  string header = "";
-  string initialization = "";
 
   array(Block) contents = psp_to_blocks(file, realname, compilecontext);
   string ps, h;

@@ -350,16 +350,20 @@ object find_parent_controller(object c)
   return parent;
 }
 
-private object lookingfor(object o, object in)
+private object lookingfor(object o, object in, void|multiset visited)
 {
   if(o == in) return 0;
-  //werror("looking for %O in %O\n", o, in);
+  visited = visited || (<>);
+  visited |= (< in >);
+
+  //werror("looking for %O in %O (%O)\n", o, in, visited);
   foreach(indices(in);int i; mixed x)
   {
+//werror("(%O) comparing in[%O] (%O) with %O\n", in, x, in[x], o);
     if(in[x] == o) return in;
-    if(objectp(in[x]) && Program.inherits(object_program(in[x]), Fins.FinsController))
+    if(objectp(in[x]) && Program.inherits(object_program(in[x]), Fins.FinsController) && !visited[in[x]])
     {
-      mixed r = lookingfor(o, in[x]);
+      mixed r = lookingfor(o, in[x], visited);
       if(r) return r;
     } 
   }

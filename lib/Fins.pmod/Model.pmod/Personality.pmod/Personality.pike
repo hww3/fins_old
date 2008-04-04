@@ -107,6 +107,9 @@ mapping map_field(mapping t)
       if(t->default) field->default = (int)t->default;
       field->type = "integer";
       break;
+    case "float":
+      field->type = "float";
+      break;
     case "blob":
       field->type = "binary_string";
 	  if((int)t->length)

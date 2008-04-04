@@ -231,6 +231,10 @@ void do_add_field(mapping field)
       {
         add_field(.IntField(field->name, field->length, !field->not_null, (int)field->default));
       }
+      if(field->type == "float")
+      {
+        add_field(.FloatField(field->name, field->length, !field->not_null, (float)field->default));
+      }
       if(field->type == "timestamp")
       {
         add_field(.TimeStampField(field->name, 0));

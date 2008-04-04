@@ -21,7 +21,7 @@ string get_editor_string(void|string value, void|.DataObjectInstance i)
   }
 }
 
-void create(string _name, int _len, int(0..1) _null, int|void _default)
+void create(string _name, int _len, int(0..1) _null, float|void _default)
 {
    name = _name;
    len = _len;

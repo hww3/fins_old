@@ -13,6 +13,10 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- New template type "ePike" provides simple PSP embedded pike syntax for 
+    situations where Simple templates are not expressive enough.
+- Autodetection of Model fields works properly for floats
+    (Christian Ress)
 - Added <%available languages name="varname"%> and <%language_selector%>
     macros for generating custom and standard language selectors, 
     respectively.

@@ -2,23 +2,21 @@ inherit .Simple;
 
 constant TEMPLATE_EXTENSION = ".ep";
 
-string header = 
-#"
-void _yield()
-{
-  if(is_layout)
-  {
-    if(__view) __view->render(buf, __d);
-  }
-  else throw(Error.Generic(\"invalid yield in non-layout template.\n\"));
-}
-";
+private int includes = 0;
+
+string header = "";
 
 string _sprintf(mixed ... args)
 {
   return "ePike(" + templatename + ")";
 }
 
+//!
+static void create(string _templatename, 
+         .TemplateContext|void context_obj, int|void _is_layout)
+{
+	::create(_templatename, context_obj, _is_layout);
+}
 
 string parse_psp(string file, string realname, object|void compilecontext)
 {
@@ -31,15 +29,13 @@ string parse_psp(string file, string realname, object|void compilecontext)
 
   header += ("int is_layout = " + is_layout + ";\n");
 
-  foreach(macros_used; string macroname ;)
-  {
-    header += ("function __macro_" + macroname + ";");
-    initialization += ("__macro_" + macroname + " = __context->view->get_simple_macro(\"" + macroname + "\");");
+  header += h;
+  pikescript+=(
+#"Fins.Template.TemplateContext context; 
+  static void create(Fins.Template.TemplateContext _context){
+	 context = _context; 
   }
 
-  header += h;
-  pikescript+=("object __context; static void create(object context){__context = context; " + initialization + 
-#"}
   void render(String.Buffer buf, Fins.Template.TemplateData __d,object|void __view){
 	mapping data = __d->get_data();
 	function yield=lambda()
@@ -48,7 +44,7 @@ string parse_psp(string file, string realname, object|void compilecontext)
 		{
 			if(__view) __view->render(buf, __d);
 		}
-  		else throw(Error.Generic(\"invalid yield in non-layout template.\n\"));
+  		else throw(Error.Generic(\"invalid yield in non-layout template.\\n\"));
 	};"
 	);
   pikescript += ps;
@@ -98,144 +94,17 @@ class PikeBlock
 
       return(i + "\n// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\nexpr = " + expr + "; buf->add((string)(!zero_type(expr)?expr:\"\"));" + f);
     }
-
+    else if(has_prefix(contents, "<%="))
+    {
+      string expr = String.trim_all_whites(contents[3..strlen(contents)-3]);
+      return "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\ncatch(buf->add((string)" + expr + "));\n";
+	}
     else
     {
       string expr = String.trim_all_whites(contents[2..strlen(contents)-3]);
       return "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\n" + expr + "\n";
     }
   }
-
- string pikeify(string expr)
- {
-   string cmd = "";
-   string arg = "";
-
-  array a = array_sscanf(expr, "%[a-zA-Z0-9_] %s");
-
-  if(sizeof(a)>1) 
-    arg = String.trim_all_whites(a[1]);
-   cmd = a[0];
-
-
-   if((<"if", "elseif", "foreach">)[expr])
-   {
-     if(sizeof(a) !=2)
-     {
-       throw(Error.Generic(sprintf("PSP format error: invalid command format in %s at line %d.\n", templatename, start)));
-     }
-
-   }
-/*
-   else 
-   {
-     cmd = expr;
-   }
-*/
-   switch(cmd)
-   {
-     case "if":
-       return " if( " + arg + " ) { \n";
-       break;
-
-     case "elseif":
-       return " } else if( " + arg + " ) { \n";
-       break;
-
-     case "foreach":
-       mapping a = p_argify(arg);
-       if(!a->var && a->val)
-       {
-         throw(Error.Generic(sprintf("PSP format error: invalid foreach syntax in %s at line %d.\n", templatename, start)));
-       }
-       array ac = ({});
-       string start = "";
-       if(a->var[0] == '$')
-       {
-         foreach((a->var[1..])/".";;string v)
-          ac += ({ "[\"" + v + "\"]" });
-          start = "data" + (ac * "");
-       }    
-       else start = "\"" + a->var + "\"";    
-       if(!a->ind) a->ind = a->val + "_ind";
-
-       return " catch { foreach(" + start + ";mixed __v; mixed __q) {"
-         "object __d = __d->clone(); __d->add(\"" + a->val + "\", __q); __d->add(\"" + a->ind + "\", __v); "
-         "mapping data = __d->get_data(); data[\"" + a->val + "\"]=__q; data[\"" + a->ind + "\"] = __v;" ;
-       break;
-
-     case "end":
-       return " }}; // end \n";
-       break;
-
-     case "else":
-       return " } else { \n";
-       break;
-
-     case "yield":
-       if(is_layout)
-       {
-         return "if(__view) __view->render(buf, __d);";
-       }
-       else throw(Error.Generic("invalid yield in non-layout template.\n"));
-       break;
-
-     case "endif":
-       return " } // endif \n";
-       break;
-
-     default:
-       string rx = "";
-       function f = context->view->get_simple_macro(cmd);
-       if(!f)
-         throw(Error.Generic(sprintf("PSP format error: invalid command at line %d.\n", (int)start)));
-
-       macros_used[cmd] ++;
-
-       return ("{catch{ "
-              " buf->add(__macro_" + cmd + "(__d, " + argify(arg) + "));};}");
-       break;
-   }
-
- }
-
- string argify(string arg)
- {
-
-   array rv = ({});
-   int keepgoing = 0;
-   do{
-    keepgoing = 0;
-    string key, value;
-    int r = sscanf(arg,  "%*[ \n\t]%[a-zA-Z0-9_]=\"%s\"%s", key, value, arg);
-    if(r>2) keepgoing=1;
-    if(r<=2) break;
-
-    if(key && strlen(key))
-    {
-      rv += ({"\"" + lower_case(key) + "\":\"" + value + "\"" });
-     }
-   }while(keepgoing);
-   return "([" + rv*", " + "])";
- }
-
- mapping p_argify(string arg)
- {
-   mapping rv = ([]);
-   int keepgoing = 0;
-   do{
-    keepgoing = 0;
-    string key, value;
-    int r = sscanf(arg,  "%*[ \n\t]%[a-zA-Z0-9_]=\"%s\"%s", key, value, arg);
-    if(r>2) keepgoing=1;
-    if(r<2) break;
-
-    if(key && strlen(key))
-      rv += ([lower_case(key): value ]);
-
-   }while(keepgoing);
-   return rv;
- }
 
  string|array(Block) parse_directive(string exp, object|void compilecontext)
  {

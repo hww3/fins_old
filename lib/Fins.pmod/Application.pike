@@ -563,7 +563,7 @@ public mixed handle_http(.Request request)
 
 object generate_template_error(object er)
 {
-  object t = view->get_view("internal:error_template");
+  object t = view->low_get_view(Fins.Template.Simple, "internal:error_template");
   t->add("message", er->message());
              
   return t;
@@ -571,7 +571,7 @@ object generate_template_error(object er)
 
 object generate_error(object er)
 {
-  object t = view->get_view("internal:error_500");
+  object t = view->low_get_view(Fins.Template.Simple, "internal:error_500");
 
   t->add("error_type", String.capitalize(er->error_type || "Generic"));
   t->add("message", er->message());
@@ -582,7 +582,7 @@ object generate_error(object er)
 
 object generate_error_array(array er)
 {
-  object t = view->get_view("internal:error_500");
+  object t = view->low_get_view(Fins.Template.Simple, "internal:error_500");
 
   t->add("error_type", String.capitalize("Generic"));
   t->add("message", er[0]);

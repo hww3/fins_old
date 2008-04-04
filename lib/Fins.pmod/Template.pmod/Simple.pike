@@ -22,7 +22,7 @@ int last_update;
 
 object layout;
 
-string script;
+//string script;
 string templatename;
 array contents = ({});
 program compiled_template;
@@ -55,9 +55,9 @@ static void reload_template()
    last_update = time();
 
    string template = load_template(templatename);
-   string psp = parse_psp(template, templatename);
-   script = psp;
-
+   //string psp = parse_psp(template, templatename);
+   //script = psp;
+//  werror("SCRIPT: %s\n\n", psp);
    mixed x = gauge{
      compiled_template = compile_string(template, templatename);
    };
@@ -119,7 +119,7 @@ void render_view(String.Buffer buf, object ct, object d)
 program compile_string(string code, string realfile, object|void compilecontext)
 {
   string psp = parse_psp(code, realfile, compilecontext);
-  //werror("PSP: %O\n", psp);
+//  werror("PSP: %s\n", psp);
   return predef::compile_string(psp, realfile);
 }
 
@@ -321,7 +321,7 @@ class TextBlock
     int cl = start;
     int atend=0;
     int current=0;
-    retval+="\n buf->add(";
+    retval+="\n buf->add(\n";
     do
     {
        string line;

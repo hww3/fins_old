@@ -33,7 +33,7 @@ void create(string _name, int _len, int(0..1) _null, float|void _default)
    ::create();
 }
 
-int decode(string value, void|.DataObjectInstance i)
+float decode(string value, void|.DataObjectInstance i)
 {
    return (float)value;
 }

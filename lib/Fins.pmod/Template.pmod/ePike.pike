@@ -32,8 +32,10 @@ string parse_psp(string file, string realname, object|void compilecontext)
   header += h;
   pikescript+=(
 #"Fins.Template.TemplateContext context; 
+  function get_simple_macro;
   static void create(Fins.Template.TemplateContext _context){
 	 context = _context; 
+	 get_simple_macro = context->view->get_simple_macro;
   }
 
   void render(String.Buffer buf, Fins.Template.TemplateData __d,object|void __view){
@@ -98,6 +100,14 @@ class PikeBlock
     {
       string expr = String.trim_all_whites(contents[3..strlen(contents)-3]);
       return "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\ncatch(buf->add((string)" + expr + "));\n";
+	}
+	else if(has_prefix(contents, "<%#"))
+	{
+		string keyword, exp = "";
+	    string expr = String.trim_all_whites(contents[3..strlen(contents)-3]);
+  	    int r = sscanf(expr, "%[A-Za-z0-9_] %s", keyword, exp);
+      werror( "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\ncatch(buf->add(get_simple_macro(\"" + keyword + "\")(__d, ([" + exp + "]) )));\n");
+return	 "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\n(buf->add(get_simple_macro(\"" + keyword + "\")(__d, ([" + exp + "]) )));\n";
 	}
     else
     {

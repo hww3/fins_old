@@ -13,6 +13,9 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- ePike templates can call macros using the syntax: <%#macroname%>, 
+    with arguments passed as though a mapping, without the ([]). Example:
+    <%#humanize "var": "standard_id"%>
 - New template type "ePike" provides simple PSP embedded pike syntax for 
     situations where Simple templates are not expressive enough.
 - Autodetection of Model fields works properly for floats

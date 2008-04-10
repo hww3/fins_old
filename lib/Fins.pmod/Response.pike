@@ -96,7 +96,7 @@
   //!
   public void not_found(string filename)
   {
-    object e = request->fins_app->view->get_view("internal:error_404");
+    object e = request->fins_app->view->low_get_view(Fins.Template.Simple, "internal:error_404");
 
     e->add("filename", filename);
     set_view(e);

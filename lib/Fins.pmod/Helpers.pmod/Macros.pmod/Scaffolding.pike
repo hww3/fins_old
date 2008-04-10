@@ -12,9 +12,9 @@ string simple_macro_field_editor(Fins.Template.TemplateData data, mapping|void a
 	
 	mixed rd = data->get_data();
 	
-	mixed item = get_var_value(arguments->item, rd);
-	mixed field = get_var_value(arguments->field, rd);
-	mixed orig = get_var_value(arguments->orig, rd);
+	mixed item = arguments->item;
+	mixed field = arguments->field;
+	mixed orig = arguments->orig;
 	
 	if(!orig)
 	{

@@ -1,25 +1,5 @@
 inherit .Base;
 
-//! completely untested.
-//! assign var to val
-//! args: var, val
-string simple_macro_assign(Fins.Template.TemplateData data, mapping|void args)
-{
-	mixed d = data->get_data();
-	mixed val = get_var_value(args->var, d);
-	d[args["name"]] = val;
-  return "";
-}
-
-
-//! completely untested.
-string simple_macro_aindex(Fins.Template.TemplateData data, mapping|void args)
-{
-	mixed d = data->get_data();
-	mixed val = get_var_value(args->var, d);
-	return(d[(int)get_var_value(args["ind"], d)]);
-}
-
 //!
 string simple_macro_sessionid(Fins.Template.TemplateData data, mapping|void args)
 {
@@ -38,7 +18,7 @@ string simple_macro_LOCALE(Fins.Template.TemplateData data, mapping|void args)
 //! args: var
 string simple_macro_humanize(Fins.Template.TemplateData data, mapping|void args)
 {
-  return Tools.Language.Inflect.humanize(get_var_value(args->var, data->get_data())||"");
+  return Tools.Language.Inflect.humanize(args->var || "");
 }
 
 //! args: 
@@ -125,17 +105,6 @@ string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void ar
   m_delete(args, "action");
   m_delete(args, "args");
 
-  if(sizeof(args)) 
-  {
-    vars = args;  
-    foreach(args; string k; string v)
-    {
-      v = get_var_value(v, data->get_data()) || "";
-      args[k] = v;
-    }
-// werror("data: %O\n", data->get_data());
-  }
-
   string url = data->get_request()->fins_app->url_for_action(action, uargs, vars);
 
   return "<a href=\"" + url + "\">";
@@ -165,22 +134,11 @@ string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void arg
   mapping vars = ([]);
 
   if(args->args)
-    uargs = get_var_value(args->args, data->get_data())/"/";
+    uargs = args->args/"/";
 
   m_delete(args, "controller");
   m_delete(args, "action");
   m_delete(args, "args");
-
-  if(sizeof(args)) 
-  {
-    vars = args;  
-    foreach(args; string k; string v)
-    {
-      v = get_var_value(v, data->get_data()) || "";
-      vars[k] = v;
-    }
-// werror("data: %O\n", data->get_data());
-  }
 
   string url = data->get_request()->fins_app->url_for_action(action, uargs, vars);
 
@@ -191,27 +149,27 @@ string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void arg
 //! args: var
 string simple_macro_capitalize(Fins.Template.TemplateData data, mapping|void args)
 {
-    return String.capitalize(get_var_value(args->var, data->get_data())||"");
+    return String.capitalize(args->var||"");
 }
 
 //! args: var
 //! if var is not provided, it is assumed to be "msg".
 string simple_macro_flash(Fins.Template.TemplateData data, mapping|void args)
 {
-    if(!args->var) args->var = "$msg";
-    return (get_var_value(args->var, data->get_flash())||"");
+    if(!args->var) args->var = "msg";
+    return (data->get_flash()[args->var]||"");
 }
 
 //! args: var
 string simple_macro_sizeof(Fins.Template.TemplateData data, mapping|void args)
 {
-    return (string)(sizeof(get_var_value(args->var, data->get_data())||({})));
+    return (string)(sizeof(args->var ||({})));
 }
 
 //! args: var, splice, final
 string simple_macro_implode(Fins.Template.TemplateData data, mapping|void args)
 {
-  mixed v = get_var_value(args->var, data->get_data());
+  mixed v = args->var;
 
   if(!arrayp(v))
     return "invalid type for " + args->var;
@@ -233,7 +191,7 @@ string simple_macro_implode(Fins.Template.TemplateData data, mapping|void args)
 //! args: var
 string simple_macro_boolean(Fins.Template.TemplateData data, mapping|void args)
 {
-        mixed v = get_var_value(args->var, data->get_data());
+        mixed v = args->var;
                 if (intp(v))
                 {
                         return (v != 0)?"Yes":"No";
@@ -251,7 +209,7 @@ string simple_macro_boolean(Fins.Template.TemplateData data, mapping|void args)
 //! args: var
 string simple_macro_describe_object(Fins.Template.TemplateData data, mapping|void args)
 {
-  mixed v = get_var_value(args->var, data->get_data());
+  mixed v = args->var;
 
   if(objectp(v) && v->describe) return v->describe();
   else return sprintf("%O\n", v);
@@ -260,8 +218,8 @@ string simple_macro_describe_object(Fins.Template.TemplateData data, mapping|voi
 //! args: var
 string simple_macro_describe(Fins.Template.TemplateData data, mapping|void args)
 {
-  string key = get_var_value(args->key, data->get_data());
-  mixed value = get_var_value(args->var, data->get_data());
+  string key = args->key;
+  mixed value = args->var;
   string rv = "";
 
     if(stringp(value) || intp(value))

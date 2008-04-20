@@ -28,10 +28,6 @@ array contents = ({});
 program compiled_template;
 multiset macros_used = (<>);
 
-string pikescript = "";
-string header = "";
-string initialization = "";
-
 string _sprintf(mixed ... args)
 {
   return "SimpleTemplate(" + templatename + ")";
@@ -119,8 +115,13 @@ void render_view(String.Buffer buf, object ct, object d)
 program compile_string(string code, string realfile, object|void compilecontext)
 {
   string psp = parse_psp(code, realfile, compilecontext);
-//  werror("PSP: %s\n", psp);
-  return predef::compile_string(psp, realfile);
+//  Stdio.write_file("/tmp/foo.txt", sprintf("PSP: %s\n\n", psp));
+  program p;
+
+  if(catch(p = predef::compile_string(psp, realfile)))
+    werror("psp: %s\n", psp);
+
+  return p;
 }
 
 
@@ -200,14 +201,17 @@ string parse_psp(string file, string realname, object|void compilecontext)
 {
   // now, let's render some pike!
 
+//werror("**** parse_psp: %O %O\n", file, realname);
+//werror("%O\n", backtrace());
   array(Block) contents = psp_to_blocks(file, realname, compilecontext);
-  string ps, h;
+  string ps = "", h = "" , header = "", initialization = "", pikescript = "";
  
   [ps, h] = render_psp(contents, "", "", compilecontext);
 
-  header += ("int is_layout = " + is_layout + ";\n");
+  header += ("int is_layout = " + is_layout + "; inherit Fins.Helpers.Macros.Base;\n");
 
-  foreach(macros_used; string macroname ;)
+  //werror("MACROS: %O\n", macros_used);
+  foreach(macros_used; string macroname;)
   {
     header += ("function __macro_" + macroname + ";");
     initialization += ("__macro_" + macroname + " = __context->view->get_simple_macro(\"" + macroname + "\");");
@@ -487,6 +491,7 @@ class PikeBlock
        if(!f)
          throw(Error.Generic(sprintf("PSP format error: invalid command at line %d.\n", (int)start)));
 
+//werror("adding macro " + cmd + "\n");
        macros_used[cmd] ++;
 
        return ("{catch{ "
@@ -510,7 +515,12 @@ class PikeBlock
 
     if(key && strlen(key))
     {
-      rv += ({"\"" + lower_case(key) + "\":\"" + value + "\"" });
+      if(value[0] == '$' && value[1] && value[1] != '$')
+      {
+        value = "get_var_value(\"" + value + "\", data)";
+      }
+      else value = "\"" + value + "\"";
+      rv += ({"\"" + lower_case(key) + "\":" + value  });
      }
    }while(keepgoing);
    return "([" + rv*", " + "])";

@@ -21,6 +21,7 @@ static void create(string _templatename,
 string parse_psp(string file, string realname, object|void compilecontext)
 {
   // now, let's render some pike!
+  string pikescript = "", header = "";
 
   array(Block) contents = psp_to_blocks(file, realname, compilecontext);
   string ps, h;

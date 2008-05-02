@@ -48,6 +48,6 @@ static void create(Fins.Application app, string|void dir)
 
 void index(Request req, Response resp, mixed ... args)
 {
-	werror("Serving " + Stdio.append_path(static_dir, args*"/") + " from " + getcwd());
+//	werror("Serving " + Stdio.append_path(static_dir, args*"/") + " from " + getcwd());
    	low_static_request(req, resp, Stdio.append_path(static_dir, args*"/"));
 }

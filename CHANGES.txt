@@ -13,6 +13,9 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Errors generated during template compilation are now handled more 
+     consistently; they are less likely to be swallowed, and are
+     presented to the client uniformly.
 - Fins.StaticController added, which allows static directories to be
      served from within an app, much like /static/ is served by default.
 - templates that render to wide strings are now automatically encoded

@@ -12,8 +12,7 @@ The file <%$filename%> was not found.
 ";
 
 constant error_500 =
-#"
-<html>
+#"<html>
 <head>
 <title>Error 500: <%$error_type%></title>
 </head>
@@ -23,12 +22,26 @@ An error occurred while processing your request:
 <p>
 <%$backtrace%>
 </body>
-</html>
-";
+</html>";
+
+constant error_templatecompile = 
+#"<html>
+<head>
+<title>Fins: Template Compile Error</title>
+</head>
+<body>
+<h1>Fins: Template Compile Error</h1>
+An error occured while compiling a template:
+<p>
+<pre>
+<%$message%>
+</pre>
+</body>
+</html>";
+
 
 constant error_template = 
-#"
-<html>
+#"<html>
 <head>
 <title>Fins: Template Error</title>
 </head>
@@ -38,9 +51,7 @@ An error occured while processing a template:
 <p>
 <%$message%>
 </body>
-</html>
-
-";
+</html>";
 
 constant index = 
 #"

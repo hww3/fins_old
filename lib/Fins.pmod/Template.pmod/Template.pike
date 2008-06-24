@@ -70,3 +70,111 @@ public string get_type()
 {
   return "text/html";
 }
+
+
+class _error_handler {
+
+  //!
+  void compile_error(string a,int b,string c);
+
+  //!
+  void compile_warning(string a,int b,string c);
+}
+
+array(_error_handler) compile_error_handlers = ({});
+
+//!
+void push_compile_error_handler( _error_handler q )
+{
+  compile_error_handlers = ({q})+compile_error_handlers;
+}
+
+//!
+void pop_compile_error_handler()
+{
+  compile_error_handlers = compile_error_handlers[1..];
+}
+
+
+class LowErrorContainer
+{
+  string d;
+  string errors="", warnings="";
+  int has_errors;
+
+  string get()
+  {  
+    return errors;
+  }
+
+  //!
+  string get_warnings()
+  {
+    return warnings;
+  }
+  
+  //!
+  void print_warnings(string prefix) {
+    if(warnings && strlen(warnings))
+      werror(prefix+"\n"+warnings);
+  }
+
+  //!
+  void got_error(string file, int line, string err, int|void is_warning)
+  {
+	has_errors++;
+    if (file[..sizeof(d)-1] == d) {
+      file = file[sizeof(d)..];
+    }
+    if( is_warning)
+      warnings+= sprintf("%s:%s\t%s\n", file, line ? (string) line : "-", err);
+    else
+      errors += sprintf("%s:%s\t%s\n", file, line ? (string) line : "-", err);
+  }
+
+  //!
+  void compile_error(string file, int line, string err)
+  {
+    got_error(file, line, "Error: " + err);
+  }
+
+  //!
+  void compile_warning(string file, int line, string err)
+  {
+    got_error(file, line, "Warning: " + err, 1);
+  }
+
+  //!
+  void create()
+  {
+    d = getcwd();
+    if (sizeof(d) && (d[-1] != '/') && (d[-1] != '\\'))
+      d += "/";
+  }
+}
+
+//! @appears ErrorContainer
+class ErrorContainer
+{
+  inherit LowErrorContainer;
+
+  //!
+  void compile_error(string file, int line, string err)
+  {
+//	werror("compile_error()\n");
+	    if( sizeof(compile_error_handlers) )
+	      compile_error_handlers->compile_error( file,line, err );
+	    else
+	      ::compile_error(file,line,err);
+  }  
+
+	  //!
+	  void compile_warning(string file, int line, string err)
+	  {
+	    if( sizeof(compile_error_handlers) )
+	      compile_error_handlers->compile_warning( file,line, err );
+	    else
+	      ::compile_warning(file,line,err);
+	  }
+}
+

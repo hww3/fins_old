@@ -84,7 +84,9 @@ string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void ar
 {
   object controller;
   object request = data->get_request();
-  string event = args->action;
+  string event = "index";
+  if(args->action)
+    event = args->action;
 //  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
 
   controller = request->controller;

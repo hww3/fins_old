@@ -537,10 +537,14 @@ public mixed handle_http(.Request request)
 
     if(er && objectp(er))
     {
+//		werror("handling error %O.\n", er);
       switch(er->error_type)
       {
         case "template":
-          response->set_view(generate_template_error(er));
+		  if(er->is_templatecompile_error)
+          	response->set_view(generate_templatecompile_error(er));
+		  else
+        	response->set_view(generate_template_error(er));
           response->set_error(500);
           break;
         default:
@@ -559,6 +563,14 @@ public mixed handle_http(.Request request)
   else response->set_data("Unknown event: %O\n", request->not_query);
 
   return response->get_response();
+}
+
+object generate_templatecompile_error(object er)
+{
+  object t = view->low_get_view(Fins.Template.Simple, "internal:error_templatecompile");
+  t->add("message", er->message());
+             
+  return t;
 }
 
 object generate_template_error(object er)

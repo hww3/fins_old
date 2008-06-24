@@ -107,7 +107,7 @@ class PikeBlock
 		string keyword, exp = "";
 	    string expr = String.trim_all_whites(contents[3..strlen(contents)-3]);
   	    int r = sscanf(expr, "%[A-Za-z0-9_] %s", keyword, exp);
-      werror( "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\ncatch(buf->add(get_simple_macro(\"" + keyword + "\")(__d, ([" + exp + "]) )));\n");
+      //werror( "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\ncatch(buf->add(get_simple_macro(\"" + keyword + "\")(__d, ([" + exp + "]) )));\n");
 return	 "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"\n(buf->add(get_simple_macro(\"" + keyword + "\")(__d, ([" + exp + "]) )));\n";
 	}
     else
@@ -122,7 +122,7 @@ return	 "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"
    exp = String.trim_all_whites(exp);
  
    if(search(exp, "\n")!=-1)
-     throw(Error.Generic("PSP format error: invalid directive format in " + templatename + ".\n"));
+     throw(Fins.Errors.TemplateCompile("PSP format error: invalid directive format in " + templatename + ".\n"));
  
    // format of a directive is: keyword option="value" ...
  
@@ -141,7 +141,7 @@ return	 "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"
        break;
 
      default:
-       throw(Error.Generic("PSP format error: unknown directive " + keyword + " in " + templatename + ".\n"));
+       throw(Fins.Errors.TemplateCompile("PSP format error: unknown directive " + keyword + " in " + templatename + ".\n"));
  
    }
  }
@@ -153,7 +153,7 @@ return	 "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"
 	 int r = sscanf(exp, "%*sname=\"%s\"%*s", project);
 
 	   if(r != 3) 
-	     throw(Error.Generic("PSP format error: unknown project format in " + templatename + ".\n"));
+	     throw(Fins.Errors.TemplateCompile("PSP format error: unknown project format in " + templatename + ".\n"));
 //		werror("project is %O\n", backtrace() );
 	 return "__d->get_request()->_locale_project = \"" + project + "\";";
 	
@@ -165,14 +165,14 @@ return	 "// "+ start + " - " + end + "\n#line " + start + " \"" + filename + "\"
    string file;
    string contents;
 
-   if(includes > max_includes) throw(Error.Generic("PSP Error: too many includes, possible recursion in " + templatename + " !\n")); 
+   if(includes > max_includes) throw(Fins.Errors.TemplateCompile("PSP Error: too many includes, possible recursion in " + templatename + " !\n")); 
 
    includes++;
 
    int r = sscanf(exp, "%*sfile=\"%s\"%*s", file);
  
    if(r != 3) 
-     throw(Error.Generic("PSP format error: unknown include format in " + templatename + ".\n"));
+     throw(Fins.Errors.TemplateCompile("PSP format error: unknown include format in " + templatename + ".\n"));
 
    contents = load_template(file, compilecontext);
  

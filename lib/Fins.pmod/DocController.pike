@@ -7,6 +7,8 @@ int __checked_layouts;
 //! corresponding template file.
 int __quiet;
 
+static int __has_errors;
+
 //!
 //!  Implements a controller which automatically provides a view based on
 //!  the position of the request within the tree
@@ -124,8 +126,24 @@ private class DocRunner(function req)
     Fins.Template.View lview;
 
     mixed e = catch(lview = view->get_view(request->not_args));
-    if(e && !__quiet) Log.exception("An error occurred while loading the template " + request->not_args + "\n"
+
+    if(e && objectp(e) && e->is_templatecompile_error)
+	{
+		Log.exception("An error occurred while compiling the template " + request->not_args + "\n", e);
+		throw(e);
+	}
+    else if( e && !__quiet) Log.exception("An error occurred while loading the template " + request->not_args + "\n"
        "To turn these notices off, set the __quiet flag in your DocController instances.", e);
+	else if(e && __quiet)
+	{
+		if(!__has_errors)
+		{
+			Log.critical("An error occurred while loading a template in controller %O; this error has been surpressed.\n"
+							"To enable these errors, unset the __quiet flag in your DocController instance.", get_controller());
+			__has_errors++;
+		}
+	}
+
     if(layout && lview)
       lview->set_layout(layout);
     if(lview)

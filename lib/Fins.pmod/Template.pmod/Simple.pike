@@ -101,7 +101,7 @@ public string render(.TemplateData d)
 
 void render_view(String.Buffer buf, object ct, object d)
 {
-  if(!is_layout) throw(Error.Generic("trying to render a view from a non-layout.\n"));
+  if(!is_layout) throw(Fins.Errors.TemplateCompile("trying to render a view from a non-layout.\n"));
 
    if(auto_reload && template_updated(templatename, last_update))
    {
@@ -118,9 +118,15 @@ program compile_string(string code, string realfile, object|void compilecontext)
 //  Stdio.write_file("/tmp/foo.txt", sprintf("PSP: %s\n\n", psp));
   program p;
 
-  if(catch(p = predef::compile_string(psp, realfile)))
-    werror("psp: %s\n", psp);
+  object e = ErrorContainer();
+  master()->set_inhibit_compile_errors(e);
 
+  mixed err = catch(p = predef::compile_string(psp, realfile));
+
+  if(e->has_errors)
+  {
+    throw(Fins.Errors.TemplateCompile(e->get()));
+  }
   return p;
 }
 
@@ -175,7 +181,7 @@ array(Block) psp_to_blocks(string file, string realfile, void|object compilecont
       }
       else { sp = sp + 2; continue; } // the start was escaped.
 
-      if(end == 0) error("invalid format: missing end tag.\n");
+      if(end == 0) Fins.Errors.TemplateCompile("invalid format: missing end tag.\n");
 
       else 
       {
@@ -423,7 +429,7 @@ class PikeBlock
    {
      if(sizeof(a) !=2)
      {
-       throw(Error.Generic(sprintf("PSP format error: invalid command format in %s at line %d.\n", templatename, start)));
+       throw(Fins.Errors.TemplateCompile(sprintf("PSP format error: invalid command format in %s at line %d.\n", templatename, start)));
      }
 
    }
@@ -447,7 +453,7 @@ class PikeBlock
        mapping a = p_argify(arg);
        if(!a->var && a->val)
        {
-         throw(Error.Generic(sprintf("PSP format error: invalid foreach syntax in %s at line %d.\n", templatename, start)));
+         throw(Fins.Errors.TemplateCompile(sprintf("PSP format error: invalid foreach syntax in %s at line %d.\n", templatename, start)));
        }
        array ac = ({});
        string start = "";
@@ -478,7 +484,7 @@ class PikeBlock
        {
          return "if(__view) __view->render(buf, __d);";
        }
-       else throw(Error.Generic("invalid yield in non-layout template.\n"));
+       else throw(Fins.Errors.TemplateCompile("invalid yield in non-layout template.\n"));
        break;
 
      case "endif":
@@ -489,7 +495,7 @@ class PikeBlock
        string rx = "";
        function f = context->view->get_simple_macro(cmd);
        if(!f)
-         throw(Error.Generic(sprintf("PSP format error: invalid command at line %d.\n", (int)start)));
+         throw(Fins.Errors.TemplateCompile(sprintf("PSP format error: invalid command at line %d.\n", (int)start)));
 
 //werror("adding macro " + cmd + "\n");
        macros_used[cmd] ++;
@@ -549,7 +555,7 @@ class PikeBlock
    exp = String.trim_all_whites(exp);
  
    if(search(exp, "\n")!=-1)
-     throw(Error.Generic("PSP format error: invalid directive format in " + templatename + ".\n"));
+     throw(Fins.Errors.TemplateCompile("PSP format error: invalid directive format in " + templatename + ".\n"));
  
    // format of a directive is: keyword option="value" ...
  
@@ -568,7 +574,7 @@ class PikeBlock
        break;
 
      default:
-       throw(Error.Generic("PSP format error: unknown directive " + keyword + " in " + templatename + ".\n"));
+       throw(Fins.Errors.TemplateCompile("PSP format error: unknown directive " + keyword + " in " + templatename + ".\n"));
  
    }
  }
@@ -580,7 +586,7 @@ class PikeBlock
 	 int r = sscanf(exp, "%*sname=\"%s\"%*s", project);
 
 	   if(r != 3) 
-	     throw(Error.Generic("PSP format error: unknown project format in " + templatename + ".\n"));
+	     throw(Fins.Errors.TemplateCompile("PSP format error: unknown project format in " + templatename + ".\n"));
 //		werror("project is %O\n", backtrace() );
 	 return "__d->get_request()->_locale_project = \"" + project + "\";";
 	
@@ -592,14 +598,14 @@ class PikeBlock
    string file;
    string contents;
 
-   if(includes > max_includes) throw(Error.Generic("PSP Error: too many includes, possible recursion in " + templatename + " !\n")); 
+   if(includes > max_includes) throw(Fins.Errors.TemplateCompile("PSP Error: too many includes, possible recursion in " + templatename + " !\n")); 
 
    includes++;
 
    int r = sscanf(exp, "%*sfile=\"%s\"%*s", file);
  
    if(r != 3) 
-     throw(Error.Generic("PSP format error: unknown include format in " + templatename + ".\n"));
+     throw(Fins.Errors.TemplateCompile("PSP format error: unknown include format in " + templatename + ".\n"));
 
    contents = load_template(file, compilecontext);
  

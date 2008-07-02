@@ -12,7 +12,8 @@ string simple_macro_LOCALE(Fins.Template.TemplateData data, mapping|void args)
 	object r = data->get_request();
 	
 //	werror("project: %O, language: %O", r->get_project(), r->get_lang());
-	return Locale.translate(r->get_project(), r->get_lang(), (int)args["id"], args["string"]);
+	return Locale.translate(r->get_project(), r->get_lang(), 
+					(int)args["id"], args["string"]);
 }
 
 //! args: var
@@ -46,7 +47,7 @@ string simple_macro_available_languages(Fins.Template.TemplateData data, mapping
 
 //! produce a drop down language selector
 //!
-//! args:
+//! args: text
 string simple_macro_language_selector(Fins.Template.TemplateData data, mapping|void args)
 {
 	String.Buffer buf = String.Buffer();
@@ -56,6 +57,7 @@ string simple_macro_language_selector(Fins.Template.TemplateData data, mapping|v
  	mapping l = data->get_request()->fins_app->available_languages();	
 
 	buf += "<form id=\"language_form\">\n";
+        buf += (args->text || "Language: ");
         buf += "<input type=\"hidden\" name=\"qd\" value=\"" + time() + "\">";
 	buf += "<select name=\"_lang\" ";
 	buf += "onChange=\"document.getElementById('language_form').submit();\"";

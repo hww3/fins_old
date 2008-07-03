@@ -13,6 +13,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added text="" option to language_selector macro to specify text in front
+    of the dropdown control. Value defaults to "Language:"
 - Errors generated during template compilation are now handled more 
      consistently; they are less likely to be swallowed, and are
      presented to the client uniformly.

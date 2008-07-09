@@ -48,8 +48,6 @@ void set_value(string section, string item, mixed value)
 //! variable item in configuration section "section".
 string get_value(string section, string item)
 {
-  string val;
-
   if(!values[section])
   {
     throw(Error.Generic("Unable to find configuration section " + section + ".\n"));
@@ -73,8 +71,6 @@ string get_value(string section, string item)
 //! variable item in configuration section "section".
 array get_value_array(string section, string item)
 {
-  array val;
-
   if(!values[section])
   {
     throw(Error.Generic("Unable to find configuration section " + section + ".\n"));

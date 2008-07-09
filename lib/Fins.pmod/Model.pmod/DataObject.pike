@@ -735,7 +735,6 @@ int set_atomic(mapping values, int|void no_validation, .DataObjectInstance i)
 {
    mapping object_data = ([]);
    multiset fields_set = (<>);
-   mixed key_value;
 
    foreach(values; string field; mixed value)
    {

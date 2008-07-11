@@ -13,6 +13,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added support for controlling FinServe's session configuration values
+    (storage type, location and session timeout) from the app config file.
 - Added text="" option to language_selector macro to specify text in front
     of the dropdown control. Value defaults to "Language:"
 - Errors generated during template compilation are now handled more 

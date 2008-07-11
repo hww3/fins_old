@@ -9,7 +9,7 @@ array session_storage = ({});
 void create()
 {
   log = Tools.Logging.get_logger("session");
-  start_session_cleaner();
+  call_out(start_session_cleaner, 5);
 
 }
 
@@ -32,7 +32,6 @@ void session_cleaner()
 void start_session_cleaner()
 {
   // let's do this as a thread; it's easier that way.
-    sleep(5);
     Thread.Thread cleaner = Thread.Thread(session_cleaner);
 }
 

@@ -112,7 +112,6 @@ int do_startup()
 #endif /* fork() */
 
   Log.info("FinServe starting on port " + my_port);
-  Log.info("Starting Session Manager.");
   call_out(session_startup, 0);
 
   Log.info("FinServe loading application " + project + " using configuration " + config_name);
@@ -154,24 +153,49 @@ int do_startup()
 void session_startup()
 {
   Session.SessionStorage s;
+
+  Log.info("Starting Session Manager.");
+
   session_manager = Session.SessionManager();
 
-  if(session_storagetype == "ram")
+  if(app->config->web)
   {
-    s = Session.RAMSessionStorage();
+    if(app->config->web->session_storage_type)
+      session_storagetype = app->config->web->session_storage_type;
+    if(app->config->web->session_storage_location)
+      session_storagedir = app->config->web->session_storage_location;
+    if(app->config->web->session_timeout)
+      session_timeout = (int)app->config->web->session_timeout;
   }
-  if(session_storagetype == "file")
+
+  switch(session_storagetype)
   {
-    s = Session.FileSessionStorage();
-    s->set_storagedir(session_storagedir);
+    case "file":
+      Log.info("SessionManager will use files in " + session_storagedir + " to store session data.");
+      s = Session.FileSessionStorage();
+      s->set_storagedir(session_storagedir);
+      break;
+
+    case "sqlite":
+      Log.info("SessionManager will use SQLite database " + session_storagedir + " to store session data.");
+      s = Session.SQLiteSessionStorage();
+      s->set_storagedir(session_storagedir);
+      break;
+
+    case "ram":
+      Log.info("SessionManager will use RAM to store session data.");
+      s = Session.RAMSessionStorage();
+      break;
+	
+    default:
+      Log.warn("Unknown session storage type '" + session_storagetype + "'."); 
+      Log.info("SessionManager will use RAM to store session data.");
+      s = Session.RAMSessionStorage();
+      break;
   }
-  else if(session_storagetype == "sqlite")
-  {
-    s = Session.SQLiteSessionStorage();
-    s->set_storagedir(session_storagedir);
-  }
+
   session_manager->set_default_timeout(session_timeout);
-  session_manager->set_cleaner_interval(session_timeout);
+  session_manager->set_cleaner_interval(session_timeout + random(session_timeout)/2	);
   session_manager->session_storage = ({s});
 
   add_constant("Session", Session.Session);

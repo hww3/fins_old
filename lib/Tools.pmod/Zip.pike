@@ -420,7 +420,7 @@ werror("writing file " + rfn + "\n");
     }
     else
     {
-      if(rfn[-1] == '/') rfn = rfn[..-2];
+      if(rfn[-1] == '/') rfn = rfn[0..sizeof(rfn)-2];
 werror("making directory " + rfn + "\n");
       mkdir(combine_path(todir, rfn));
       low_unzip(rfn, todir);

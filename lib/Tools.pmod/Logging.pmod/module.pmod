@@ -90,7 +90,7 @@ Tools.Logging.Log.Logger create_logger(string loggername)
 
   // go with a default.
   if(!l) {	
-    werror("no defined logger " + loggername + ", using default.");
+    default_logger->debug("no defined logger " + loggername + ", using default.");
    l = Tools.Logging.Log.Logger();
   }
   return l;

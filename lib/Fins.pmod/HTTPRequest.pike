@@ -42,3 +42,13 @@ void flatten_headers()
   if(request_headers->pragma)
     pragma |= (multiset)(request_headers->pragma/",");
 }
+
+//! an X-Forwarded-For aware method of getting the original client address. 
+//! note that X-F-F headers are notoriously easy to forge, so don't rely
+//! on this value to be accurate if you know there to be proxies present.
+string get_client_addr()
+{
+  string f = request_headers["x-forwarded-for"];
+  if(!f) return (remoteaddr/" ")[0];
+  else return String.trim_whites((f/",")[0]);
+}

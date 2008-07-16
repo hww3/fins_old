@@ -33,6 +33,17 @@ string _sprintf(mixed ... args)
   return object_type + "(" + get_descriptor() + "/" + key_value + ")";
 }
 
+mixed cast(string t)
+{
+  switch(t)
+  {
+    case "mapping":
+      return get_atomic();
+    default:
+     throw(Error.Generic("Unable to cast DataObjectInstance to " + t + ".\n"));
+  }
+}
+
 string describe_value(string key, mixed value)
 {
   return master_object->describe_value(key, value, this);

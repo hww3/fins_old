@@ -13,6 +13,11 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added HTTPRequest->get_client_addr() which is X-Forwarded-For aware. 
+    Note that the X-F-F header is easily spoofed, so do not use this
+    in situations where this would be dangerous.
+- Added cast() to Model.DataObjectInstance, to make it easier to get
+    a mapping containing the contents of the object.
 - Added support for controlling FinServe's session configuration values
     (storage type, location and session timeout) from the app config file.
 - Added text="" option to language_selector macro to specify text in front

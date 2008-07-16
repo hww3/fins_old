@@ -55,6 +55,7 @@ static string load_template(string templatename, void|object compilecontext)
 
   if(!template || !sizeof(template))
    {
+	 Log.debug("Error loadng template %s", templatename);
      throw(Fins.Errors.Template("Template does not exist or is empty: " + templatename + "\n"));
    }
    return template;

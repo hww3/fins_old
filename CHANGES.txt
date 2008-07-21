@@ -13,6 +13,9 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added LMTP and SMTP processors. Currently, there's not much glue, so
+    you'd need to implement the callbacks (which currently accept any
+    mail delivered.)
 - Added HTTPRequest->get_client_addr() which is X-Forwarded-For aware. 
     Note that the X-F-F header is easily spoofed, so do not use this
     in situations where this would be dangerous.

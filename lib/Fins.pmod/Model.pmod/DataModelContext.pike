@@ -56,7 +56,7 @@ program get_personality()
 {
   if(!sql) throw(Error.Generic("No SQL connection defined.\n"));
 
-  return .Personality[type()];
+  return .Personality[lower_case(type())];
 }
 
 int initialize()

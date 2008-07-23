@@ -81,7 +81,6 @@ static function get_func(mixed k)
   function f;
   string ot;
   program p;
-  int i;
 
   // we only like strings.
   if(!stringp(k)) return 0;

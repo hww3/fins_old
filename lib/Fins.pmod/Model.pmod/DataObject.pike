@@ -195,9 +195,9 @@ static void reflect_definition()
 	Log.info("reflect_definition: table name for %s is %s.", instance, table);
     set_table_name(table);
     set_instance_name(instance);
-    foreach(context->sql->list_fields(table);; mapping t)
+    foreach(context->personality->list_fields(table);; mapping field)
     {
-      mapping field = context->personality->map_field(t);
+//      mapping field = context->personality->map_field(t, table);
 
       Log.info("reflect_definition: looking at field %s: %O.", field->name, field);
 
@@ -227,6 +227,8 @@ static void reflect_definition()
 
 void do_add_field(mapping field)
 {
+
+  Log.debug("adding field %O.", field);
       if(field->type == "integer")
       {
         add_field(.IntField(field->name, field->length, !field->not_null, (int)field->default));

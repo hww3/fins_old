@@ -22,6 +22,12 @@ string get_serial_insert_value()
 	return "NULL";
 }
 
+array(mapping) list_fields(string table)
+{
+   array x = sql->list_fields(table);
+   return map(x, map_field);
+}
+
 // there's little agreement here, so we'll have to override this everwhere.
 // start is the starting point from which to begin the limit, where the first record is record 1.
 string get_limit_clause(int limit, int|void start)
@@ -64,6 +70,10 @@ mapping map_field(mapping t)
   mapping field = ([]);
 
   field->name = t->name;
+
+  if(!t->flags)
+    t->flags = ([]);
+
   field->primary_key = t->flags->primary_key;
 
   if(t->type == "unknown" && this->get_field_info)

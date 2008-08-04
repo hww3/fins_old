@@ -13,6 +13,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- DateFields and its derivatives accept time fractions (such as the result 
+    of Calendar.now().)
 - Added LMTP and SMTP processors. Currently, there's not much glue, so
     you'd need to implement the callbacks (which currently accept any
     mail delivered.)

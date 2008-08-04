@@ -75,6 +75,8 @@ mapping map_field(mapping t)
     t->flags = ([]);
 
   field->primary_key = t->flags->primary_key;
+  if(t->default)
+    field->default = t->default;
 
   if(t->type == "unknown" && this->get_field_info)
   { 
@@ -114,7 +116,6 @@ mapping map_field(mapping t)
       break;
     case "integer":
     case "long":
-      if(t->default) field->default = (int)t->default;
       field->type = "integer";
       break;
     case "float":

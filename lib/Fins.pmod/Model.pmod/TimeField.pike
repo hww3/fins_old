@@ -23,6 +23,8 @@ string encode(mixed value, void|.DataObjectInstance i)
     return "NULL";
   }
 
+  if(stringp(value)) return sprintf("'%s'", value);
+
   return "'" + value->format_tod() + "'";
 }
 

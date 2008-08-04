@@ -53,6 +53,8 @@ string encode(mixed value, void|.DataObjectInstance i)
     return "NULL";
   }
 
+  if(stringp(value)) return sprintf("'%s'", value);
+
   return "'" + value->format_ymd() + "'";
 }
 
@@ -92,6 +94,12 @@ mixed validate(mixed value, void|.DataObjectInstance i)
    {
      return value;
    }
+
+   if(objectp(value) && Program.implements(object_program(value), Calendar.YMD()->Fraction))
+   {
+     return value;
+   }
+
    else
    {
       throw(Error.Generic("Cannot set " + name + " using " + basetype(value) + ".\n"));

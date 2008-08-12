@@ -13,6 +13,9 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added Fins.Model.MetaDataField, which provides a "shadow" field that
+    stores a mapping of data in another field. Useful for storing data
+    that's transient or not otherwise easily stored in a field of its own.
 - DateFields and its derivatives accept time fractions (such as the result 
     of Calendar.now().)
 - Added LMTP and SMTP processors. Currently, there's not much glue, so

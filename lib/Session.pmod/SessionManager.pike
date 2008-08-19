@@ -2,7 +2,7 @@
 static int default_timeout = 3600;
 static int cleaner_interval = 3600;
 
-Tools.Logging.Log log;
+Tools.Logging.Log.Logger log;
 
 array session_storage = ({});
 

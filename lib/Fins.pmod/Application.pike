@@ -451,7 +451,7 @@ string url_for_action(function|object action, array|void args, mapping|void vars
   if(arrayp(args))
     path = combine_path(path, args*"/");
 
-  if(vars)
+  if(vars && sizeof(vars))
     path = add_variables_to_path(path, vars);
 
   return path;

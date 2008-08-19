@@ -100,7 +100,6 @@ string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void ar
   if(!action) throw(Error.Generic("action_link: action " + args->action + " can not be resolved.\n"));
 
   array uargs;
-  mapping vars;
 
   if(args->args)
     uargs = args->args/"/";
@@ -109,7 +108,7 @@ string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void ar
   m_delete(args, "action");
   m_delete(args, "args");
 
-  string url = data->get_request()->fins_app->url_for_action(action, uargs, vars);
+  string url = data->get_request()->fins_app->url_for_action(action, uargs, args);
 
   return "<a href=\"" + url + "\">";
 }
@@ -135,7 +134,6 @@ string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void arg
   if(!action) throw(Error.Generic("action_link: action " + args->action + " can not be resolved.\n"));
 //werror("********* action: %O\n", action);
   array uargs;
-  mapping vars = ([]);
 
   if(args->args)
     uargs = args->args/"/";
@@ -144,11 +142,17 @@ string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void arg
   m_delete(args, "action");
   m_delete(args, "args");
 
-  string url = data->get_request()->fins_app->url_for_action(action, uargs, vars);
+  string url = data->get_request()->fins_app->url_for_action(action, uargs, args);
 
   return url;
 }
 
+
+//! args: var
+string simple_macro_autoformat(Fins.Template.TemplateData data, mapping|void args)
+{
+    return replace(args->var||"", ({"\n\n", "\n"}), ({"<p/>", "<br/>"}));
+}
 
 //! args: var
 string simple_macro_capitalize(Fins.Template.TemplateData data, mapping|void args)

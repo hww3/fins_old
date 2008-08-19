@@ -1,5 +1,5 @@
 object output;
-string format = "%{hour:02d}:%{min:02d}:%{sec:02d} %{level} - %{msg}";
+string format = "%{hour:02d}:%{min:02d}:%{sec:02d} %{level} - %{name}: %{msg}";
 function format_function;
 
 static void create(mapping config)

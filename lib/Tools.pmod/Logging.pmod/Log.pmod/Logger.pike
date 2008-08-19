@@ -46,6 +46,7 @@ static void create(mapping|void config)
     set_level(DEBUG);
   }
   else configure(config);
+  local_vars["name"] = config?(config->name):"default";
 }
 
 void configure(mapping config)

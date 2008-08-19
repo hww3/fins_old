@@ -3,7 +3,7 @@
 //! DataObjectInstance object to retrieve data for a given
 //! data type.
 
-import Tools.Logging;
+object log = Tools.Logging.get_logger("model.dataobject");
 
 string default_operator = " AND ";
 
@@ -192,21 +192,21 @@ static void reflect_definition()
   if(!get_table_name() || !sizeof(get_table_name()))
   {
     string table = Tools.Language.Inflect.pluralize(lower_case(instance));
-	Log.info("reflect_definition: table name for %s is %s.", instance, table);
+	log->info("reflect_definition: table name for %s is %s.", instance, table);
     set_table_name(table);
     set_instance_name(instance);
     foreach(context->personality->list_fields(table);; mapping field)
     {
 //      mapping field = context->personality->map_field(t, table);
 
-      Log.info("reflect_definition: looking at field %s: %O.", field->name, field);
+      log->debug("reflect_definition: looking at field %s: %O.", field->name, field);
 
       if(field->primary_key || (!primary_key && field->name =="id"))
       {
         // for now, primary keys must be integer.
         if(field->type!="integer") continue;
 
-        Log.info("reflect_definition: have a primary key.");  
+        log->debug("reflect_definition: have a primary key.");  
         add_field(.PrimaryKeyField(field->name));        
         set_primary_key(field->name);
       }
@@ -215,7 +215,7 @@ static void reflect_definition()
         do_add_field(field);
       else  
       {
-        Log.info("reflect_definition: have a possible link.");
+        log->debug("reflect_definition: have a possible link.");
         context->builder->possible_links += ({ (["obj": this, "field": field]) });
       }
     }
@@ -228,7 +228,7 @@ static void reflect_definition()
 void do_add_field(mapping field)
 {
 
-  Log.debug("adding field %O.", field);
+  log->debug("adding field %O.", field);
       if(field->type == "integer")
       {
         add_field(.IntField(field->name, field->length, !field->not_null, (int)field->default));
@@ -506,7 +506,7 @@ array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
     query += (" " + _default_sort_order_cached);
   }
 
-  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
+  if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
   
   array qr = context->sql->query(query);
 
@@ -558,7 +558,7 @@ void load(mixed id, .DataObjectInstance i, int|void force)
      string query = sprintf(single_select_query, (_fields_string), 
        table_name, primary_key->field_name, primary_key->encode(id));
 
-     if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
+     if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
 
      array result = context->sql->query(query);
 
@@ -587,7 +587,7 @@ void load_alternate(mixed id, .DataObjectInstance i, int|void force)
 {
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
-     Log.debug("load_alternate(%O, %O): loading from database.", id, i);
+     log->debug("load_alternate(%O, %O): loading from database.", id, i);
 /*
      mapping _fieldnames = ([]);
      array _fields = ({});
@@ -603,7 +603,7 @@ void load_alternate(mixed id, .DataObjectInstance i, int|void force)
      string query = sprintf(single_select_query, (_fields_string), 
        table_name, alternate_key->field_name, alternate_key->encode(id));
 
-  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
+  if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
 
 
      array result = context->sql->query(query);
@@ -717,7 +717,7 @@ mixed get(string field, .DataObjectInstance i)
    string query = sprintf(single_select_query, fields[field]->field_name, table_name, 
      primary_key->field_name, primary_key->encode(id), i);
 
-  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
+  if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
 
    mixed result = context->sql->query(query);
 
@@ -828,7 +828,7 @@ int set(string field, mixed value, int|void no_validation, .DataObjectInstance i
 
      string update_query = sprintf(single_update_query, table_name, fields[field]->field_name, new_value, primary_key->name, key_value);
      i->set_saved(1);
-  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), update_query);
+  if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), update_query);
      context->sql->query(update_query);
      load(i->get_id(), i, 1);   
    }
@@ -893,7 +893,7 @@ int delete(int|void force, .DataObjectInstance i)
 
    string delete_query = sprintf(single_delete_query, table_name, primary_key->name, key_value);
 
-  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), delete_query);
+  if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), delete_query);
    context->sql->query(delete_query);
    m_delete(objs, i->get_id());
    destruct(i);
@@ -1041,7 +1041,7 @@ static int commit_changes(multiset fields_set, mapping object_data, int|void no_
          string values_clause = "(" + (qvalues * ", ") + ")";
 
          query = sprintf(insert_query, table_name, fields_clause, values_clause);
-  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
+  if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
       }
       else
       {
@@ -1056,7 +1056,7 @@ static int commit_changes(multiset fields_set, mapping object_data, int|void no_
          set_clause = (set * ", ");
          
          query = sprintf(multi_update_query, table_name, set_clause, primary_key->field_name, primary_key->encode(update_id));
-  if(context->debug) werror("%O: %O\n", Tools.Function.this_function(), query);
+  if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
       }
       context->sql->query(query);
 }

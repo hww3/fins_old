@@ -1,6 +1,6 @@
 #!/usr/local/bin/pike -Mlib -DLOCALE_DEBUG
 
-import Fins;
+//import Fins;
 import Tools.Logging;
 
 object access_logger;
@@ -21,7 +21,7 @@ int session_timeout = 3600;
 
 Session.SessionManager session_manager;
 
-Fins.Application app;
+object /*Fins.Application*/ app;
 Protocols.HTTP.Server.Port port;
 program server = Protocols.HTTP.Server.Port;
 
@@ -290,7 +290,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
 
 void load_application()
 {
-  Fins.Application application;
+  object application;
 
   application = Fins.Loader.load_app(combine_path(getcwd(), project), config_name);
 

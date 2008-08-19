@@ -1,6 +1,7 @@
 import Fins;
-import Tools.Logging;
 inherit FinsBase;
+
+object log = Tools.Logging.get_logger("model");
 
 //!
 object context;
@@ -41,7 +42,7 @@ void register_types()
 {
   if(!repository->get_object_module())
   {
-    Log.warn("Using automatic model registration, but no datatype_definition_module set. Skipping.");
+    log->warn("Using automatic model registration, but no datatype_definition_module set. Skipping.");
     return;
   }
   object im = repository->get_object_module();
@@ -64,7 +65,7 @@ void register_types()
 
       di = compile_string(dip); 
     }
-    Log.info("Registering data type %s", d->instance_name);
+    log->info("Registering data type %s", d->instance_name);
     repository->add_object_type(d, di);
   }
 }
@@ -112,13 +113,13 @@ void initialize_links()
 
   foreach(context->builder->possible_links;; mapping pl)
   {
-    Log.debug("investigating possible link %s.", pl->field->name);
+    log->debug("investigating possible link %s.", pl->field->name);
     string pln = lower_case(pl->field->name);
 
     foreach(context->repository->object_definitions; string on; object od)
     {
       string mln = Tools.Language.Inflect.singularize(od->table_name) + "_" + od->primary_key->field_name;
-      Log.debug("considering %s as a possible field linkage.", mln);
+      log->debug("considering %s as a possible field linkage.", mln);
       if(pln == lower_case(mln))
       {
         pl->obj->add_field(Model.KeyReference(od->instance_name, pl->field->name, od->instance_name));
@@ -141,7 +142,7 @@ void initialize_links()
     
   foreach(table_components;; mapping o)
   {
-    Log.debug("looking for multi link reference for %s.", o->tn);
+    log->debug("looking for multi link reference for %s.", o->tn);
 
     foreach(table_components;; mapping q)
     {
@@ -149,7 +150,7 @@ void initialize_links()
 
       if(available_tables[o->tn + "_" + q->tn])
       {
-        Log.debug("have a mlr on %s", o->tn + "_" + q->tn);
+        log->debug("have a mlr on %s", o->tn + "_" + q->tn);
           o->od->add_field(Model.MultiKeyReference(o->od, Tools.Language.Inflect.pluralize(q->od->instance_name),
             o->tn + "_" + q->tn, 
             lower_case(o->od->instance_name + "_" + o->od->primary_key->field_name), 
@@ -166,7 +167,7 @@ void initialize_links()
     }
   }
 
-  Log.debug("possible links left over: %O", context->builder->possible_links);
+  log->debug("possible links left over: %O", context->builder->possible_links);
   foreach(context->builder->possible_links;; mapping pl)
   {
     pl->obj->do_add_field(pl->field);

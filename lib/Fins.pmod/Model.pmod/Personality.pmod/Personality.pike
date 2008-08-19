@@ -1,5 +1,4 @@
-import Tools.Logging;
-
+object log = Tools.Logging.get_logger("model.personality");
 object sql;
 object context;
 
@@ -66,7 +65,7 @@ string unquote_binary(string s)
 
 mapping map_field(mapping t)
 {
-  Log.debug("mapping field %O.", t);
+  log->debug("mapping field %O.", t);
   mapping field = ([]);
 
   field->name = t->name;
@@ -84,7 +83,7 @@ mapping map_field(mapping t)
     t->type = x->type;
   }
 
-  Log.debug("Field %s.%s is a %s.", t->table, t->name, t->type); 
+  log->debug("Field %s.%s is a %s.", t->table, t->name, t->type); 
 
   switch(t->type)
   {

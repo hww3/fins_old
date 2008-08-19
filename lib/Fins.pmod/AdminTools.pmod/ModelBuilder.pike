@@ -1,6 +1,7 @@
 import Tools.Logging;
 
-Fins.Application app;
+object app;
+//Fins.Application app;
 string project;
 string config_name = "dev";
 array commands;

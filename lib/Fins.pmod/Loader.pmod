@@ -2,10 +2,10 @@ import Tools.Logging;
 
 //! @param app_dir
 //!   the full path to the application directory.
-Fins.Application load_app(string app_dir, string config_name)
+object load_app(string app_dir, string config_name)
 {
   string cn;
-  Fins.Application a;
+  object a;
 
   if(!file_stat(app_dir)) 
     throw(Error.Generic("Application directory " + app_dir + " does not exist.\n"));
@@ -27,9 +27,9 @@ Fins.Application load_app(string app_dir, string config_name)
   object o;
 
   if(o = master()->resolv(config->app_name + ".Model"))
-    Fins.Model.set_model_module(o);
+    master()->resolv("Fins.Model.module")->set_model_module(o);
   if(o = master()->resolv(config->app_name + ".Objects"))
-    Fins.Model.set_object_module(o);
+    master()->resolv("Fins.Model.module")->set_object_module(o);
 
   program p;
 

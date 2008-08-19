@@ -1,11 +1,11 @@
-import Tools.Logging;
-
 mapping(string:.DataObject) object_definitions = ([]);
 mapping(program:.DataObject) program_definitions = ([]);
 mapping(string:program) instance_definitions = ([]);
 static mapping(object:object) scaffold_controllers = ([]);
 static object model_module;
 static object object_module;
+
+object log = Tools.Logging.get_logger("model");
 
 object Objects = objects(this);
 
@@ -74,7 +74,7 @@ program get_instance(string name)
 //!
 void add_object_type(.DataObject t, program i)
 {
-   Log.debug("adding type def: %O", t->instance_name);
+   log->debug("adding type def: %O", t->instance_name);
    object_definitions[t->instance_name] = t;
    program_definitions[object_program(t)] = t;
    instance_definitions[t->instance_name] = i;

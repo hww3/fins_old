@@ -24,10 +24,12 @@ string get_editor_string(void|string value, void|.DataObjectInstance i)
 
 void create(string _name, int _len, int(0..1) _null, int|void _default)
 {
+   int na = query_num_arg();
+//if(_name=="digested") werror("digested: %O, %O\n", na, _default);
    name = _name;
    len = _len;
    null = _null;
-   if(_default != UNDEFINED) 
+   if(na == 4) 
      default_value = _default;
    else default_value = .Undefined;
 

@@ -115,7 +115,7 @@ void render_view(String.Buffer buf, object ct, object d)
 program compile_string(string code, string realfile, object|void compilecontext)
 {
   string psp = parse_psp(code, realfile, compilecontext);
-//  Stdio.write_file("/tmp/foo.txt", sprintf("PSP: %s\n\n", psp));
+//  Stdio.write_file("/tmp/" + realfile + ".txt", sprintf("PSP: %s\n\n", psp));
   program p;
 
   object e = ErrorContainer();

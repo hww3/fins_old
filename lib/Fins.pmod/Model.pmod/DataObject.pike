@@ -231,11 +231,11 @@ void do_add_field(mapping field)
   log->debug("adding field %O.", field);
       if(field->type == "integer")
       {
-        add_field(.IntField(field->name, field->length, !field->not_null, (int)field->default));
+        add_field(.IntField(field->name, field->length, !field->not_null, field->default?(int)field->default:Fins.Model.Undefined));
       }
       if(field->type == "float")
       {
-        add_field(.FloatField(field->name, field->length, !field->not_null, (float)field->default));
+        add_field(.FloatField(field->name, field->length, !field->not_null, field->default?(float)field->default:0));
       }
       if(field->type == "timestamp")
       {
@@ -261,7 +261,7 @@ void do_add_field(mapping field)
       {
         add_field(.BinaryStringField(field->name, field->length, !field->not_null, field->default));
       }
-   if(field->flags && field->flags->unique && ! alternate_key)
+   if(field->unique && ! alternate_key)
      set_alternate_key(field->name);
 }
 

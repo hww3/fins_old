@@ -13,6 +13,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Model automatically detects fields with a UNIQUE key, and uses the first
+    in each table as the alternate key when using config via reflection.
 - Added Fins.Model.MetaDataField, which provides a "shadow" field that
     stores a mapping of data in another field. Useful for storing data
     that's transient or not otherwise easily stored in a field of its own.

@@ -24,7 +24,7 @@ string get_serial_insert_value()
 array(mapping) list_fields(string table)
 {
    array x = sql->list_fields(table);
-   return map(x, map_field);
+   return map(x, map_field, table);
 }
 
 // there's little agreement here, so we'll have to override this everwhere.
@@ -63,7 +63,7 @@ string unquote_binary(string s)
   }
 }
 
-mapping map_field(mapping t)
+mapping map_field(mapping t, string table)
 {
   log->debug("mapping field %O.", t);
   mapping field = ([]);
@@ -77,15 +77,18 @@ mapping map_field(mapping t)
   if(t->default)
     field->default = t->default;
 
-  if(t->type == "unknown" && this->get_field_info)
+  if(this->get_field_info)
   { 
     mapping x = this->get_field_info(t->table, t->name);
-    t->type = x->type;
+    if(t->type == "unknown")
+      t->type = x->type;
+    t->unique = x->unique;
   }
 
   log->debug("Field %s.%s is a %s.", t->table, t->name, t->type); 
 
-  switch(t->type)
+  werror("mapping field %O\n", t);
+  switch(lower_case(t->type))
   {
     case "string":
     case "var string":
@@ -98,9 +101,9 @@ mapping map_field(mapping t)
         field->length = t->length;
       else
       {
-	     if(t->type == "text")
-	       field->length = 1024;
-	  }
+        if(t->type == "text")
+          field->length = 1024;
+      }
       break;
     case "time":
       field->type = "time";
@@ -130,10 +133,21 @@ mapping map_field(mapping t)
 	       field->length = 32200;
 	  }
       break;
+    case "mediumblob":
+      field->type = "binary_string";
+	  if((int)t->length)
+        field->length = t->length;
+      else
+      {
+	     if(t->type == "blob")
+	       field->length = 1664400;
+	  }
+      break;
     default:
       throw(Error.Generic("unknown field type " + t->type + ".\n"));
   }
 
+  field->unique = t->unique;
   field->not_null = t->flags->not_null;
 
   return field;

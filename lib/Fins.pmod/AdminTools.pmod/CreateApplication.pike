@@ -102,6 +102,22 @@ string start_contents =
   exec pike $PIKE_ARGS -x fins start __APPNAME__ $*
 ";
 
+
+string fins_contents =
+#"#!/bin/sh
+
+  PIKE_ARGS=\"\"
+
+  if [ x$FINS_HOME != \"x\" ]; then
+    PIKE_ARGS=\"$PIKE_ARGS -M$FINS_HOME/lib\"
+  else
+    echo \"FINS_HOME is not defined. Define if you have Fins installed outside of your standard Pike module search path.\"
+  fi
+
+  cd `dirname $0`/../..
+  exec pike $PIKE_ARGS -x fins $1 __APPNAME__ $2 $3 $4
+";
+
 void create(array args)
 {
   Log.info("CreateApplication module loading");
@@ -159,6 +175,7 @@ int run()
 
   cd ("bin");
   Stdio.write_file("start.sh", customize(start_contents));
+  Stdio.write_file("fins.sh", customize(fins_contents));
   Process.system("chmod a+rx start.sh");
   
   return 0;

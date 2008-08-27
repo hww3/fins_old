@@ -3,8 +3,6 @@
   Fins.Template.Template template;
   Fins.Template.TemplateData template_data;
 
-  int response_size;
-
   static Fins.Request request;  
 
   static int __rendered = 0;

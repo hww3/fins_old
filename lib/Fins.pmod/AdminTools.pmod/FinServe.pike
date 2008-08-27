@@ -328,5 +328,5 @@ void load_application()
     }
     response->redirect(req);
 
-    logger->debug( "Created new session sid='%s' host='%s'",ssid,request->remoteaddr);
+    logger->debug( "Created new session sid='%s' host='%s'",ssid,request->get_client_addr());
   }

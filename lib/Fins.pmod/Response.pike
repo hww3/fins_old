@@ -313,16 +313,6 @@
         __rendered = 1;
      }
 
-    // TODO we need to calculate sizes of files better.
-    if(response->file)
-    {
-      object st = response->file->stat();
-      if(st)
-        response_size = st->size;
-    }
-    else
-      response_size = response->data?sizeof(response->data):-1;
-
   }
 
   //!

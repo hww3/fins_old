@@ -13,6 +13,7 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Access logging is now performed properly; output is in Common Log Format.
 - Model automatically detects fields with a UNIQUE key, and uses the first
     in each table as the alternate key when using config via reflection.
 - Added Fins.Model.MetaDataField, which provides a "shadow" field that

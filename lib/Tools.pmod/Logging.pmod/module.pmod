@@ -14,6 +14,8 @@ object default_logger = Tools.Logging.Log.Logger();
 //!
 //!  [logger.logger_name] <-- configures a logger named "logger_name"
 //!  appender=appender_name <-- use the appender "appender_name"
+//!  class=Some.Pike.Class <-- use the specified pike class for appending,
+//!    defaults to Tools.Logging.Log.Logger
 //!
 //!  [appender.appender_name] <-- configures an appender named "appender_name"
 //!  class=Some.Pike.Class <-- use the specified pike class for appending
@@ -142,7 +144,19 @@ Tools.Logging.Log.Logger create_logger_from_config(string loggername)
 
   cx = insert_config_variables(cx);
 
-  object l = Tools.Logging.Log.Logger(cx);
+  program loggerclass;
+  if(cx->class)
+  {
+    program lc = master()->resolv(cx["class"]);
+    if(lc) loggerclass = lc;
+    else
+      throw(Error.Generic("Logger type " + cx["class"] + " does not exist.\n"));
+      
+  }
+  if(!loggerclass)
+    loggerclass = Tools.Logging.Log.Logger;
+  
+  object l = loggerclass(cx);
   
   return l;
 }

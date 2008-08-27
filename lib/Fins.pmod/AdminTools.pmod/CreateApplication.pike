@@ -39,6 +39,7 @@ appender=default_debuglog
 
 [logger.access]
 appender=access_log
+class=Tools.Logging.Log.AccessLogger
 
 [appender.default_console]
 class=Tools.Logging.Log.ConsoleAppender
@@ -49,7 +50,7 @@ file=${appdir}/logs/debug.log
 
 [appender.access_log]
 file=${appdir}/logs/access.log
-class=Tools.Logging.Log.FileAppender
+class=Tools.Logging.Log.AccessFileAppender
 ";
 
 string model_contents =

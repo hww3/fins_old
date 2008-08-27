@@ -3,7 +3,7 @@
 //import Fins;
 import Tools.Logging;
 
-object access_logger;
+function access_logger;
 object logger;
 
 constant default_port = 8080;
@@ -133,7 +133,9 @@ int do_startup()
   }
   else
   {
-    access_logger = Tools.Logging.get_logger("access");
+    object al = Tools.Logging.get_logger("access");
+    if(al->log) access_logger = al->log;
+    else access_logger = al->do_msg;
     port = server(handle_request, (int)my_port);  
     port->request_program = Fins.HTTPRequest;
 
@@ -205,7 +207,6 @@ void session_startup()
 
 void handle_request(Protocols.HTTP.Server.Request request)
 {
-  access_logger->debug("Received %O", request);
   mixed r;
 
   // Do we have either the session cookie or the PSESSIONID var?
@@ -233,13 +234,17 @@ void handle_request(Protocols.HTTP.Server.Request request)
     response->type="text/html";
     response->data = "<h1>An error occurred while processing your request:</h1>\n"
                      "<pre>" + describe_backtrace(e) + "</pre>";
+    response->request = request;
+    access_logger(response);
     request->response_and_finish(response);
     return;
   }
 
+
   e = catch {
     if(mappingp(r))
     {
+      access_logger(r);
       request->response_and_finish(r);
     }
     else if(stringp(r))
@@ -249,6 +254,8 @@ void handle_request(Protocols.HTTP.Server.Request request)
       response->type = "text/html";
       response->error = 200;
       response->data = r;
+      response->request = request;
+      access_logger(response);
       request->response_and_finish(response);
     }
     else
@@ -261,6 +268,8 @@ void handle_request(Protocols.HTTP.Server.Request request)
       response->error = 404;
       response->data = "<h1>Page not found</h1>"
                        "Fins was unable to find a handler for " + request->not_query + ".";
+      response->request = request;
+      access_logger(response);
       request->response_and_finish(response);
     }
   };
@@ -281,6 +290,8 @@ void handle_request(Protocols.HTTP.Server.Request request)
     response->type="text/html";
     response->data = "<h1>Internal Server Error</h1>\n"
                      "<pre>" + describe_backtrace(e) + "</pre>";
+    response->request = request;
+    access_logger(response);
     request->response_and_finish(response);
     return;
   }

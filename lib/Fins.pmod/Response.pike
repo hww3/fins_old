@@ -3,6 +3,8 @@
   Fins.Template.Template template;
   Fins.Template.TemplateData template_data;
 
+  int response_size;
+
   static Fins.Request request;  
 
   static int __rendered = 0;
@@ -313,6 +315,16 @@
         __rendered = 1;
      }
 
+    // TODO we need to calculate sizes of files better.
+    if(response->file)
+    {
+      object st = response->file->stat();
+      if(st)
+        response_size = st->size;
+    }
+    else
+      response_size = response->data?sizeof(response->data):-1;
+
   }
 
   //!
@@ -345,6 +357,8 @@
 	  ({ sprintf("expires=%s", Protocols.HTTP.Server.http_date(cookies["__expiration__"])) });
        response->extra_heads["set-cookie"] = _cookies * " ";
      }
+ 
+    response->request = request;
 
     return response;
   }

@@ -68,7 +68,8 @@ public void set_appenders(array a)
   appenders = a;
 }
 
-static void do_msg(int level, string m, mixed|void ... extras)
+//! only use for special occasions.
+public void do_msg(int level, string m, mixed|void ... extras)
 {
 //werror("DEBUG: %d, %d\n", level, loglevel);
   if(level < loglevel)

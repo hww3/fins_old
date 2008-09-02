@@ -89,7 +89,7 @@ object __get_layout(object request)
       break;
     else
     {
-      Log.debug("Unable to load layout from \"%s\".", p);
+      Log.debug("Unable to load layout from \"%s\", error was %s.", p, e[0]);
     }
   }
 

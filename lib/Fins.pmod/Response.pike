@@ -143,6 +143,7 @@
   public string get_redirect_url(string|URI|function|Fins.FinsController to, array|void args, mapping|void vars)
   {
     string dest;
+    if(arrayp(to)) to = to[0];
     if(functionp(to) || (objectp(to) && (object_program(to) != Standards.URI)))
     {
 	  dest = request->fins_app->url_for_action(to, args, vars);
@@ -158,7 +159,8 @@
       {
         if(args && sizeof(args))
           to = Standards.URI(combine_path(to->path, args*"/"), to);
-        dest = (string)to;
+        if(to)
+          dest = (string)to;
       }
 
 

@@ -135,7 +135,7 @@ int do_startup()
   {
     object al = Tools.Logging.get_logger("access");
     if(al->log) access_logger = al->log;
-    else access_logger = al->do_msg;
+    else access_logger = genlogger(al);
     port = server(handle_request, (int)my_port);  
     port->request_program = Fins.HTTPRequest;
 
@@ -152,6 +152,10 @@ int do_startup()
   }
 }
 
+function genlogger(object al)
+{
+  return lambda(mapping m){al->do_msg(10,"", m);};
+}
 void session_startup()
 {
   Session.SessionStorage s;

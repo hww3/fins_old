@@ -62,6 +62,7 @@ static void reload_template()
 
 void set_layout(string|object layoutpath)
 {
+//werror("%O->set_layout(%O)\n", this, layoutpath);
    if(objectp(layoutpath)) 
      layout=layoutpath;
    else
@@ -77,6 +78,7 @@ object load_layout(string path)
 //!
 public string render(.TemplateData d)
 {
+//   werror("%O->render()\n", this);
    String.Buffer buf = String.Buffer();
 
    if(auto_reload && template_updated(templatename, last_update))
@@ -101,6 +103,7 @@ public string render(.TemplateData d)
 
 void render_view(String.Buffer buf, object ct, object d)
 {
+// werror("rendering view %O\n", this);
   if(!is_layout) throw(Fins.Errors.TemplateCompile("trying to render a view from a non-layout.\n"));
 
    if(auto_reload && template_updated(templatename, last_update))
@@ -216,11 +219,12 @@ string parse_psp(string file, string realname, object|void compilecontext)
 
   header += ("int is_layout = " + is_layout + "; inherit Fins.Helpers.Macros.Base;\n");
 
-  //werror("MACROS: %O\n", macros_used);
+//  werror("MACROS: %O\n", macros_used);
   foreach(macros_used; string macroname;)
   {
     header += ("function __macro_" + macroname + ";");
     initialization += ("__macro_" + macroname + " = __context->view->get_simple_macro(\"" + macroname + "\");");
+//    initialization += ("werror(\"__macro_" + macroname + ": %O\\n\",__macro_" + macroname + ");");
   }
 
   header += h;
@@ -500,8 +504,8 @@ class PikeBlock
 //werror("adding macro " + cmd + "\n");
        macros_used[cmd] ++;
 
-       return ("{catch{ "
-              " buf->add(__macro_" + cmd + "(__d, " + argify(arg) + "));};}");
+       return ("{mixed e = catch{"
+              " buf->add(__macro_" + cmd + "(__d, " + argify(arg) + "));};if(e)werror(\"An error occurred while calling macro " + cmd + ":\" + e[0] + \"\\n\");}");
        break;
    }
 

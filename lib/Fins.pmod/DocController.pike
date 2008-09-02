@@ -87,6 +87,10 @@ object __get_layout(object request)
     e = catch(l = view->low_get_template(view->default_template, p, 0, 1));
     if(!e)
       break;
+    else
+    {
+      Log.debug("Unable to load layout from \"%s\".", p);
+    }
   }
 
   return l;
@@ -124,6 +128,9 @@ private class DocRunner(function req)
   {
     object layout = __get_layout(request);
     Fins.Template.View lview;
+
+    if(layout)
+      Log.debug("Have a layout: %O\n", layout);
 
     mixed e = catch(lview = view->get_view(request->not_args));
 

@@ -135,6 +135,8 @@ public Template.Template low_get_template(program templateType, string templateN
     templates[templateType][templateName] = t;
   }
 
+//  if(t) werror("success.\n");
+
   return t;
 
 }

@@ -13,6 +13,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- New applications created with pike -x fins get a fins.sh script that can 
+    be used to run the fins tool more easily (similar to start.sh).
 - Access logging is now performed properly; output is in Common Log Format.
 - Model automatically detects fields with a UNIQUE key, and uses the first
     in each table as the alternate key when using config via reflection.

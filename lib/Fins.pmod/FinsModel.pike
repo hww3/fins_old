@@ -111,6 +111,29 @@ void initialize_links()
     a->obj->add_field(Model.InverseForeignKeyReference(a->my_name, Tools.Language.Inflect.singularize(a->other_type), a->other_field));
   }
 
+  foreach(context->builder->has_many_many;; mapping a)
+  {
+     object this_type;
+     object that_type;
+
+     this_type = context->repository->object_definitions[a->this_type->instance_name];
+     that_type = context->repository->object_definitions[a->that_type];
+//werror("%O\n", a /*indices(context->repository->object_definitions)*/);
+     log->debug("*** have a Many-to-Many relationship in %s between %O and %O", a->join_table, this_type, that_type);
+
+     this_type->add_field(Model.MultiKeyReference(this_type, Tools.Language.Inflect.pluralize(a->that_name),
+            a->join_table,
+            lower_case(this_type->instance_name + "_" + this_type->primary_key->field_name),
+            lower_case(that_type->instance_name + "_" + that_type->primary_key->field_name),
+             that_type->instance_name, that_type->primary_key->name));
+
+     that_type->add_field(Model.MultiKeyReference(that_type, Tools.Language.Inflect.pluralize(a->this_name),
+            a->join_table,
+            lower_case(that_type->instance_name + "_" + that_type->primary_key->field_name),
+            lower_case(this_type->instance_name + "_" + this_type->primary_key->field_name),
+             this_type->instance_name, this_type->primary_key->name));
+  }
+
   foreach(context->builder->possible_links;; mapping pl)
   {
     log->debug("investigating possible link %s.", pl->field->name);
@@ -127,11 +150,9 @@ void initialize_links()
         context->builder->possible_links -= ({pl});
       }
     }
-
   }
 
   array table_components = ({});
-    
 
   foreach(context->repository->object_definitions; string on; object od)
   {
@@ -162,7 +183,6 @@ void initialize_links()
             lower_case(q->od->instance_name + "_" + q->od->primary_key->field_name), 
             lower_case(o->od->instance_name + "_" + o->od->primary_key->field_name),
              o->od->instance_name, o->od->primary_key->name));
-
       }
     }
   }
@@ -172,4 +192,8 @@ void initialize_links()
   {
     pl->obj->do_add_field(pl->field);
   }
+  
+  context->builder->belongs_to = ({});
+  context->builder->has_many = ({});
+  context->builder->has_many_many = ({});
 }

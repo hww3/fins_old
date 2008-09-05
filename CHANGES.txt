@@ -13,6 +13,10 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added DataObject->has_many_to_many() in order to simplify creation of
+    many to many relationships where the join table is not named in a
+    standard fashion and/or special attribute names are desired in the
+    generated objects. 
 - New applications created with pike -x fins get a fins.sh script that can 
     be used to run the fins tool more easily (similar to start.sh).
 - Access logging is now performed properly; output is in Common Log Format.

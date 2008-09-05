@@ -290,7 +290,7 @@ void belongs_to(string other_type, string|void my_name, string|void my_field)
 //! @[belongs_to]. note that a datatype that uses this method won't have a field
 //! in the corresponding "local" database table that contains the reference 
 //! information. as a result, the parameters in this method don't use database
-//! field names at all, unlink @[belongs_to].
+//! field names at all, unlike @[belongs_to].
 //!
 //! @param other_type
 //!   pluralized version of the data type name (not the table name) of the type the field references.
@@ -305,6 +305,50 @@ void belongs_to(string other_type, string|void my_name, string|void my_field)
 void has_many(string other_type, string|void my_name, string|void other_field)
 {
   context->builder->has_many += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "obj": this]) });  
+}
+
+//!  define a many to many relationship in which the local object can be linked to many other objects
+//!  and vice versa. this requires the use of a join table with two fields: one to contain the id
+//!  of each type being linked. Each of the two types will have an attribute that returns the 
+//!  result of this many-to-many mapping, which we refer to as "this" and "that".
+//!
+//!  @param join_table
+//!    the name of the table containing the relationship. typically named in the
+//!    form of typeas_typebs.
+//!  @param that_type
+//!    the name of the other type in the relationship (this being the other).
+//!  @param this_name
+//!    the name of the attribute object to be used. often, this is the name of this type.
+//!  @param that_name
+//!    the name of the attribute object to be used. often, this is the name of that type.
+//!
+//!  @example
+//!  // assume we have a field called lists_owners that contains a many-to-many
+//!  // mapping of shopping lists to their owners. The data type for this type is "List"
+//!  // and the type of the other object is "User". The type of entity for each 
+//!  // is "owned_list" and "list_owner", respectively. This will result in the List type
+//!  // having an attribute called "list_owners" and the "User" type will have one called
+//!  // owned_lists.
+//!  //
+//!  // the table will have 2 fields, called user_id (assuming the primary key of the users
+//!  // table is "id" and one called list_id. 
+//!  has_many_to_many("lists_owners", "User", "owned_list", "list_owner");
+//!
+//!  @note
+//!   it's only necessary to include a call to this method in one of the types in the relation
+//!   though doing so in both (with the appropriate values for each) will not cause harm.
+//!
+//!  @note
+//!   if standard naming practices are employed for table names and field names, use of this
+//!   method is typically not necessary, as the auto configuration process will detect this.
+//!  
+//!   this function is typically most useful if you want to have multiple many-to-many
+//!   relationships that have unique table or attribute names in the resulting objects.
+void has_many_to_many(string join_table, string that_type, string this_name, string that_name)
+{
+  context->builder->has_many_many += ({ (["join_table": join_table, "this_type": this, 
+                           "that_type": that_type,
+                           "this_name": this_name, "that_name": that_name ]) });
 }
 
 void add_ref(.DataObjectInstance o)

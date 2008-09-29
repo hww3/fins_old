@@ -19,9 +19,6 @@ constant module_unique = 0;
 #define TRACE_LEAVE(A) do{if(id->misc->trace_leave)id->misc->trace_leave((A));}while(0)
 
 
-int redirects, accesses, errors, dirlists;
-int puts, deletes, mkdirs, moves, chmods, appes;
-
 int running_isolated = 0;
 object findprog_handler;
 Thread.Queue queue;
@@ -40,20 +37,8 @@ Fins.Application application;  application = Fins.Loader.load_app(combine_path(f
 
 string status()
 {
-  return ("<h2>Accesses to this filesystem</h2>"+
-	  (redirects?"<b>Redirects</b>: "+redirects+"<br>":"")+
-	  (accesses?"<b>Normal files</b>: "+accesses+"<br>"
-	   :"No file accesses<br>")+
-	  (QUERY(put)&&puts?"<b>Puts</b>: "+puts+"<br>":"")+
-	  (QUERY(put)&&QUERY(appe)&&appes?"<b>Appends</b>: "+appes+"<br>":"")+
-	  (QUERY(method_mkdir)&&mkdirs?"<b>Mkdirs</b>: "+mkdirs+"<br>":"")+
-	  (QUERY(method_mv)&&moves?
-	   "<b>Moved files</b>: "+moves+"<br>":"")+
-	  (QUERY(method_chmod)&&chmods?"<b>CHMODs</b>: "+chmods+"<br>":"")+
-	  (QUERY(delete)&&deletes?"<b>Deletes</b>: "+deletes+"<br>":"")+
-	  (errors?"<b>Permission denied</b>: "+errors
-	   +" (not counting .htaccess)<br>":"")+
-	  (dirlists?"<b>Directories</b>:"+dirlists+"<br>":""));
+  return ("<h2>Fins Application Status</h2>" +
+    sprintf("%O", application));
 }
 
 void create()

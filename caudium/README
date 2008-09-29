@@ -1,0 +1,23 @@
+Caudium support for Fins applications
+
+Installation Instructions
+
+1. copy fins_http.pike to your caudium/server/protocols directory.
+2. copy fins_application.pike to your caudium/local/modules directory.
+3. shutdown caudium, if started already.
+4. start caudium with the following option added to start-caudium:
+    start-caudium -M/path/to/Fins/lib
+
+   where /path/to/Fins/lib is the path to your Fins lib directory.
+5. start Caudium
+
+To add a fins application to a virtual server:
+
+1. Change the protocol for the virtual server's listen port from http 
+  to fins_http. If you're using IP-less virtual hosting, this would be 
+  the virtual server handling the requests.
+2. Add the Fins Application module to your virtual server.
+3. Set the value of the Fins Application Framework Directory path to 
+  the Fins directory.
+4. Provide the name of the application and configuration.
+

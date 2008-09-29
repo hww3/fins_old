@@ -17,6 +17,8 @@ inherit Processor;
 
 object smtp;
 
+program server = Protocols.SMTP.Server;
+
 array supported_protocols()
 {
   return ({"SMTP"});
@@ -33,8 +35,7 @@ void start()
     string host = config["smtp"]["host"];
     array|string domains = config["smtp"]["domain"];
     if(stringp(domains)) domains = ({ domains });
-    smtp = Protocols.SMTP.Server(domains, port, host, 
-	_cb_mailfrom, _cb_rcptto, _cb_data);
+    smtp = server(domains, port, host, _cb_mailfrom, _cb_rcptto, _cb_data);
   }
 }
 

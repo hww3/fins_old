@@ -123,7 +123,7 @@ string fins_contents =
   shift 1
 
   cd `dirname $0`/../..
-  exec pike $PIKE_ARGS -x fins $1 __APPNAME__ $2 $3 $4
+  exec pike $PIKE_ARGS -x fins $ARG0 __APPNAME__ $*
 ";
 
 void create(array args)
@@ -185,6 +185,7 @@ int run()
   Stdio.write_file("start.sh", customize(start_contents));
   Stdio.write_file("fins.sh", customize(fins_contents));
   Process.system("chmod a+rx start.sh");
+  Process.system("chmod a+rx fins.sh");
   
   return 0;
 }

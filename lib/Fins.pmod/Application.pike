@@ -535,30 +535,33 @@ public mixed handle_http(.Request request)
       return r;
     };
 
-    if(er && objectp(er))
+    if(er)
     {
-//		werror("handling error %O.\n", er);
-      switch(er->error_type)
+       Log.exception(sprintf("An exception occurred while executing event %O", event), er);
+       if(objectp(er))
       {
-        case "template":
+//		werror("handling error %O.\n", er);
+        switch(er->error_type)
+        {
+          case "template":
 		  if(er->is_templatecompile_error)
           	response->set_view(generate_templatecompile_error(er));
 		  else
         	response->set_view(generate_template_error(er));
-          response->set_error(500);
-          break;
-        default:
-          response->set_view(generate_error(er));
-          response->set_error(500);
-          break;
+            response->set_error(500);
+            break;
+          default:
+            response->set_view(generate_error(er));
+            response->set_error(500);
+            break;
+        }
       }
-    }
-    else if(er)
-    {
+      else
+      {
           response->set_view(generate_error_array(er));
           response->set_error(500);
+      }
     }
-
   }
   else response->set_data("Unknown event: %O\n", request->not_query);
 

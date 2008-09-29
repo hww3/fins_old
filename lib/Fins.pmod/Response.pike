@@ -4,9 +4,8 @@
   Fins.Template.TemplateData template_data;
 
   static Fins.Request request;  
-
+  static int low_response = 0;
   static int __rendered = 0;
-
 //!
   static void create(Fins.Request|void r)
   {
@@ -317,6 +316,12 @@
 
   }
 
+  public void set_low_response(mapping resp)
+  {
+    low_response = 1;
+    response = resp;
+  }
+
   //!
   public string get_data()
   {
@@ -333,6 +338,7 @@
   //!
   public mapping get_response()
   {
+     if(low_response) return response;
      if(!__rendered) render();
 
      if(!response->error) return 0;

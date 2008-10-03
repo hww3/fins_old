@@ -406,7 +406,6 @@ e=catch{
   array inds = indices(request->variables);
 
   int should_update;
-werror("fields: %O\n", request->variables->___fields);
   foreach(request->variables->___fields/","; int ind; string field)
   {
      // we don't worry about the primary key.
@@ -420,7 +419,9 @@ werror("fields: %O\n", request->variables->___fields);
 		{
 			if(request->variables["__old_value_" + e] != request->variables[e])
 			{
+				werror("field: %O\n", item->master_object->fields[field]);
 				Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
+		        if(item->master_object->fields[field]->is_shadow) continue;
 				should_update = 1;
 				mapping x = ([]);
 				foreach(elements;; string e)
@@ -433,7 +434,9 @@ werror("fields: %O\n", request->variables->___fields);
         else	
  	  if(request->variables["__old_value_" + field] != request->variables[field])
 	  {
+		werror("field: %O\n", item->master_object->fields[field]);
 		Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
+        if(item->master_object->fields[field]->is_shadow) continue;
 		should_update = 1;
 		v[field] = request->variables[field];
 	  }
@@ -512,7 +515,7 @@ e=catch{
     return;
   }
 
-  werror("%O\n", request->variables);
+ // werror("%O\n", request->variables);
   m_delete(request->variables, "___save");
 
   array inds = indices(request->variables);
@@ -526,12 +529,14 @@ e=catch{
      if(item->master_object->get_primary_key()->name == field) continue; 
 
 	array elements = glob( "_" + field + "__*", inds);
-	
-	if(sizeof(elements))
+//	werror ("elements: %O\n", elements);
+	if(sizeof(elements) > 0)
 	{
 		foreach(elements;; string e)
 		{
 				Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
+				werror("%O\n", item->master_object->fields[field]);
+		        if(item->master_object->fields[field]->is_shadow) continue;
 				should_update = 1;
 				mapping x = ([]);
 				foreach(elements;; string e)
@@ -542,6 +547,8 @@ e=catch{
 	}
         else	
 	  {
+			werror("%O\n", item->master_object->fields[field]);
+	        if(item->master_object->fields[field]->is_shadow) continue;
 		Log.debug("Scaffold: " + field + " in " + model_object->instance_name + " changed.");
 		should_update = 1;
 		v[field] = request->variables[field];
@@ -599,7 +606,7 @@ werror("make_value_editor(%O=%O)\n", key, model_object->fields[key]);
   {
 werror("no editor for shadow field " + key + "\n");
 	if(o)
-      return describe(o, key, value);   
+	  return describe(o, key, value);   
     else return "";
   }
   else if(model_object->primary_key->name == key)

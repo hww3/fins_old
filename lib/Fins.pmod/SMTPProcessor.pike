@@ -10,8 +10,8 @@ inherit Processor;
 //! processor=my_smtp_processor
 //! 
 //! [smtp]
-//! port=portnum
-//! host=bindhost
+//! listen_port=portnum
+//! listen_host=bindhost
 //! domain=relaydomain1
 //! domain=relaydomainn
 
@@ -31,11 +31,13 @@ void start()
 
   else
   {
-    int port = (int)(config["smtp"]["port"]);
-    string host = config["smtp"]["host"];
+    int port = (int)(config["smtp"]["listen_port"] || 25);
+    string host = config["smtp"]["listen_host"] || "localhost";
     array|string domains = config["smtp"]["domain"];
     if(stringp(domains)) domains = ({ domains });
-    smtp = server(domains, port, host, _cb_mailfrom, _cb_rcptto, _cb_data);
+    Log.info("Opening SMTP Listener on %s:%d for domains %s.", host, port, domains*", ");
+    smtp = Protocols.SMTP.Server(domains, port, host, 
+	_cb_mailfrom, _cb_rcptto, _cb_data);
   }
 }
 

@@ -113,6 +113,48 @@ string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void ar
   return "<a href=\"" + url + "\">";
 }
 
+//! args: controller, action, args, method, enctype
+//!
+//! any arguments other than those above will be considered variables to 
+//! be added to the url above.
+string simple_macro_action_form(Fins.Template.TemplateData data, mapping|void args)
+{
+  object controller;
+  object request = data->get_request();
+  string event = "index";
+  if(args->action)
+    event = args->action;
+//  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
+
+  controller = request->controller;
+  if(args->controller)
+    controller = data->get_request()->fins_app->get_controller_for_path(args->controller, controller);
+  if(!controller) throw(Error.Generic("action_link: controller " + args->controller + " can not be resolved.\n"));
+
+  mixed action = controller[event];
+  if(!action) throw(Error.Generic("action_link: action " + args->action + " can not be resolved.\n"));
+
+  array uargs;
+
+  if(args->args)
+    uargs = args->args/"/";
+
+  string other = "";
+
+  if(args->method) other += " method=\"" + args->method + "\"";
+  if(args->enctype) other += " method=\"" + args->enctype + "\"";
+
+  m_delete(args, "controller");
+  m_delete(args, "action");
+  m_delete(args, "args");
+  m_delete(args, "method");
+  m_delete(args, "enctype");
+
+  string url = data->get_request()->fins_app->url_for_action(action, uargs, args);
+
+  return "<form action=\"" + url + "\"" + other + ">";
+}
+
 //! args: controller, action, args 
 //!
 //! any arguments other than those above will be considered variables to 

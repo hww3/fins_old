@@ -13,6 +13,7 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added action_form macro.
 - Added DataObject->has_many_to_many() in order to simplify creation of
     many to many relationships where the join table is not named in a
     standard fashion and/or special attribute names are desired in the

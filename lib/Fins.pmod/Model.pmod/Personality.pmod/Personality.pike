@@ -65,7 +65,7 @@ string unquote_binary(string s)
 
 mapping map_field(mapping t, string table)
 {
-  log->debug("mapping field %O.", t);
+//  log->debug("mapping field %O.", t);
   mapping field = ([]);
 
   field->name = t->name;
@@ -87,7 +87,7 @@ mapping map_field(mapping t, string table)
 
   log->debug("Field %s.%s is a %s.", t->table, t->name, t->type); 
 
-  werror("mapping field %O\n", t);
+//  werror("mapping field %O\n", t);
   switch(lower_case(t->type))
   {
     case "string":

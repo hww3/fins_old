@@ -156,7 +156,7 @@ string low_get_lang()
 
     if(this->request_headers["accept-language"])
       lh = this->request_headers["accept-language"];
-
+    if(!lh) lh = "";
     foreach(lh/",";;string lang)
     {
       array l = lang/";";

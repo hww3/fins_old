@@ -25,6 +25,7 @@
   }
 
   static mapping response = (["type": "text/html",
+			      "_type": "text/html",
                               "error": 0,
                               "extra_heads": ([])
                               ]);
@@ -34,12 +35,29 @@
   //!
   public void set_type(string mimetype)
   {
-    response->type = mimetype;
+    response->_type = mimetype;
+    if(response->_charset) response->type = response->_type + 
+      "; charset=" + response->_charset;
+    else response->type = response->_type;
+  }
+ 
+  //!
+  public void set_charset(string charset)
+  {
+    response->_charset = charset;
+    if(response->_charset) response->type = response->_type + 
+      "; charset=" + response->_charset;
+    else response->type = response->_type;
   }
 
   //!
   public void|string get_type() {
-    return response->type;
+    return response->_type;
+  }
+
+  //!
+  public void|string get_charset() {
+    return response->_charset;
   }
 
   //! when only one argument is provided, name is presumed to be "msg".

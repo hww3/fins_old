@@ -124,15 +124,15 @@ string simple_macro_action_form(Fins.Template.TemplateData data, mapping|void ar
   string event = "index";
   if(args->action)
     event = args->action;
-//  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
+//  if(!event) throw(Error.Generic("action_form: event name must be provided.\n"));
 
   controller = request->controller;
   if(args->controller)
     controller = data->get_request()->fins_app->get_controller_for_path(args->controller, controller);
-  if(!controller) throw(Error.Generic("action_link: controller " + args->controller + " can not be resolved.\n"));
+  if(!controller) throw(Error.Generic("action_form: controller " + args->controller + " can not be resolved.\n"));
 
   mixed action = controller[event];
-  if(!action) throw(Error.Generic("action_link: action " + args->action + " can not be resolved.\n"));
+  if(!action) throw(Error.Generic("action_form: action " + args->action + " can not be resolved.\n"));
 
   array uargs;
 
@@ -281,3 +281,12 @@ string simple_macro_describe(Fins.Template.TemplateData data, mapping|void args)
 
   return rv;
 }
+
+//! display a calendar object in a friendly manner 
+//!
+//! args: var
+string simple_macro_friendly_date(Fins.Template.TemplateData data, mapping|void args)
+{
+  return Tools.String.friendly_date(args->var);
+}
+

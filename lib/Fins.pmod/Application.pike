@@ -170,8 +170,21 @@ static void load_view()
   else Log.debug("No view defined!");
 }
 
+object get_master_for_thread()
+{	
+  if(master()->findprog_handler)
+   return master()->get_findprog_handler_for_thread();	
+  else return master();
+}
+
+array get_program_path()
+{
+	return get_master_for_thread()->pike_program_path;
+}
+
 static object low_load_controller(string controller_name)
 {
+	werror("low_load_controller(%O)\n", controller_name);
   program c;
   string cn;
   string f;
@@ -181,8 +194,9 @@ static object low_load_controller(string controller_name)
   if(!has_suffix(cn, ".pike"))
     cn = cn + ".pike";
 
-  foreach( ({""}) + master()->pike_program_path;; string p)
+  foreach( ({""}) + get_program_path();; string p)
   {
+	werror("looking in %O\n", p);
     f = Stdio.append_path(p, cn);
     object stat = file_stat(f);
      
@@ -193,6 +207,7 @@ static object low_load_controller(string controller_name)
     else f = 0;
   }
 
+werror("file: %O\n",f);
   if(f)
   {
     c = compile_string(Stdio.read_file(f), f);
@@ -205,6 +220,7 @@ static object low_load_controller(string controller_name)
   object o = c(this);
   o->__controller_name = cn;
   o->__controller_source = f;
+werror("controller loaded: %O\n", o);
   return o;
 }
 
@@ -681,6 +697,8 @@ array get_event(.Request request)
     req = req[1..];
   array r = req/"/";
 
+//werror("req: %O\n", r);
+
   if(controller_autoreload)
   {
 	controller_updated(controller, this, "controller");
@@ -710,6 +728,7 @@ array get_event(.Request request)
 
   cc = controller;
   request->controller = cc;
+werror("controller: %O\n", cc);
   request->controller_name = cc->__controller_name;
 
 

@@ -1,4 +1,5 @@
 .DataObject master_object;
+.DataModelContext context;
 
 //! this is an actual instance containing model-domain data
 //! 
@@ -94,7 +95,7 @@ void set_operator(int o)
 }
 
 //!
-static void create(mixed|void id, object _object_type)
+static void create(mixed|void id, object _object_type, void|.DataModelContext context)
 {
   if(!_object_type)
     throw(Error.Generic("No Data Object Definition passed to create()\n"));
@@ -103,7 +104,11 @@ static void create(mixed|void id, object _object_type)
     master_object = _object_type;
      object_type = _object_type->instance_name;
   }
-   
+
+  if(!context)
+    context = Fins.Model.get_default_context();   
+
+  this->context = context;
 
   if(id == UNDEFINED)
   {
@@ -112,7 +117,7 @@ static void create(mixed|void id, object _object_type)
 
   else
   {
-    master_object->load(id, this);
+    master_object->load(context, id, this);
 //    master_object->add_ref(this);
   }
 
@@ -128,82 +133,82 @@ Fins.Errors.Validation valid()
 //!
 void refresh()
 {
-   master_object->load(key_value, this, 1);
+   master_object->load(context, key_value, this, 1);
 }
 
 //!
-.DataObjectInstance new()
+.DataObjectInstance new(void|.DataModelContext c)
 {
-   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object);  
+   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object, c||context);  
 
    new_object->set_new_object(1);
    return   new_object;
 }
 
 //!
-.DataObjectInstance find_by_alternate(mixed id)
+.DataObjectInstance find_by_alternate(mixed id, void|.DataModelContext c)
 {
-   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object);  
-    master_object->load_alternate(id, new_object);
+   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object, c||context);  
+    master_object->load_alternate(c, id, new_object);
     return new_object;
 }
 
 //!
-.DataObjectInstance find_by_id(int id)
+.DataObjectInstance find_by_id(int id, void|.DataModelContext c)
 {
-   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object);  
+   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object, c||context);  
 
-    master_object->load(id, new_object);
+    master_object->load(c||context, id, new_object);
 //    master_object->add_ref(new_object);
    return new_object;
 }
 
 //!
-array(object(.DataObjectInstance)) find_all()
+array(object(.DataObjectInstance)) find_all(void|.DataModelContext c)
 {
-  return find(([]));
+  return find(([]), c||context);
 }
 
 //!
-array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void criteria)
+array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void criteria, void|.DataModelContext c)
 {
-  return master_object->find(qualifiers, criteria, this);
+  return master_object->find(c||context, qualifiers, criteria, this);
 }
 
 //!
-int delete(void|int force)
+int delete(void|int force, void|.DataModelContext c)
 {
-   return master_object->delete(force, this);
+   return master_object->delete(c||context, force, this);
 }
 
 //!
-int save(int|void no_validation)
+int save(int|void no_validation, void|.DataModelContext c)
 {
-   return master_object->save(no_validation, this);
+   return master_object->save(c||context, no_validation, this);
 }
 
 //!
-int set_atomic(mapping values, int|void no_validation)
+int set_atomic(mapping values, int|void no_validation, void|.DataModelContext c)
 {
-   return master_object->set_atomic(values, no_validation, this);
+   return master_object->set_atomic(c||context, values, no_validation, this);
 }
 
 //!
-int set(string name, string value, int|void no_validation)
+int set(string name, string value, int|void no_validation, void|.DataModelContext c)
 {
-   return master_object->set(name, value, no_validation, this);
+   return master_object->set(c||context, name, value, no_validation, this);
 }
 
 //!
-mixed get_atomic()
+mixed get_atomic(void|.DataModelContext c)
 {
-   return master_object->get_atomic(this);
+   return master_object->get_atomic(c||context, this);
 }
 
 //!
-mixed get(string name)
+mixed get(string name, void|.DataModelContext c)
 {
-   return master_object->get(name, this);
+   return master_object->get(c||context, name, this);
 }
 
 //!

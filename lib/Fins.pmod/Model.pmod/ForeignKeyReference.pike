@@ -17,7 +17,8 @@ static void create(string _name)
 // value will be null in a foreign key, as we're not in an object where that's a real field.
 mixed decode(string value, void|.DataObjectInstance i)
 {
-  return .DataObjectInstance(UNDEFINED, otherobject)->find(([ i->master_object->primary_key->field_name :
+  return .DataObjectInstance(UNDEFINED, otherobject, i->context)->find(([ 			
+		i->master_object->primary_key->field_name :
                                   (int) i->get_id()]));
 }
 

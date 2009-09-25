@@ -3,17 +3,15 @@ object otherobject;
 object parentobject;
 array contents;
 int changed;
+.DataModelContext context;
 
-static void create(.Field f, object parent)
+static void create(.Field f, object parent, void|.DataModelContext c)
 {
-
-
   field = f; 
   parentobject = parent;
-  otherobject = parent->master_object->context->repository["get_object"](field->otherobject);
+  context = c || parent->master_object->repository["get_default_context"]();
+  otherobject = parent->master_object->repository["get_object"](field->otherobject);
   changed = 1;
-
-
 }
 
 static mixed cast(string rt)
@@ -75,7 +73,7 @@ int(0..1) _is_type(string t)
 
 void get_contents()
 {
-  contents = Fins.Model.old_find(otherobject, ([ field->otherkey :
+  contents = Fins.Model.old_find(context, otherobject, ([ field->otherkey :
                                   (int) parentobject->get_id()]));
 
   changed = 0;

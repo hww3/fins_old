@@ -2,8 +2,13 @@ Version 0.1
 
 INCOMPATIBLE CHANGES
 
+- Many model functions have changed to take a DataModelContext object
+    as an optional or required argument as a means of supporting multiple
+    database connections per model definition. In situations where the 
+    context is optional, the default context will be used if a context
+    is not provided. 
 - FCGI Support requires a recent version of Public.Web.FCGI, as changes
-    in the API of this module changed incompatibly.
+    in the API of this module changed incompatably.
 - Simple template changes: foreach argument "var" can now be a variable 
     (preceeded by a '$') or a constant string, as with macro variables.
 - Macro syntax: most template macros that accept arguments that are 
@@ -13,6 +18,13 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Support for multiple database connections (see INCOMPATIBLE CHANGES 
+  above for notes on potential compatibility concerns)
+- Added DataModelContext->clone() to create a clone of the context
+    with a new database connection.
+- Added DataModelContext->find as a context/connection specific method
+    of retrieving objects. Model.find continues to work with the 
+    default context/connection.
 - Added action_form macro.
 - Added DataObject->has_many_to_many() in order to simplify creation of
     many to many relationships where the join table is not named in a

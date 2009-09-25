@@ -32,6 +32,7 @@ void load_model()
    d->initialize();
 
    context = d;
+   repository->set_default_context(context);
 
    register_types();
    initialize_links();

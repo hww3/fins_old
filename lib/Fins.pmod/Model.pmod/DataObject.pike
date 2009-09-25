@@ -32,7 +32,7 @@ mapping default_values = ([]);
 .Field alternate_key;
 
 //!
-.DataModelContext context;
+.Repository repository; 
 
 object my_undef = .Undefined;
 
@@ -65,22 +65,22 @@ string table_name = "";
 //mapping new_object_data = ([]);
 array field_order = ({});
 
-//!
-void create(.DataModelContext c)
+//! repo is retained, context is not.
+void create(.DataModelContext context, .Repository repo)
 {
-   context = c;
+  repository = repo;
 
    if(define && functionp(define))
    {
-     define();
+     define(context);
    }
    else
    { 
-     reflect_definition();
+     reflect_definition(context);
    }
 
    if(post_define && functionp(post_define))
-     post_define();
+     post_define(context);
 
   set_weak_flag(objs, Pike.WEAK);
 }
@@ -123,11 +123,11 @@ string describe(object i)
 //! if not defined, the object will attempt to auto-configure itself
 //! from the table definition. see the Fins automatic model configuration
 //! documentation for details.
-void define();
+void define(.DataModelContext context);
 
 //! define the object's fields and relationships; useful for adding custom attributes
 //! when also using automatic definition.
-void post_define();
+void post_define(.DataModelContext context);
 
 //! set the default operator to use when querying on multiple fields.
 //!  valid values are @[Fins.Model.OPER_AND] and @[Fins.Model.OPER_OR].
@@ -184,7 +184,7 @@ void validate_on_update(mapping changes, Fins.Errors.Validation errors, .DataObj
 //!
 void validate_on_create(mapping changes, Fins.Errors.Validation errors, .DataObjectInstance i);
 
-static void reflect_definition()
+static void reflect_definition(.DataModelContext context)
 {
   string instance =
              (replace(master()->describe_program(object_program(this)), ".", "/")/"/")[-1];
@@ -207,12 +207,12 @@ static void reflect_definition()
         if(field->type!="integer") continue;
 
         log->debug("reflect_definition: have a primary key.");  
-        add_field(.PrimaryKeyField(field->name));        
+        add_field(context, .PrimaryKeyField(field->name));        
         set_primary_key(field->name);
       }
 
       else if(field->type != "integer" || search(field->name, "_")==-1)
-        do_add_field(field);
+        do_add_field(context, field);
       else  
       {
         log->debug("reflect_definition: have a possible link.");
@@ -225,41 +225,41 @@ static void reflect_definition()
 
 }
 
-void do_add_field(mapping field)
+void do_add_field(.DataModelContext context, mapping field)
 {
 
   log->debug("adding field %O.", field);
       if(field->type == "integer")
       {
-        add_field(.IntField(field->name, field->length, !field->not_null, field->default?(int)field->default:Fins.Model.Undefined));
+        add_field(context, .IntField(field->name, field->length, !field->not_null, field->default?(int)field->default:Fins.Model.Undefined));
       }
       if(field->type == "float")
       {
-        add_field(.FloatField(field->name, field->length, !field->not_null, field->default?(float)field->default:0));
+        add_field(context, .FloatField(field->name, field->length, !field->not_null, field->default?(float)field->default:0));
       }
       if(field->type == "timestamp")
       {
-        add_field(.TimeStampField(field->name, 0));
+        add_field(context, .TimeStampField(field->name, 0));
       }
       else if(field->type == "date")
       {
-        add_field(.DateField(field->name, !field->not_null, field->default));
+        add_field(context, .DateField(field->name, !field->not_null, field->default));
       }
       else if(field->type == "datetime")
       {
-        add_field(.DateTimeField(field->name, !field->not_null, field->default));
+        add_field(context, .DateTimeField(field->name, !field->not_null, field->default));
       }
       else if(field->type == "time")
       {
-        add_field(.TimeField(field->name, !field->not_null, field->default));
+        add_field(context, .TimeField(field->name, !field->not_null, field->default));
       }
       else if(field->type == "string")
       {
-        add_field(.StringField(field->name, field->length, !field->not_null, field->default));
+        add_field(context, .StringField(field->name, field->length, !field->not_null, field->default));
       }
       else if(field->type == "binary_string")
       {
-        add_field(.BinaryStringField(field->name, field->length, !field->not_null, field->default));
+        add_field(context, .BinaryStringField(field->name, field->length, !field->not_null, field->default));
       }
    if(field->unique && ! alternate_key)
      set_alternate_key(field->name);
@@ -280,7 +280,7 @@ void do_add_field(mapping field)
 //!   datatype. if not specified, this defaults to the singular inflection of the
 //!   other datatype, and the database field name of the other data type's primary
 //!   key, separated by an underscore.
-void belongs_to(string other_type, string|void my_name, string|void my_field)
+void belongs_to(.DataModelContext context, string other_type, string|void my_name, string|void my_field)
 {
   context->builder->belongs_to += ({ (["my_name": my_name, "other_type": other_type, "my_field": my_field, "obj": this]) });
 }
@@ -302,7 +302,7 @@ void belongs_to(string other_type, string|void my_name, string|void my_field)
 //!   the name of the field in the other datatype (not a database field name) that
 //!   represents the link to this data type. If you used @[belongs_to] and specified an alternate
 //!   value for the my_name attribute, you'll need to provide that value to this parameter as well.
-void has_many(string other_type, string|void my_name, string|void other_field)
+void has_many(.DataModelContext context, string other_type, string|void my_name, string|void other_field)
 {
   context->builder->has_many += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "obj": this]) });  
 }
@@ -344,7 +344,7 @@ void has_many(string other_type, string|void my_name, string|void other_field)
 //!  
 //!   this function is typically most useful if you want to have multiple many-to-many
 //!   relationships that have unique table or attribute names in the resulting objects.
-void has_many_to_many(string join_table, string that_type, string this_name, string that_name)
+void has_many_to_many(.DataModelContext context, string join_table, string that_type, string this_name, string that_name)
 {
   context->builder->has_many_many += ({ (["join_table": join_table, "this_type": this, 
                            "that_type": that_type,
@@ -417,16 +417,16 @@ void set_alternate_key(string _key)
 }
 
 //! 
-void add_default_value_object(string field, string objecttype, mapping criteria, int unique)
+void add_default_value_object(.DataModelContext context, string field, string objecttype, mapping criteria, int unique)
 {
    if(unique)
-     default_values[field] = lambda(){ return context->app->model->repository->old_find(objecttype, criteria)[0];};
+     default_values[field] = lambda(){ return repository->old_find(context, objecttype, criteria)[0];};
    else
-     default_values[field] = lambda(){ return context->app->model->repository->old_find(objecttype, criteria);};
+     default_values[field] = lambda(){ return repository->old_find(context, objecttype, criteria);};
 }
 
 //!
-void add_field(.Field f)
+void add_field(.DataModelContext context, .Field f)
 {
    f->set_context(context);
    fields[f->name] = f;
@@ -490,7 +490,7 @@ void gen_fields()
 //!   the criteria object will determine the type of comparison made for 
 //!   the field, otherwise the criteria will be an equality comparison on the
 //!   value (as in the SQL: field1='value' if the field field1 were a string type)
-array find(mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
+array find(.DataModelContext context, mapping qualifiers, .Criteria|void criteria, .DataObjectInstance i)
 {
   string query;
   array(object(.DataObjectInstance)) results = ({});
@@ -581,7 +581,7 @@ void generate_sort_order()
 	_default_sort_order_cached = o;
 }
 
-void load(mixed id, .DataObjectInstance i, int|void force)
+void load(.DataModelContext context, mixed id, .DataObjectInstance i, int|void force)
 {
 
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
@@ -627,7 +627,7 @@ void load(mixed id, .DataObjectInstance i, int|void force)
   }
 }
 
-void load_alternate(mixed id, .DataObjectInstance i, int|void force)
+void load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, int|void force)
 {
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
@@ -712,19 +712,19 @@ void low_load(mapping row, .DataObjectInstance i, /*mapping|void fieldnames*/)
   return;
 }
 
-mapping get_atomic(.DataObjectInstance i)
+mapping get_atomic(.DataModelContext context, .DataObjectInstance i)
 {
   mapping a = ([]);
 
   foreach(fields;string n; object f )
   {
-    a[f->name] = get(f->name, i);
+    a[f->name] = get(context, f->name, i);
   }
 
   return a;
 }
 
-mixed get(string field, .DataObjectInstance i)
+mixed get(.DataModelContext context, string field, .DataObjectInstance i)
 {
    if(field == "_id")
      field = primary_key->name;
@@ -745,7 +745,7 @@ mixed get(string field, .DataObjectInstance i)
      return i->object_data[field];
    }
 
-   load(id, i, 0);
+   load(context, id, i, 0);
 
    if(objs[id] && has_index(objs[id], field))
    {
@@ -777,7 +777,7 @@ mixed get(string field, .DataObjectInstance i)
 */
 }
 
-int set_atomic(mapping values, int|void no_validation, .DataObjectInstance i)
+int set_atomic(.DataModelContext context, mapping values, int|void no_validation, .DataObjectInstance i)
 {
    mapping object_data = ([]);
    multiset fields_set = (<>);
@@ -804,7 +804,7 @@ int set_atomic(mapping values, int|void no_validation, .DataObjectInstance i)
    if(i->is_new_object())
    {
       mixed key;
-      commit_changes(fields_set, object_data, no_validation, 0, i);
+      commit_changes(context, fields_set, object_data, no_validation, 0, i);
       key = primary_key->get_id(i);
       i->set_id(key);
       i->set_new_object(0);
@@ -814,11 +814,11 @@ int set_atomic(mapping values, int|void no_validation, .DataObjectInstance i)
       i->fields_set = (<>);      
    }
    else
-     commit_changes(fields_set, object_data, no_validation, i->get_id(), i);
-   load(i->get_id(), i, 1);
+     commit_changes(context, fields_set, object_data, no_validation, i->get_id(), i);
+   load(context, i->get_id(), i, 1);
 }
 
-int set(string field, mixed value, int|void no_validation, .DataObjectInstance i)
+int set(.DataModelContext context, string field, mixed value, int|void no_validation, .DataObjectInstance i)
 {
    if(!fields[field])
    {
@@ -874,7 +874,7 @@ int set(string field, mixed value, int|void no_validation, .DataObjectInstance i
      i->set_saved(1);
   if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), update_query);
      context->sql->query(update_query);
-     load(i->get_id(), i, 1);   
+     load(context, i->get_id(), i, 1);   
    }
    
    else
@@ -891,7 +891,7 @@ int set(string field, mixed value, int|void no_validation, .DataObjectInstance i
 //! be deleted, and so on. this is a very dangerous behavior
 //! and could result in large numbers of records not directly 
 //! related to this object being deleted.
-int delete(int|void force, .DataObjectInstance i)
+int delete(.DataModelContext context, int|void force, .DataObjectInstance i)
 {
    // first, check to see what we link to.
    string key_value = primary_key->encode(i->get_id());
@@ -906,7 +906,7 @@ int delete(int|void force, .DataObjectInstance i)
      if(Program.inherits(object_program(r), .InverseForeignKeyReference))
      {
        werror("%O is a link to this table's primary key\n", n);
-       mixed m = get(n, i);
+       mixed m = get(context, n, i);
        if(m && sizeof(m) && !force) // this should work, because any object should have a size.
        {
          throw(Error.Generic("An object of type " + r->otherobject + " refers to this object.\n"));
@@ -928,7 +928,7 @@ int delete(int|void force, .DataObjectInstance i)
 
      else if(Program.inherits(object_program(r), .MultiKeyReference))
      {
-       foreach(get(n, i);; object mem)
+       foreach(get(context, n, i);; object mem)
          i[n]-=mem;
      }
    }
@@ -998,7 +998,7 @@ Fins.Errors.Validation valid(object i)
    else return 0;
 }
 
-static int commit_changes(multiset fields_set, mapping object_data, int|void no_validation, mixed update_id, object i)
+static int commit_changes(.DataModelContext context, multiset fields_set, mapping object_data, int|void no_validation, mixed update_id, object i)
 {
    string query;
    array qfields = ({});
@@ -1105,12 +1105,12 @@ static int commit_changes(multiset fields_set, mapping object_data, int|void no_
       context->sql->query(query);
 }
 
-int save(int|void no_validation, .DataObjectInstance i)
+int save(.DataModelContext context, int|void no_validation, .DataObjectInstance i)
 {   
    if(i->is_new_object())
    {
       mixed key;
-      commit_changes(i->fields_set, i->object_data, no_validation, 0, i);
+      commit_changes(context, i->fields_set, i->object_data, no_validation, 0, i);
       key = primary_key->get_id(i);
       i->set_id(key);
       i->set_new_object(0);
@@ -1121,7 +1121,7 @@ int save(int|void no_validation, .DataObjectInstance i)
    }
    else if(autosave == 0)
    {
-      commit_changes(i->fields_set, i->object_data, no_validation, i->get_id(), i);
+      commit_changes(context, i->fields_set, i->object_data, no_validation, i->get_id(), i);
       i->set_id(primary_key->get_id(i));
       i->set_saved(1);
       i->object_data = ([]);
@@ -1132,5 +1132,5 @@ int save(int|void no_validation, .DataObjectInstance i)
       throw(Error.Generic("Cannot save() when autosave is enabled.\n"));
    }
 
-   load(i->get_id(), i, 1);
+   load(context, i->get_id(), i, 1);
 }

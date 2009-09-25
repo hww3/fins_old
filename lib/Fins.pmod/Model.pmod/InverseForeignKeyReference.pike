@@ -29,7 +29,7 @@ mixed decode(string value, void|.DataObjectInstance i)
   }
   else
   {
-    array r = Fins.Model.old_find(otherobject, ([ otherkey : (int) i->get_id()]), criteria);
+    array r = Fins.Model.old_find(i->context, otherobject, ([ otherkey : (int) i->get_id()]), criteria);
     if(r && sizeof(r))
       return r[0];
     else return 0;

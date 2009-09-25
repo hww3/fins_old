@@ -9,6 +9,8 @@ object log = Tools.Logging.get_logger("model");
 
 object Objects = objects(this);
 
+private .DataModelContext default_context;
+
 class objects(object repository)
 {
   mixed `[](mixed a)
@@ -18,10 +20,20 @@ class objects(object repository)
   }
 }
 
-function(string|program|object,mapping,void|.Criteria:array) _find = old_find;
+function(void|.DataModelContext,string|program|object,mapping,void|.Criteria:array) _find = old_find;
+
+.DataModelContext get_default_context()
+{
+   return default_context;
+}
+
+void set_default_context(.DataModelContext c)
+{
+	default_context = c;
+}
 
 //!
-array old_find(string|program|object ot, mapping qualifiers, void|.Criteria criteria)
+array old_find(void|.DataModelContext context, string|program|object ot, mapping qualifiers, void|.Criteria criteria)
 {
    object o;
    if(!objectp(ot))
@@ -29,7 +41,8 @@ array old_find(string|program|object ot, mapping qualifiers, void|.Criteria crit
    else
      o = ot;
    if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
-   return get_instance(o->instance_name)(UNDEFINED)->find(qualifiers, criteria);
+   if(!context) context = get_default_context();
+   return get_instance(o->instance_name)(UNDEFINED)->find(qualifiers, criteria, context);
 }
 
 //!
@@ -95,15 +108,16 @@ void set_scaffold_controller(object model_component, object controller)
 }
 
 //!
-array find_all(string|object ot)
+array find_all(void|.DataModelContext context, string|object ot)
 {
-  return old_find(ot, ([]));
+
+  return old_find(context, ot, ([]));
 }
 
 // find() is in module.pmod.
 
 //!
-.DataObjectInstance find_by_id(string|program|object ot, int id)
+.DataObjectInstance find_by_id(void|.DataModelContext context, string|program|object ot, int id)
 {
    object o;
    if(!objectp(ot))
@@ -111,11 +125,11 @@ array find_all(string|object ot)
    else
      o = ot;
    if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
-   return  get_instance(o->instance_name)(id);
+   return  get_instance(o->instance_name)(id, context);
 }
 
 //!
-array find_by_query(string|program|object ot, string query)
+array find_by_query(void|.DataModelContext context, string|program|object ot, string query)
 {
    object o;
    if(!objectp(ot))
@@ -124,11 +138,11 @@ array find_by_query(string|program|object ot, string query)
      o = ot;
    if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
 
-   return old_find(o, (["0": Fins.Model.Criteria(query)]));
+   return old_find(context, o, (["0": Fins.Model.Criteria(query)]));
 }
 
 //!
-.DataObjectInstance find_by_alternate(string|program|object ot, mixed id)
+.DataObjectInstance find_by_alternate(void|.DataModelContext context, string|program|object ot, mixed id)
 {
    object o;
    if(!objectp(ot))
@@ -139,11 +153,11 @@ array find_by_query(string|program|object ot, string query)
    if(!o->alternate_key)
      throw(Error.Generic("Object type " + ot + " does not have an alternate key.\n"));
 
-   return get_instance(o->instance_name)(UNDEFINED)->find_by_alternate(id);
+   return get_instance(o->instance_name)(UNDEFINED)->find_by_alternate(id, context);
 }
 
 //!
-.DataObjectInstance new(string|program|object ot)
+.DataObjectInstance new(void|.DataModelContext context, string|program|object ot)
 {
    object o;
    if(!objectp(ot))
@@ -151,5 +165,5 @@ array find_by_query(string|program|object ot, string query)
    else
      o = ot;
   if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
-  return  get_instance(o->instance_name)(UNDEFINED);
+  return  get_instance(o->instance_name)(UNDEFINED, context);
 }

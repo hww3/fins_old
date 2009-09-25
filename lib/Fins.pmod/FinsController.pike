@@ -142,7 +142,7 @@ static void after_filter(function|object filter)
 
 //! it is not recommended that you override this method. use the start()
 //!  method to load up your controllers.
-static void create(.Application a)
+static void create(object a)
 {  
   Log.debug("%O->create()", this);
   __last_load = time();

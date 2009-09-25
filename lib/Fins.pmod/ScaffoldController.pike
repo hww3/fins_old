@@ -227,7 +227,7 @@ werror("data: %O\n", id->variables);
     rv += "<i>" + id->misc->flash->msg + "</i><p>\n";
   rv += "<form action=\"" + action_url(do_pick) + "\" method=\"post\">";
 
-  array x = Fins.Model.find_all(model_component);
+  array x = Fins.Model.find_all(0, model_component);
 
   foreach(x;; object o)
   {
@@ -576,7 +576,7 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 
-  object no = Fins.Model.new(model_object->instance_name);
+  object no = Fins.Model.new(0, model_object->instance_name);
 
   decode_old_values(request->variables, orig);
 

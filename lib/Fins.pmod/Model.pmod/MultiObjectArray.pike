@@ -2,7 +2,7 @@ inherit .ObjectArray;
 
 void get_contents()
 {
-  contents = Fins.Model.old_find(otherobject, ([ field : parentobject]));
+  contents = Fins.Model.old_find(context, otherobject, ([ field : parentobject]));
 
   changed = 0;
 }
@@ -21,7 +21,7 @@ werror("otherobject: %O\n", otherobject);
   // ok, we have the right kind of object, now we need to get the id.
   int id = parentobject->get_id();  
 
-  arg->master_object->context->sql->query("INSERT INTO " + field->mappingtable + 
+  arg->context->sql->query("INSERT INTO " + field->mappingtable + 
 	 "(" + field->my_mappingfield + "," + field->other_mappingfield + ") VALUES(" + 
 	 parentobject->master_object->primary_key->encode(parentobject->get_id()) + "," + 
 	 arg->master_object->primary_key->encode(arg->get_id()) + ")");
@@ -42,7 +42,7 @@ mixed `-(mixed arg)
   // ok, we have the right kind of object, now we need to get the id.
   int id = parentobject->get_id();  
 
-  arg->master_object->context->sql->query("DELETE FROM " + field->mappingtable + 
+  arg->context->sql->query("DELETE FROM " + field->mappingtable + 
 	 " WHERE " + field->my_mappingfield + "=" + 
 	 parentobject->master_object->primary_key->encode(parentobject->get_id()) + " AND " + 
     field->other_mappingfield + "=" + 

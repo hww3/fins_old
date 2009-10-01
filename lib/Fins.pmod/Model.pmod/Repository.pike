@@ -57,13 +57,13 @@ object get_object_module()
   return object_module;
 }
 
-//! called in Fins.Loader.
+//! called in Fins.FinsModel.
 void set_model_module(object o)
 {
   model_module = o;
 }
 
-//! called in Fins.Loader.
+//! called in Fins.FinsModel.
 void set_object_module(object o)
 {
   object_module = o;

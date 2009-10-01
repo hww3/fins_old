@@ -24,13 +24,6 @@ object load_app(string app_dir, string config_name)
   Fins.Configuration config = load_configuration(app_dir, config_name);
   Log.info("Preparing to load application " + config->app_name + ".");
 
-  object o;
-
-  if(o = master()->resolv(config->app_name + ".Model"))
-    master()->resolv("Fins.Model.module")->set_model_module(o);
-  if(o = master()->resolv(config->app_name + ".Objects"))
-    master()->resolv("Fins.Model.module")->set_object_module(o);
-
   program p;
 
   cn = "application";

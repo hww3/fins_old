@@ -2,6 +2,10 @@ Version 0.1
 
 INCOMPATIBLE CHANGES
 
+- Default module name for data mapping definitions has changed from
+    Appname.Model to Appname.DataMappings. This can be changed by
+    creating a class called "defaults" that inherits Fins.Helpers.Defaults
+    and overrides these default value names.
 - Many model functions have changed to take a DataModelContext object
     as an optional or required argument as a means of supporting multiple
     database connections per model definition. In situations where the 
@@ -18,8 +22,11 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- added Configuration.get_sections()
+- Appname.Model is now Appname.DataMappings, for clarity. (see 
+    INCOMPATIBLE CHANGES section above)
 - Support for multiple database connections (see INCOMPATIBLE CHANGES 
-  above for notes on potential compatibility concerns)
+    above for notes on potential compatibility concerns)
 - Added DataModelContext->clone() to create a clone of the context
     with a new database connection.
 - Added DataModelContext->find as a context/connection specific method

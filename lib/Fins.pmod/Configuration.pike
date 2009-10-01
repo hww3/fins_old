@@ -33,6 +33,11 @@ static void create(string appdir, string|mapping _config_file)
   }
 }
 
+array get_sections()
+{
+  return indices(values);
+}
+
 //! sets a value in the configuration
 void set_value(string section, string item, mixed value)
 {

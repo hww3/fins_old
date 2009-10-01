@@ -175,8 +175,8 @@ int run()
   cd("../modules");
   mkdir(newappname + ".pmod");
   cd(newappname + ".pmod");
-  mkdir("Objects.pmod");
-  mkdir("Model.pmod");  
+  mkdir(Fins.Helpers.Defaults.data_instance_module_name + ".pmod");
+  mkdir(Fins.Helpers.Defaults.data_mapping_module_name + ".pmod");  
 //  Stdio.write_file("Repo.pmod", customize(repo_contents));
 
   cd("../..");

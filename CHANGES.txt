@@ -22,7 +22,10 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
-- added Configuration.get_sections()
+- Multiple data models can be defined by specifying additional sections
+    in the application config file in the form [model_(identifer)] where
+    id, datasource, definition_module and debug are required values.  
+- Added Configuration.get_sections()
 - Appname.Model is now Appname.DataMappings, for clarity. (see 
     INCOMPATIBLE CHANGES section above)
 - Support for multiple database connections (see INCOMPATIBLE CHANGES 

@@ -3,12 +3,6 @@ inherit FinsBase;
 
 object log = Tools.Logging.get_logger("model");
 
-//! the default context
-object context;
-
-//! 
-mapping contexts = ([]);
-
 static void create(Fins.Application a)
 {
   ::create(a);
@@ -21,16 +15,19 @@ void load_model()
 // this will be @[Fins.Model]. Do not change this, as the app loader
 // won't use this value, causing the model to break.
 
-  context = configure_context(config["model"], 1);
+  object context = configure_context(config["model"], 1);
 
-  contexts["_default"] = context;
+  Fins.Model.set_context("_default", context);
+
+  if(config["model"]["id"])
+    Fins.Model.set_context(config["model"]["id"], context);     
 
   foreach(glob("model_*", config->get_sections());; string md)
   {
 	 log->info("configuring model id <" + config[md]["id"] + "> specified in config secion " + md);
      object ctx = configure_context(config[md], 0);
-     contexts[config[md]["id"]] = ctx;
-  }
+     Fins.Model.set_context(config[md]["id"], ctx);
+   }
 
 }
 
@@ -39,9 +36,9 @@ object configure_context(mapping config_section, int is_default)
   object repository;
   string definition_module;
 
-  if(is_default)
-    repository = Fins.Model.module;
-  else
+//  if(is_default)
+//    repository = Fins.Model.module;
+//  else
     repository = Fins.Model.Repository();
 
   object o;
@@ -93,7 +90,7 @@ void register_types(object ctx)
   object im = ctx->repository->get_object_module();
   object mm = ctx->repository->get_model_module();
 
-// werror("mm: %O\n", mm);
+ werror("mm: %O\n", mm);
   foreach(mkmapping(indices(mm), values(mm));string n; program c)
   {
     object d = c(ctx);
@@ -146,14 +143,14 @@ void initialize_links(object ctx)
   {
     if(!a->my_name) a->my_name = a->other_type;
     if(!a->my_field) a->my_field = lower_case(a->other_type + "_" + ctx->repository->get_object(a->other_type)->primary_key->field_name);    
-    a->obj->add_field(Model.KeyReference(a->my_name, a->my_field, a->other_type));
+    a->obj->add_field(ctx, Model.KeyReference(a->my_name, a->my_field, a->other_type));
   }
 
   foreach(ctx->builder->has_many;; mapping a)
   {
     if(!a->my_name) a->my_name = a->other_type;
     if(!a->other_field) a->other_field = a->obj->instance_name;    
-    a->obj->add_field(Model.InverseForeignKeyReference(a->my_name, Tools.Language.Inflect.singularize(a->other_type), a->other_field));
+    a->obj->add_field(ctx, Model.InverseForeignKeyReference(a->my_name, Tools.Language.Inflect.singularize(a->other_type), a->other_field));
   }
 
   foreach(ctx->builder->has_many_many;; mapping a)
@@ -166,13 +163,13 @@ void initialize_links(object ctx)
 //werror("%O\n", a /*indices(ctx->repository->object_definitions)*/);
      log->debug("*** have a Many-to-Many relationship in %s between %O and %O", a->join_table, this_type, that_type);
 
-     this_type->add_field(Model.MultiKeyReference(this_type, Tools.Language.Inflect.pluralize(a->that_name),
+     this_type->add_field(ctx, Model.MultiKeyReference(this_type, Tools.Language.Inflect.pluralize(a->that_name),
             a->join_table,
             lower_case(this_type->instance_name + "_" + this_type->primary_key->field_name),
             lower_case(that_type->instance_name + "_" + that_type->primary_key->field_name),
              that_type->instance_name, that_type->primary_key->name));
 
-     that_type->add_field(Model.MultiKeyReference(that_type, Tools.Language.Inflect.pluralize(a->this_name),
+     that_type->add_field(ctx, Model.MultiKeyReference(that_type, Tools.Language.Inflect.pluralize(a->this_name),
             a->join_table,
             lower_case(that_type->instance_name + "_" + that_type->primary_key->field_name),
             lower_case(this_type->instance_name + "_" + this_type->primary_key->field_name),
@@ -190,8 +187,8 @@ void initialize_links(object ctx)
       log->debug("considering %s as a possible field linkage.", mln);
       if(pln == lower_case(mln))
       {
-        pl->obj->add_field(Model.KeyReference(od->instance_name, pl->field->name, od->instance_name));
-        od->add_field(Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(pl->obj->instance_name), pl->obj->instance_name, od->instance_name));
+        pl->obj->add_field(ctx, Model.KeyReference(od->instance_name, pl->field->name, od->instance_name));
+        od->add_field(ctx, Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(pl->obj->instance_name), pl->obj->instance_name, od->instance_name));
         ctx->builder->possible_links -= ({pl});
       }
     }
@@ -217,13 +214,13 @@ void initialize_links(object ctx)
       if(available_tables[o->tn + "_" + q->tn])
       {
         log->debug("have a mlr on %s", o->tn + "_" + q->tn);
-          o->od->add_field(Model.MultiKeyReference(o->od, Tools.Language.Inflect.pluralize(q->od->instance_name),
+          o->od->add_field(ctx, Model.MultiKeyReference(o->od, Tools.Language.Inflect.pluralize(q->od->instance_name),
             o->tn + "_" + q->tn, 
             lower_case(o->od->instance_name + "_" + o->od->primary_key->field_name), 
             lower_case(q->od->instance_name + "_" + q->od->primary_key->field_name),
              q->od->instance_name, q->od->primary_key->name));
 
-          q->od->add_field(Model.MultiKeyReference(q->od, Tools.Language.Inflect.pluralize(o->od->instance_name),
+          q->od->add_field(ctx, Model.MultiKeyReference(q->od, Tools.Language.Inflect.pluralize(o->od->instance_name),
             o->tn + "_" + q->tn, 
             lower_case(q->od->instance_name + "_" + q->od->primary_key->field_name), 
             lower_case(o->od->instance_name + "_" + o->od->primary_key->field_name),
@@ -235,7 +232,7 @@ void initialize_links(object ctx)
   log->debug("possible links left over: %O", ctx->builder->possible_links);
   foreach(ctx->builder->possible_links;; mapping pl)
   {
-    pl->obj->do_add_field(pl->field);
+    pl->obj->do_add_field(ctx, pl->field);
   }
   
   ctx->builder->belongs_to = ({});

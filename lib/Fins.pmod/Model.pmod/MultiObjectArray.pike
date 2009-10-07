@@ -2,7 +2,7 @@ inherit .ObjectArray;
 
 void get_contents()
 {
-  contents = Fins.Model.old_find(context, otherobject, ([ field : parentobject]));
+  contents = context->old_find(otherobject, ([ field : parentobject]));
 
   changed = 0;
 }

@@ -6,12 +6,13 @@ inherit .DataObjectInstance;
 string type_name = "unknown";
 
 //!
-object repository = .module;
+string context_name = "_default";
 
 //!
 static void create(int|void identifier, void|.DataModelContext c)
 {
-  object o = repository["get_object"](type_name);
+  context = c||Fins.Model.get_context(context_name);
+  object o = context->repository->get_object(type_name);
 
   ::create(identifier, o, c);
 }

@@ -95,7 +95,7 @@ void set_operator(int o)
 }
 
 //!
-static void create(mixed|void id, object _object_type, void|.DataModelContext context)
+static void create(mixed|void id, object _object_type, .DataModelContext context)
 {
   if(!_object_type)
     throw(Error.Generic("No Data Object Definition passed to create()\n"));
@@ -104,9 +104,6 @@ static void create(mixed|void id, object _object_type, void|.DataModelContext co
     master_object = _object_type;
      object_type = _object_type->instance_name;
   }
-
-  if(!context)
-    context = Fins.Model.get_default_context();   
 
   this->context = context;
 

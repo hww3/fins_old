@@ -87,3 +87,80 @@ object clone()
 	
 	return d;
 }
+
+function(string|program|object,mapping,void|.Criteria:array) _find = old_find;
+
+//!
+array old_find(string|program|object ot, mapping qualifiers, void|.Criteria criteria)
+{
+   object o;
+   if(!objectp(ot))
+     o = repository->get_object(ot);
+   else
+     o = ot;
+   if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
+
+   return repository->get_instance(o->instance_name)(UNDEFINED)->find(qualifiers, criteria, this);
+}
+
+//!
+array find_all(string|object ot)
+{
+
+  return old_find(ot, ([]));
+}
+
+// find() is in module.pmod.
+
+//!
+.DataObjectInstance find_by_id(string|program|object ot, int id)
+{
+   object o;
+   if(!objectp(ot))
+     o = repository->get_object(ot);
+   else
+     o = ot;
+   if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
+   return  repository->get_instance(o->instance_name)(id, this);
+}
+
+//!
+array find_by_query(string|program|object ot, string query)
+{
+   object o;
+   if(!objectp(ot))
+     o = repository->get_object(ot);
+   else
+     o = ot;
+   if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
+
+   return old_find(o, (["0": Fins.Model.Criteria(query)]));
+}
+
+//!
+.DataObjectInstance find_by_alternate(string|program|object ot, mixed id)
+{
+   object o;
+   if(!objectp(ot))
+     o = repository->get_object(ot);
+   else
+     o = ot;
+   if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
+   if(!o->alternate_key)
+     throw(Error.Generic("Object type " + ot + " does not have an alternate key.\n"));
+
+   return repository->get_instance(o->instance_name)(UNDEFINED)->find_by_alternate(id, this);
+}
+
+//!
+.DataObjectInstance new(string|program|object ot)
+{
+   object o;
+   if(!objectp(ot))
+     o = repository->get_object(ot);
+   else
+     o = ot;
+  if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
+  return  repository->get_instance(o->instance_name)(UNDEFINED, this);
+}
+

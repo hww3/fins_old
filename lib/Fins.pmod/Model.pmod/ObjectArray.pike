@@ -73,7 +73,7 @@ int(0..1) _is_type(string t)
 
 void get_contents()
 {
-  contents = Fins.Model.old_find(context, otherobject, ([ field->otherkey :
+  contents = context->old_find(otherobject, ([ field->otherkey :
                                   (int) parentobject->get_id()]));
 
   changed = 0;

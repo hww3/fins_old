@@ -13,7 +13,13 @@ import Tools.Logging;
 //! table is called "users", this would be "User".
 string model_component = 0;
 
+//! if your application contains multiple model definitions, this should be the 
+//! model "id" for the definition containing the component. the default value
+//! selects the default model definition.
+string model_id = "_default";
+
 object model_object;
+object model_context;
 
 //! Contains default contents of the template used for displaying a list of items
 //! in this scaffolding. You may override the use of this string by creating 
@@ -133,8 +139,9 @@ void start()
 {
   if(model_component)
   {
-    model_object = model->repository->get_object(model_component);
-    model->repository->set_scaffold_controller(model_object, this);
+	model_context = Fins.Model.get_context(model_id);
+    model_object = model_context->repository->get_object(model_component);
+    model_context->repository->set_scaffold_controller(model_object, this);
   }
 }
 
@@ -149,7 +156,7 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 
-  object items = model->repository->_find(model_object, ([]));
+  object items = model_context->_find(model_object, ([]));
 
   if(!sizeof(items))
   {
@@ -169,7 +176,7 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
 {
   object v = get_view(display, display_template_string);
 
-  object item = model->repository->find_by_id(model_object, (int)request->variables->id);
+  object item = model_context->find_by_id(model_object, (int)request->variables->id);
   v->add("type", make_nice(model_object->instance_name));
 
   if(!item)
@@ -193,7 +200,7 @@ public void do_pick(Request id, Response response, mixed ... args)
     return;
   }
 
-  object sc = model->repository->get_scaffold_controller(model->repository->get_object(id->variables["for"]));
+  object sc = model_context->repository->get_scaffold_controller(model_context->repository->get_object(id->variables["for"]));
   function action;
 
   if(!(int)id->variables->for_id)
@@ -227,7 +234,7 @@ werror("data: %O\n", id->variables);
     rv += "<i>" + id->misc->flash->msg + "</i><p>\n";
   rv += "<form action=\"" + action_url(do_pick) + "\" method=\"post\">";
 
-  array x = Fins.Model.find_all(0, model_component);
+  array x = model_context->find_all(model_component);
 
   foreach(x;; object o)
   {
@@ -264,7 +271,7 @@ public void dodelete(Request id, Response response, mixed ... args)
     return;	
   }
   
-  object item = model->repository->find_by_id(model_object, (int)id->variables->id);
+  object item = model_context->find_by_id(model_object, (int)id->variables->id);
 
   if(!item)
   {
@@ -300,7 +307,7 @@ public void decode_old_values(mapping variables, mapping orig)
   {
     decode_from_form(decode_value(MIME.decode_base64(variables->old_data)), orig);
     werror("old data: %O\n", orig);
-    orig[variables->selected_field] = model->repository->find_by_id(model_object->fields[variables->selected_field]->otherobject, (int)variables->selected_id);
+    orig[variables->selected_field] = model_context->find_by_id(model_object->fields[variables->selected_field]->otherobject, (int)variables->selected_id);
   }
 
 }
@@ -313,7 +320,7 @@ public void update(Fins.Request request, Fins.Response response, mixed ... args)
   
   mapping orig = ([]);
 
-  object item = model->repository->find_by_id(model_object, (int)request->variables->id);
+  object item = model_context->find_by_id(model_object, (int)request->variables->id);
 
   if(!item)
   {
@@ -391,7 +398,7 @@ e=catch{
     return;	
   }
 
-  object item = model->repository->find_by_id(model_object, (int)request->variables->id);
+  object item = model_context->find_by_id(model_object, (int)request->variables->id);
 
   if(!item)
   {
@@ -507,7 +514,7 @@ e=catch{
     return;	
   }
 
-  object item = model->repository->new(model_object);
+  object item = model_context->new(model_object);
 
   if(!item)
   {
@@ -576,7 +583,7 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 
-  object no = Fins.Model.new(0, model_object->instance_name);
+  object no = model_context->new(model_object->instance_name);
 
   decode_old_values(request->variables, orig);
 
@@ -660,7 +667,7 @@ string describe_object(object m, string key, object o)
 
 string get_view_url(object o)
 {
-  object controller = model->repository->get_scaffold_controller(o->master_object);  
+  object controller = model_context->repository->get_scaffold_controller(o->master_object);  
   if(!controller)
     return 0;
 

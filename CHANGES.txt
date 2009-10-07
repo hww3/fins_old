@@ -2,6 +2,10 @@ Version 0.1
 
 INCOMPATIBLE CHANGES
 
+- Fins.Model is no longer the go-to location for finding objects.
+    In its place, you want to use context->find and friends. To get 
+    a context for your data model, use Fins.DataSource.modelid, where
+    _default is the default.
 - Default module name for data mapping definitions has changed from
     Appname.Model to Appname.DataMappings. This can be changed by
     creating a class called "defaults" that inherits Fins.Helpers.Defaults
@@ -22,6 +26,11 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added Fins.DataSource as the entry point for multiple model definitions.
+- The default model config section can specify an id, which can be used
+    to retrieve a context handle (in addition to using _default). 
+- Revamped Fins.Model.Repository (finding objects moved to DataModelContext),
+    and Fins.Model.module (no longer an instance of Repository).
 - Multiple data models can be defined by specifying additional sections
     in the application config file in the form [model_(identifer)] where
     id, datasource, definition_module and debug are required values.  

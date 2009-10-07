@@ -53,7 +53,7 @@ void load_indexes(string table)
 
   if(!indexes[table]) indexes[table] = ([]);
 
-  foreach(x;; mapping m)
+  if(x) foreach(x;; mapping m)
   {
     array ii = sql->query("PRAGMA index_info(" + m->name + ")");
     foreach(ii;; mapping ir)

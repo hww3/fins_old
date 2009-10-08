@@ -30,4 +30,25 @@ mapping get_field_info(string table, string field)
   return m;
 }
 
+int(0..1) transaction_supported()
+{
+//
+// TODO: not strictly true, we need to do more here.
+//
+  return 1;
+}
 
+void begin_transaction()
+{
+  context->sql->query("START TRANSACTION");
+}
+
+void rollback_transaction()
+{
+  context->sql->query("ROLLBACK");
+}
+
+void commit_transaction()
+{
+  context->sql->query("COMMIT");
+}

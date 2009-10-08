@@ -25,6 +25,8 @@ object model;
 Sql.Sql sql;
 string sql_url;
 
+int in_xa = 0;
+
 int id = random(time());
 
 string _sprintf(mixed ... args)
@@ -86,6 +88,51 @@ object clone()
 	d->initialize();
 	
 	return d;
+}
+
+//!
+int begin_transaction()
+{
+  if(!personality->transaction_supported())
+	throw(Error.Generic("Transactions are not supported by this database engine.\n"));
+
+  if(in_xa)
+	throw(Error.Generic("Already in a transaction.\n"));
+
+  personality->begin_transaction();
+  in_xa = 1;
+}
+
+//!  TODO: look for uncommitted data in objects and save before committing
+int commit_transaction()
+{
+  if(!personality->transaction_supported())
+	throw(Error.Generic("Transactions are not supported by this database engine.\n"));
+
+  if(!in_xa)
+	throw(Error.Generic("Not currently in a transaction.\n"));
+
+  personality->commit_transaction();
+  in_xa = 0;
+}
+
+//!  TODO: look for uncommitted data in objects and throw away
+int rollback_transaction()
+{
+  if(!personality->transaction_supported())
+	throw(Error.Generic("Transactions are not supported by this database engine.\n"));
+
+  if(!in_xa)
+	throw(Error.Generic("Not currently in a transaction.\n"));
+
+  personality->rollback_transaction();
+  in_xa = 0;
+}
+
+//!
+int in_transaction()
+{
+  return in_xa;
 }
 
 function(string|program|object,mapping,void|.Criteria:array) _find = old_find;

@@ -26,6 +26,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added DataModelContext()->start_transaction and friends. Needs some 
+    additional work to behave when model level autocommit is turned off.
 - Added Fins.DataSource as the entry point for multiple model definitions.
 - The default model config section can specify an id, which can be used
     to retrieve a context handle (in addition to using _default). 

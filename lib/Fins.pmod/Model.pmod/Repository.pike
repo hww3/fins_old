@@ -20,8 +20,6 @@ class objects(object repository)
   }
 }
 
-function(void|.DataModelContext,string|program|object,mapping,void|.Criteria:array) _find = old_find;
-
 .DataModelContext get_default_context()
 {
    return default_context;
@@ -30,19 +28,6 @@ function(void|.DataModelContext,string|program|object,mapping,void|.Criteria:arr
 void set_default_context(.DataModelContext c)
 {
 	default_context = c;
-}
-
-//!
-array old_find(void|.DataModelContext context, string|program|object ot, mapping qualifiers, void|.Criteria criteria)
-{
-   object o;
-   if(!objectp(ot))
-     o = get_object(ot);
-   else
-     o = ot;
-   if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
-   if(!context) context = get_default_context();
-   return get_instance(o->instance_name)(UNDEFINED)->find(qualifiers, criteria, context);
 }
 
 //!

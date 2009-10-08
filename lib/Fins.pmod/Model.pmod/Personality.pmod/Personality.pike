@@ -152,3 +152,23 @@ mapping map_field(mapping t, string table)
 
   return field;
 }
+
+int(0..1) transaction_supported()
+{
+  return 0;
+}
+
+void begin_transaction()
+{
+  throw(Error.Generic("Transactions are not supported by this database engine.\n"));
+}
+
+void rollback_transaction()
+{
+  throw(Error.Generic("Transactions are not supported by this database engine.\n"));
+}
+
+void commit_transaction()
+{
+  throw(Error.Generic("Transactions are not supported by this database engine.\n"));
+}

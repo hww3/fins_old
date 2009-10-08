@@ -62,3 +62,23 @@ void load_indexes(string table)
     }
   }
 }
+
+int(0..1) transaction_supported()
+{
+  return 1;
+}
+
+void begin_transaction()
+{
+  context->sql->query("BEGIN TRANSACTION");
+}
+
+void rollback_transaction()
+{
+  context->sql->query("ROLLBACK");
+}
+
+void commit_transaction()
+{
+  context->sql->query("COMMIT");
+}

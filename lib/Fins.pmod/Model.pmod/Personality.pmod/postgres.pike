@@ -25,3 +25,22 @@ string get_limit_clause(int limit, int|void start)
 }
 
 
+int(0..1) transaction_supported()
+{
+  return 1;
+}
+
+void begin_transaction()
+{
+  context->sql->query("START TRANSACTION");
+}
+
+void rollback_transaction()
+{
+  context->sql->query("ROLLBACK");
+}
+
+void commit_transaction()
+{
+  context->sql->query("COMMIT");
+}

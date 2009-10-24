@@ -83,7 +83,7 @@ Tools.Logging.Log.Logger get_logger(string loggername)
   if(!loggers[loggername]) 
     loggers[loggername] = create_logger(loggername);
 
-  return loggers[loggername] || loggers->default;
+  return loggers[loggername] || get_default_logger();
 }
 
 Tools.Logging.Log.Logger create_logger(string loggername)

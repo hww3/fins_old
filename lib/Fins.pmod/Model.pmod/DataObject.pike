@@ -1085,7 +1085,8 @@ static int commit_changes(.DataModelContext context, multiset fields_set, mappin
          string values_clause = "(" + (qvalues * ", ") + ")";
 
          query = sprintf(insert_query, table_name, fields_clause, values_clause);
-  if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
+werror("%O\n", context);
+  		 if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
       }
       else
       {

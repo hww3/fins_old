@@ -22,7 +22,11 @@ object set_context(string model_id, object context)
 
 object get_context(string model_id)
 {
-if(contexts[model_id]) return contexts[model_id];
+if(contexts[model_id])
+{
+//	werror("context [%s] = %O\n", model_id, contexts[model_id]);
+	 return contexts[model_id];
+}
 else throw(Error.Generic("No model context defined for " + model_id + " (yet).\n"));
 
 }

@@ -557,7 +557,7 @@ array find(.DataModelContext context, mapping qualifiers, .Criteria|void criteri
   foreach(qr;; mapping row)
   {
     string fn = table_name + "__" + primary_key->field_name;
-    object item = object_program(i)(UNDEFINED, this);
+    object item = object_program(i)(UNDEFINED, context);
     item->set_id(primary_key->decode(row[fn]));
     item->set_new_object(0);
     low_load(row, item, /*_fieldnames*/);

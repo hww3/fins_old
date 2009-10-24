@@ -77,7 +77,7 @@ mixed validate(mixed value, void|.DataObjectInstance i)
      else return default_value;
    }
 
-   else if (value == .Undefined)
+   else if (value == .Undefined || value == "")
    {
      return .Undefined;
    }
@@ -95,7 +95,7 @@ mixed validate(mixed value, void|.DataObjectInstance i)
      return value;
    }
 
-   if(objectp(value) && Program.implements(object_program(value), Calendar.YMD()->Fraction))
+   if(objectp(value) && Program.implements(object_program(value), Calendar.TimeRange))
    {
      return value;
    }
@@ -113,4 +113,24 @@ mixed from_form(mapping value, void|.DataObjectInstance i)
   object c = Calendar.dwim_day(sprintf("%04d-%02d-%02d", (int)value->year_no, 
                 (int)value->month_no, (int)value->month_day));
 	return c;
+}
+
+string get_display_string(void|mixed value, void|.DataObjectInstance i)
+{
+	if(value && objectp(value))
+    	return value->format_tod();
+	else return (string)value;
+}
+
+string get_editor_string(void|mixed value, void|.DataObjectInstance i)
+{
+	werror("TimeField.get_editor_string(%O, %O)\n", value, i);
+  string rv = "";
+  if(i) rv +=("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + 
+				(value?value->format_tod():"") + "\">" );
+  rv += "<input type=\"text\" name=\"" + name + "\" value=\"";
+  if(i) rv+=(value?value->format_tod():"");
+  rv += "\">";
+
+  return rv;
 }

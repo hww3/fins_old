@@ -26,6 +26,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added --model argument to ModelBuilder to specify which model to use 
+    (when multiple model definitions exist).
 - Added DataModelContext()->start_transaction and friends. Needs some 
     additional work to behave when model level autocommit is turned off.
 - Added Fins.DataSource as the entry point for multiple model definitions.

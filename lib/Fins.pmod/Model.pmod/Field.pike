@@ -39,6 +39,11 @@ string make_qualifier(mixed v)
   return field_name + "=" + encode(v);
 }
 
+string get_display_string(void|mixed value, void|object i)
+{
+  	return (string)(value);
+}
+
 string describe(mixed v, void|object i)
 {
   return encode(v, i);

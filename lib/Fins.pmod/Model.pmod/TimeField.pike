@@ -28,11 +28,22 @@ string encode(mixed value, void|.DataObjectInstance i)
   return "'" + value->format_tod() + "'";
 }
 
+string get_display_string(void|mixed value, void|.DataObjectInstance i)
+{
+	if(value && objectp(value))
+    	return value->format_tod();
+	else return (string)value;
+}
+
 string get_editor_string(void|mixed value, void|.DataObjectInstance i)
 {
+	werror("TimeField.get_editor_string(%O, %O)\n", value, i);
   string rv = "";
-  if(i) rv +=("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + value->format_tod() + "\">" );
+  if(i) rv +=("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + 
+				(value?value->format_tod():"") + "\">" );
   rv += "<input type=\"text\" name=\"" + name + "\" value=\"";
-  if(i) rv+=value->format_tod();
+  if(i) rv+=(value?value->format_tod():"");
   rv += "\">";
+
+  return rv;
 }

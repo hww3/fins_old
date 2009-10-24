@@ -19,6 +19,7 @@ string simple_macro_LOCALE(Fins.Template.TemplateData data, mapping|void args)
 //! args: var
 string simple_macro_humanize(Fins.Template.TemplateData data, mapping|void args)
 {
+//	werror("humanize: %O\n", args->var);
   return Tools.Language.Inflect.humanize(args->var || "");
 }
 

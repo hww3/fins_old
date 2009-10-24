@@ -65,7 +65,7 @@ mixed validate(mixed value, void|.DataObjectInstance i)
      return default_value;
    }
 
-   else if (value == .Undefined)
+   else if (value == .Undefined || value == "")
    {
      return .Undefined;
    }

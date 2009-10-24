@@ -55,8 +55,8 @@ string display_template_string =
   <div class=\"flash-message\"><% flash var=\"$msg\" %></div>
   <%action_link action=\"update\" id=\"$item._id\"%>Edit</a><p>
   <table>
-  <%foreach var=\"$item\" ind=\"key\" val=\"value\"%>
-  <tr><td><b><%humanize var=\"$key\"%></b></td><td><%describe key=\"$key\" var=\"$value\"%></td></tr>
+  <%foreach var=\"$field_order\" ind=\"key\" val=\"value\"%>
+  <tr><td><b><%humanize var=\"$value.name\"%></b></td><td><%field_describe field=\"$value\" item=\"$item\"%></td></tr>
   <%end %>
   </table>
   <p/>
@@ -186,6 +186,7 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
   else
   {
 //    mapping val = item->get_atomic();
+    v->add("field_order", model_object->field_order);
     v->add("item", item);
   }
 
@@ -290,7 +291,7 @@ public void dodelete(Request id, Response response, mixed ... args)
 string describe(object o, string key, mixed value)
 {
   string rv = "";
-
+werror("describe(%O, %O, %O)\n", o, key, value);
     if(stringp(value) || intp(value))
       rv += value; 
     else if(arrayp(value))
@@ -562,12 +563,20 @@ e=catch{
 	  }
   }
 werror("setting: %O\n", v);
-  item->set_atomic(v);  
+  mixed e;
+//item->set_atomic(v);
+  e = catch(item->set_atomic(v));
+  if(e)
+  {  
+    response->flash("msg", "Record creation failed: " + (Error.mkerror(e)->message()));
+    response->redirect(action_url(new, 0, v));
+  }
 
-  response->redirect(action_url(list));
-
-  response->flash("msg", "create successful.");
-
+  else
+  {
+    response->redirect(action_url(list));
+    response->flash("msg", "create successful.");
+  }
 };
 if(e)
   Log.exception("error", e);
@@ -604,6 +613,34 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
 static string make_nice(string v)
 {
   return Tools.Language.Inflect.humanize(v);
+}
+
+string make_value_describer(string key, void|mixed value, void|object o)
+{
+	werror("make_value_describer(%O=%O)\n", key, value);
+	  if(model_object->fields[key]->is_shadow && !model_object->fields[key]->get_display_string)
+	  {
+	werror("no editor for shadow field " + key + "\n");
+		if(o)
+		  return describe(o, key, value);   
+	    else return "";
+	  }
+	  else if(model_object->primary_key->name == key)
+	  {
+	    if(o) return (string)value;	
+	    else return 0;
+	  }
+	  else if(model_object->fields[key]->get_display_string)
+	  {
+	    if(o)
+	      return model_object->fields[key]->get_display_string(value, o);
+		else return model_object->fields[key]->get_display_string();
+	//  else if(stringp(value) || intp(value))
+	//    return "<input type=\"text\" name=\"" + key + "\" value=\"" + value + "\">";
+	  }
+	  else 
+	    return sprintf("%O", value);
+	
 }
 
 string make_value_editor(string key, void|mixed value, void|object o)

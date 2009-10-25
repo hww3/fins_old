@@ -6,6 +6,7 @@
   static Fins.Request request;  
   static int low_response = 0;
   static int __rendered = 0;
+
 //!
   static void create(Fins.Request|void r)
   {

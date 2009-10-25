@@ -136,11 +136,11 @@ int in_transaction()
 }
 
 //! not recommended for current use
-//! @depcrecated
+//! @deprecated
 function(string|program|object,mapping,void|.Criteria:array) _find = old_find;
 
 //! not recommended for current use
-//! @depcrecated
+//! @deprecated
 array old_find(string|program|object ot, mapping qualifiers, void|.Criteria criteria)
 {
    object o;
@@ -154,7 +154,7 @@ array old_find(string|program|object ot, mapping qualifiers, void|.Criteria crit
 }
 
 //! not recommended for current use
-//! @depcrecated
+//! @deprecated
 array find_all(string|object ot)
 {
 
@@ -164,7 +164,7 @@ array find_all(string|object ot)
 // find() is in module.pmod.
 
 //! not recommended for current use
-//! @depcrecated
+//! @deprecated
 .DataObjectInstance find_by_id(string|program|object ot, int id)
 {
    object o;
@@ -177,7 +177,7 @@ array find_all(string|object ot)
 }
 
 //! not recommended for current use
-//! @depcrecated
+//! @deprecated
 array find_by_query(string|program|object ot, string query)
 {
    object o;
@@ -191,7 +191,7 @@ array find_by_query(string|program|object ot, string query)
 }
 
 //! not recommended for current use
-//! @depcrecated
+//! @deprecated
 .DataObjectInstance find_by_alternate(string|program|object ot, mixed id)
 {
    object o;
@@ -207,7 +207,7 @@ array find_by_query(string|program|object ot, string query)
 }
 
 //! not recommended for current use
-//! @depcrecated
+//! @deprecated
 .DataObjectInstance new(string|program|object ot)
 {
    object o;

@@ -9,6 +9,8 @@ string event_name;
 object controller;
 mixed event;
 
+mapping iso639_2 = Tools.Language.Names.iso639_2;
+
 function get_session_by_id = _get_session_by_id;
 
 static mixed cast(string typen)
@@ -119,11 +121,26 @@ string get_lang()
   return current_lang;
 }
 
+//! the purpose of this method is to convert an iso language code
+//! to one familiar with the pike locale system.
+array map_languages(array languages)
+{
+  array out = ({}); 
+
+  foreach(languages;;string l)
+    if(iso639_2[l])
+      out += ({iso639_2[l]});
+    else if(sizeof(l)>2 && iso639_2[l[0..1]])
+      out += ({iso639_2[l[0..1]]});
+
+  return out;
+}
+
 string low_get_lang()
 {
 
   // if we've explicitly set a language (using the _lang variable, 
-  //! see HTTPRequest and friends,) write it here.
+  // see HTTPRequest and friends,) write it here.
   if (this->misc->set_lang)
   {
 //werror("low_get_lang(): setting language %O with header %O.\n", this->misc->set_lang,  this->request_headers["accept-language"]);
@@ -197,20 +214,3 @@ string low_get_lang()
     return lang;
   }
 }
-
-//! the purpose of this method is to convert an iso language code
-//! to one familiar with the pike locale system.
-array map_languages(array languages)
-{
-  array out = ({}); 
-
-  foreach(languages;;string l)
-    if(iso639_2[l])
-      out += ({iso639_2[l]});
-    else if(sizeof(l)>2 && iso639_2[l[0..1]])
-      out += ({iso639_2[l[0..1]]});
-
-  return out;
-}
-
-mapping iso639_2 = Tools.Language.Names.iso639_2;

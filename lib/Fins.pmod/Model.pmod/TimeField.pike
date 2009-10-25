@@ -28,14 +28,6 @@ string encode(mixed value, void|.DataObjectInstance i)
   return "'" + value->format_tod() + "'";
 }
 
-mixed from_form(mapping value, void|.DataObjectInstance i)
-{
-  object c = Calendar.dwim_time(sprintf("%02d-%02d", (int)value->year_no, 
-                (int)value->month_no, (int)value->month_day));
-	return c;
-}
-
-
 string get_display_string(void|mixed value, void|.DataObjectInstance i)
 {
 	if(value && objectp(value))
@@ -72,7 +64,6 @@ string get_editor_string(void|mixed value, void|.DataObjectInstance i)
         }
 
 
-        if(includetime)
         {
           vals = ({});
           foreach(({"hour_no", "minute_no", "second_no"});; string part)

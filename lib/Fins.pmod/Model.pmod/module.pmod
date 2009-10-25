@@ -15,6 +15,10 @@ constant SORT_ASCENDING = 0;
 
 protected mapping contexts = ([]);
 
+//! returns the default model context defined for the application
+//!
+//! @throws
+//!  an error if the requested model is not defined.
 object get_default_context()
 {
   if(contexts["_default"]) return contexts["_default"];
@@ -26,6 +30,10 @@ object set_context(string model_id, object context)
   contexts[model_id] = context;
 }
 
+//! get the model context identified by model_id.
+//! 
+//! @throws
+//!  an error if the requested model is not defined.
 object get_context(string model_id)
 {
 if(contexts[model_id])

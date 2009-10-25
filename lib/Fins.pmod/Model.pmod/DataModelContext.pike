@@ -3,7 +3,7 @@ int debug = 0;
 
 mapping builder = ([ "possible_links" : ({}), "belongs_to" : ({}), "has_many": ({}), "has_many_many": ({}) ]);
 
-//!
+//! contains the finder object. see also @[Fins.Model.find_provider]
 object find;
 
 //!
@@ -135,9 +135,12 @@ int in_transaction()
   return in_xa;
 }
 
+//! not recommended for current use
+//! @depcrecated
 function(string|program|object,mapping,void|.Criteria:array) _find = old_find;
 
-//!
+//! not recommended for current use
+//! @depcrecated
 array old_find(string|program|object ot, mapping qualifiers, void|.Criteria criteria)
 {
    object o;
@@ -150,7 +153,8 @@ array old_find(string|program|object ot, mapping qualifiers, void|.Criteria crit
    return repository->get_instance(o->instance_name)(UNDEFINED)->find(qualifiers, criteria, this);
 }
 
-//!
+//! not recommended for current use
+//! @depcrecated
 array find_all(string|object ot)
 {
 
@@ -159,7 +163,8 @@ array find_all(string|object ot)
 
 // find() is in module.pmod.
 
-//!
+//! not recommended for current use
+//! @depcrecated
 .DataObjectInstance find_by_id(string|program|object ot, int id)
 {
    object o;
@@ -171,7 +176,8 @@ array find_all(string|object ot)
    return  repository->get_instance(o->instance_name)(id, this);
 }
 
-//!
+//! not recommended for current use
+//! @depcrecated
 array find_by_query(string|program|object ot, string query)
 {
    object o;
@@ -184,7 +190,8 @@ array find_by_query(string|program|object ot, string query)
    return old_find(o, (["0": Fins.Model.Criteria(query)]));
 }
 
-//!
+//! not recommended for current use
+//! @depcrecated
 .DataObjectInstance find_by_alternate(string|program|object ot, mixed id)
 {
    object o;
@@ -199,7 +206,8 @@ array find_by_query(string|program|object ot, string query)
    return repository->get_instance(o->instance_name)(UNDEFINED)->find_by_alternate(id, this);
 }
 
-//!
+//! not recommended for current use
+//! @depcrecated
 .DataObjectInstance new(string|program|object ot)
 {
    object o;

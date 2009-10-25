@@ -8,7 +8,8 @@
 //! users_by_id( int identifier )
 //! users( mapping criteria )
 //! users_by_query( string where clause )
-//!
+//! users_by_alt(string alternate_id)
+//! users_by_alternate(string alternate_id)
 
 .DataModelContext context;
 

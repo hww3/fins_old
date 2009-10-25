@@ -7,6 +7,12 @@ constant OPER_AND = 0;
 //!
 constant OPER_OR = 1;
 
+//!
+constant SORT_DESCENDING = 1;
+
+//!
+constant SORT_ASCENDING = 0;
+
 protected mapping contexts = ([]);
 
 object get_default_context()

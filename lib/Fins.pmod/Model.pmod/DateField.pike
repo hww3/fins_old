@@ -108,29 +108,69 @@ mixed validate(mixed value, void|.DataObjectInstance i)
    return value;
 }
 
-mixed from_form(mapping value, void|.DataObjectInstance i)
-{
-  object c = Calendar.dwim_day(sprintf("%04d-%02d-%02d", (int)value->year_no, 
-                (int)value->month_no, (int)value->month_day));
-	return c;
-}
-
 string get_display_string(void|mixed value, void|.DataObjectInstance i)
 {
 	if(value && objectp(value))
-    	return value->format_tod();
+    	return value->format_ymd();
 	else return (string)value;
 }
 
 string get_editor_string(void|mixed value, void|.DataObjectInstance i)
 {
-	werror("TimeField.get_editor_string(%O, %O)\n", value, i);
-  string rv = "";
-  if(i) rv +=("<input type=\"hidden\" name=\"__old_value_" + name + "\" value=\"" + 
-				(value?value->format_tod():"") + "\">" );
-  rv += "<input type=\"text\" name=\"" + name + "\" value=\"";
-  if(i) rv+=(value?value->format_tod():"");
-  rv += "\">";
+        string rrv = "";
+        int def = 0;
+        array vals = ({});
 
-  return rv;
+        if(!value)
+        { 
+          def = 1; 
+          value = Calendar.now();
+        }
+        foreach(({"month_no", "month_day", "year_no"});; string part)
+        {
+	        string rv = "";
+		string current_val = 0;
+		int from, to;
+
+                if(value)
+                {
+		  current_val = value[part]();
+		}
+
+		switch(part)
+		{
+		  case "month_no":
+		    from = 1; to = 12;
+		    break;
+		  case "year_no":
+		    object cy;
+		    if(current_val) cy = Calendar.ISO.Year(current_val); else cy = Calendar.ISO.Year();
+		    from = (cy - 80)->year_no(); to = (cy + 20)->year_no();
+		    break;
+		  case "month_day":
+		    from = 1; to = 31;
+		    break;
+		}
+		rv += "<select name=\"_" + name + "__" + part + "\">\n";
+		for(int i = from; i <= to; i++) 
+                  rv += "<option " + ((int)current_val == i?"selected":"") + ">" + i + "\n";
+		rv += "</select>\n";
+
+		if(!def)
+                  rv += "<input type=\"hidden\" name=\"\"__old_value_" + name + "__" + part + "\" value=\"" + current_val + "\">";
+	
+		vals += ({rv});
+        }
+
+	rrv += (vals * " / ");
+
+      return rrv;
 }
+
+
+mixed from_form(mapping value, void|.DataObjectInstance i)
+{
+  object c = Calendar.dwim_time(sprintf("%04d-%02d-%02d", (int)value->year_no, (int)value->month_no, (int)value->month_day));
+        return c;
+}
+

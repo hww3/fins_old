@@ -32,6 +32,13 @@ string describe(mixed v, void|.DataObjectInstance i)
   return v->format_time();
 }
 
+string get_display_string(void|mixed value, void|.DataObjectInstance i)
+{
+	if(value && objectp(value))
+    	return value->format_time();
+	else return (string)value;
+}
+
 string get_editor_string(void|mixed value, void|.DataObjectInstance i)
 {
         string rrv = "";

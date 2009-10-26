@@ -318,7 +318,7 @@ public void decode_old_values(mapping variables, mapping orig)
 
 public void update(Fins.Request request, Fins.Response response, mixed ... args)
 {
-  object v = get_view(list, update_template_string);
+  object v = get_view(update, update_template_string);
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
   
@@ -591,7 +591,7 @@ public void new(Fins.Request request, Fins.Response response, mixed ... args)
   array fields = ({});
   mapping orig = ([]);
 
-  object v = get_view(list, new_template_string);
+  object v = get_view(new, new_template_string);
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 

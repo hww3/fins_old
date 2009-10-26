@@ -140,26 +140,29 @@ void refresh()
 }
 
 //!
-.DataObjectInstance new(void|.DataModelContext c)
+object new(void|.DataModelContext c)
 {
-   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object, c||context);  
+   program p = object_program(this);
+   object new_object = p(UNDEFINED, c||context);  
 
    new_object->set_new_object(1);
    return   new_object;
 }
 
 //!
-.DataObjectInstance find_by_alternate(mixed id, void|.DataModelContext c)
+object find_by_alternate(mixed id, void|.DataModelContext c)
 {
-   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object, c||context);  
+    program p = object_program(this);
+    object new_object = p(UNDEFINED, c||context);  
     master_object->load_alternate(c, id, new_object);
     return new_object;
 }
 
 //!
-.DataObjectInstance find_by_id(int id, void|.DataModelContext c)
+object find_by_id(int id, void|.DataModelContext c)
 {
-   .DataObjectInstance new_object = object_program(this)(UNDEFINED, master_object, c||context);  
+   program p = object_program(this);
+   object new_object = p(UNDEFINED, c||context);  
 
     master_object->load(c||context, id, new_object);
 //    master_object->add_ref(new_object);

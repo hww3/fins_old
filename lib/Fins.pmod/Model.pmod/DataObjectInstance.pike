@@ -7,13 +7,12 @@
 string object_type;
 multiset fields_set = (<>);
 
-// this storage location of changed values local to this instance
+// storage location of changed values local to this instance
 mapping object_data = ([]);
 
-// this storage location of changed values local to this transaction
-mapping object_data_tx = ([]);
-
 // the local storage location of the global cache for data values of this id.
+// this is shared by all objects of this id, regardless of connection, except those within
+// a transaction session.
 mapping object_data_cache = ([]); 
 
 // if non-zero, the id of the current transaction. not currently used.

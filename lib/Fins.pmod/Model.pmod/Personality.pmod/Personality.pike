@@ -160,15 +160,15 @@ int(0..1) transaction_supported()
 
 void begin_transaction()
 {
-  throw(Error.Generic("Transactions are not supported by this database engine.\n"));
+  throw(Fins.Errors.ModelError("Transactions are not supported by this database engine.\n"));
 }
 
 void rollback_transaction()
 {
-  throw(Error.Generic("Transactions are not supported by this database engine.\n"));
+  throw(Fins.Errors.ModelError("Transactions are not supported by this database engine.\n"));
 }
 
 void commit_transaction()
 {
-  throw(Error.Generic("Transactions are not supported by this database engine.\n"));
+  throw(Fins.Errors.ModelError("Transactions are not supported by this database engine.\n"));
 }

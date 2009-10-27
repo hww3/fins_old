@@ -1,3 +1,8 @@
+//! contains and manages the Data Mapping and Object Instance definitions, ScaffoldControllers 
+//! and other objects associated with a given model definition.
+//!
+//! most of the values and methods in this class are used internally by the model.
+
 mapping(string:.DataObject) object_definitions = ([]);
 mapping(program:.DataObject) program_definitions = ([]);
 mapping(string:program) instance_definitions = ([]);

@@ -1,4 +1,4 @@
-//! This is an object that defines a model-domain data type.
+//! This is an object that defines a Model-domain Data Mapping for a given table/data type.
 //! This class is singleton for a given data type. Use a
 //! DataObjectInstance object to retrieve data for a given
 //! data type.
@@ -38,6 +38,7 @@ object my_undef = .Undefined;
 
 //!
 mapping|Tools.Mapping.MappingCache  objs = ([]);
+mapping|Tools.Mapping.MappingCache  objs_by_alt = ([]);
 
 //!
 mapping fields = ([]);
@@ -62,8 +63,9 @@ int autosave = 1;
 
 string instance_name = "";
 string table_name = "";
-//mapping new_object_data = ([]);
-array field_order = ({});
+
+//! used by @[Fins.ScaffoldController] to determine the order fields are displayed in generated forms.
+array(.Field) field_order = ({});
 
 //! repo is retained, context is not.
 void create(.DataModelContext context, .Repository repo)
@@ -79,20 +81,26 @@ void create(.DataModelContext context, .Repository repo)
      reflect_definition(context);
    }
 
+   set_weak_flag(objs, Pike.WEAK);
+   set_weak_flag(objs_by_alt, Pike.WEAK);
+
    if(post_define && functionp(post_define))
      post_define(context);
-
-  set_weak_flag(objs, Pike.WEAK);
 }
 
 void set_cacheable(int timeout)
 {
   if(timeout)
+  {
     objs = Tools.Mapping.MappingCache(timeout);
+    objs_by_alt = Tools.Mapping.MappingCache(timeout);
+  }
   else  
   {
     objs = ([]);
     set_weak_flag(objs, Pike.WEAK);
+    objs_by_alt = ([]);
+    set_weak_flag(objs_by_alt, Pike.WEAK);
   }
 }
 
@@ -353,7 +361,7 @@ void has_many_to_many(.DataModelContext context, string join_table, string that_
 
 void add_ref(.DataObjectInstance o)
 {
-// werror("add_ref(%O)\n", o);
+ werror("add_ref(%O)\n", o);
 
   // FIXME: we shouldn't have to do this in more than one location!
   if(!objs[o->get_id()])
@@ -361,25 +369,11 @@ void add_ref(.DataObjectInstance o)
     mapping m = ([]);
     o->object_data_cache = m;
     objs[o->get_id()] = m;
+    if(alternate_key)
+      objs_by_alt[o[alternate_key->name]] = m;
   }
 }
 
-/*
-void sub_ref(.DataObjectInstance o)
-{
-//werror("sub_ref(%O)\n", o);
-  if(!o->is_initialized()) return;
-
-  if(!objs[o->get_id()]) return;
-
-  objs[o->get_id()][0]--;
-
-  if(objs[o->get_id()][0] == 0)
-  {
-    m_delete(objs, o->get_id());
-  }
-}
-*/
 //!
 void set_instance_name(string _name)
 {
@@ -629,7 +623,7 @@ void load(.DataModelContext context, mixed id, .DataObjectInstance i, int|void f
 
 void load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, int|void force)
 {
-   if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
+   if(force || !(id  && objs_by_alt[id])) // not a new object, so there might be an opportunity to load from cache.
    {
      log->debug("load_alternate(%O, %O): loading from database.", id, i);
 /*
@@ -669,9 +663,9 @@ void load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, 
   else // guess we need this here, also.
   {
      i->set_initialized(1);
-     i->set_id(primary_key->decode(objs[id][primary_key->field_name]));
+     i->set_id(primary_key->decode(objs_by_alt[id][primary_key->field_name]));
      i->set_new_object(0);
-     i->object_data_cache = objs[i->get_id()];
+     i->object_data_cache = objs_by_alt[i->get_id()];
   }
 }
 
@@ -708,7 +702,7 @@ void low_load(mapping row, .DataObjectInstance i, /*mapping|void fieldnames*/)
   }
   i->object_data_cache = r;
   if(alternate_key)
-    objs[r[alternate_key->name]] = r;
+    objs_by_alt[r[alternate_key->name]] = r;
   return;
 }
 

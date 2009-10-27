@@ -4,6 +4,9 @@ import Tools.Logging;
 //! this is the base application class.
 
 object __fin_serve;
+
+//! provide any context root (location in the virtual filesystem) for this application.  this setting
+//! is derived from the value of the context_root parameter in the application section of the application config file, and defaults to /.
 string context_root = "";
 
 //! The root Controller object
@@ -42,8 +45,20 @@ object bp_lock = Thread.Mutex();
 object breakpoint_hilfe;
 object bpbe;
 object bpbet;
-int controller_autoreload, cache_events;
+
+//! if set to true, controllers will be reloaded on access if they are changed. this setting
+//! is derived from the value of the reload parameter in the controller section of the application config file.
+int controller_autoreload;
+
+//! if set to true, the application will cache resolved url-to-function mappings from controllers. this setting
+//! is derived from the value of the cache_events parameter in the controller section of the application config file.
+int cache_events;
+
 Standards.URI my_url;
+
+//! determines the length of time, in hours, responses from a static file controller should indicate the file ought to be cached. 
+//! this setting is derived from the value of the static_expire_period parameter in the application section of the application 
+//! config file and defaults to 240 (10 days).
 static int exp = 24 * 10;
 
 //! constructor for the Fins application. It is normally not necessary to override this method,
@@ -92,8 +107,9 @@ void start()
 {
 }
 
-// determines whether there are any processor classes defined in
-// the application's configuration file and if present, loads them.
+//! determines whether there are any processor classes defined in the application's configuration 
+//! file and if present, loads them. this is derived from the class parameter within the processors section 
+//! of the application's configuration file.
 static void load_processors()
 {
   if(config["processors"] && config["processors"]["class"])
@@ -177,6 +193,7 @@ object get_master_for_thread()
   else return master();
 }
 
+//! returns the current thead's program path
 array get_program_path()
 {
 	return get_master_for_thread()->pike_program_path;
@@ -420,6 +437,8 @@ string get_path_for_action(function|object action, int|void nocontextroot)
   return path;
 }
 
+//! gets the url of the current application (not including the context root). this setting
+//! is derived from the value of the url parameter in the web section of the application config file.
 Standards.URI get_my_url()
 {
   string url;
@@ -554,7 +573,7 @@ public mixed handle_http(.Request request)
     if(er)
     {
        Log.exception(sprintf("An exception occurred while executing event %O", event), er);
-       if(objectp(er))
+      er = Error.mkerror(er);
       {
 //		werror("handling error %O.\n", er);
         switch(er->error_type)
@@ -571,11 +590,6 @@ public mixed handle_http(.Request request)
             response->set_error(500);
             break;
         }
-      }
-      else
-      {
-          response->set_view(generate_error_array(er));
-          response->set_error(500);
       }
     }
   }
@@ -611,28 +625,12 @@ object generate_error(object er)
   return t;
 }
 
-object generate_error_array(array er)
-{
-  object t = view->low_get_view(Fins.Template.Simple, "internal:error_500");
-
-  t->add("error_type", String.capitalize("Generic"));
-  t->add("message", er[0]);
-  t->add("backtrace", html_describe_error(er));
-
-  return t;
-}
-
 string html_describe_error(array|object er)
 {
   string rv = "";
   array bt;
 
-  if(arrayp(er))
-  {
-    bt = er[1];
-    rv = "<b>" + er[0] + "</b><p>Backtrace:<ol>";
-  }
-  else
+  er = Error.mkerror(er);
   {
     bt = er->backtrace();
     rv = "<b>" + er->message() + "</b><p>Backtrace:<ol>";

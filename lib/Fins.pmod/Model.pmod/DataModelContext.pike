@@ -25,6 +25,8 @@ object model;
 Sql.Sql sql;
 string sql_url;
 
+string context_id;
+
 int in_xa = 0;
 
 int id = random(time());

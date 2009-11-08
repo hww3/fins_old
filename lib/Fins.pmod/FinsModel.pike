@@ -9,12 +9,32 @@ static void create(Fins.Application a)
   load_model();
 }
 
+//! configures any models defined in the application's configuration file. this method is automatically called
+//! by the constructor.
+//!
+//! an application normally contains a default model, which is specified in the "model" section of the application's
+//! configuration file. additional model definitions can be specified in the configuration file by adding sections
+//! whose name is in the form of "model_x" where x is some unique identifier.
+//!
+//! valid configuration values for a model definition include "id", "datasource", "definition_module" and "debug". 
+//! The "datasource" attribute is mandatory for all model definitions; "definition_module" and "id" are mandatory for 
+//! all definitions other than the default, and all other attributes are optional for all model definitions.
+//!
+//! when each model is loaded, a database connection will be made and all registered data types will be configured,
+//! either manually or automatically using database reflection. Additionally the default context for each model 
+//! definition will be registered in @[Fins.DataSources] using the value of its "id" attribute as the key.
+//!
+//! in addition to being available from Fins.Model, the default model is also available from @[Fins.Datasources] by its
+//! "id" attribute, or if no "id" is specified, using the key "_default".
+//!
+//! @example
+//!    // get a context for the default model
+//!    Fins.Model.DataModelContext ctx = Fins.DataSources._default;
+//!    // get a context for the model whose configuration specifies an "id" of "my_additional_model"
+//!    Fins.Model.DataModelContext ctx2 = Fins.DataSources.my_additional_model;
+//!
 void load_model()
 {
-// an object that provides Model repository service, by default
-// this will be @[Fins.Model]. Do not change this, as the app loader
-// won't use this value, causing the model to break.
-
   object context = configure_context(config["model"], 1);
 
   Fins.Model.set_context("_default", context);
@@ -28,7 +48,6 @@ void load_model()
      object ctx = configure_context(config[md], 0);
      Fins.Model.set_context(config[md]["id"], ctx);
    }
-
 }
 
 object configure_context(mapping config_section, int is_default)
@@ -36,17 +55,14 @@ object configure_context(mapping config_section, int is_default)
   object repository;
   string definition_module;
 
-//  if(is_default)
-//    repository = Fins.Model.module;
-//  else
-    repository = Fins.Model.Repository();
+  repository = Fins.Model.Repository();
 
   object o;
 
   object defaults = Fins.Helpers.Defaults;
   catch(defaults = (object)"defaults");
 
-  if(is_default) definition_module = config->app_name;
+  if(is_default) definition_module = (config_section->definition_module || config->app_name);
   else definition_module = config_section->definition_module;
 
   if(!definition_module)
@@ -62,6 +78,7 @@ object configure_context(mapping config_section, int is_default)
  string url = config_section["datasource"];
  object s = Sql.Sql(url);
  object d = Fins.Model.DataModelContext();
+ d->context_id = config_section["id"] || "_default";
  d->sql = s;
  d->sql_url = url;
  d->debug = (int)config_section["debug"];
@@ -102,38 +119,14 @@ void register_types(object ctx)
     }
     else
     {
-      string dip = "inherit Fins.Model.DirectAccessInstance;\n string type_name = \"" + n + "\";\n"
-                   "object repository = " + get_repo_class(ctx->repository) + ";";
-
-      di = compile_string(dip); 
+		throw(Fins.Errors.ModelError("No Data Instance class defined for data type " + n + " in model id " + ctx->context_id + "."));
     }
     log->info("Registering data type %s", d->instance_name);
     ctx->repository->add_object_type(d, di);
   }
 }
 
-//!
-string get_repo_class(object repository)
-{
-  object r;
-
-  if(repository == Fins.Model.module) return "Fins.Model.module";
-
-  r = master()->resolv(app->config->app_name + ".Repo");
-
-  if(repository == r) return app->config->app_name + ".Repo";
-
-  string s = master()->describe_object(repository);
-
-  if(search(s, "()") != -1) // ok, we probably have a non-module class. providing a 
-                            // program as opposed to a module will result in non-functional 
-                            // model. i have no idea what would happen if you provided a 
-                            // repository made available through add_constant.
-    s = "((program)\"" + master()->describe_program(object_program(repository)) + "\")()";
-
-  return s;
-}
-
+// there be monsters here...
 void initialize_links(object ctx)
 {
   if(!ctx->repository->object_definitions || 

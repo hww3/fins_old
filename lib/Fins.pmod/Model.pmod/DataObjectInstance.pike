@@ -1,8 +1,18 @@
 .DataObject master_object;
 .DataModelContext context;
 
-//! this is an actual instance containing model-domain data
+//! this is an actual instance containing model-domain data for a given data type. 
+//! typically, this means that an object of this type represents a row of data
+//! in your database.
 //! 
+//! fields are accessed or set using the `[] and `[]= operators; thus if your data-mapping
+//! contained a field called "full_name," you would access it in this way:
+//!
+//! myobject["full_name"]
+//!
+//! data for an object may be cached so that subsequent requests to find an object by
+//! id (primary key) or alternate key do not generate database requests. to alter this
+//! behavior, see @[Fins.Model.DataObject.set_cachable].
 
 string object_type;
 multiset fields_set = (<>);
@@ -127,18 +137,26 @@ static void create(mixed|void id, object _object_type, .DataModelContext context
 }
 
 //! performs validation on object and returns an error object if any errors occur.
+//! 
+//! @seealso
+//! @[Fins.Model.DataObject.valid]
 Fins.Errors.Validation valid()
 {
   return master_object->valid(this);
 }
 
-//!
+//! if data is suspected to be stale (such as for long-lived objects where the underlying
+//! database records might have been changed), this call will force the data to be refreshed
+//! from the database.
 void refresh()
 {
    master_object->load(context, key_value, this, 1);
 }
 
+//! create a new object of this type. 
 //!
+//! @note
+//!   no record is created in the underlying database for this object until @[save] is called.
 object new(void|.DataModelContext c)
 {
    program p = object_program(this);
@@ -180,7 +198,12 @@ array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void crite
   return master_object->find(c||context, qualifiers, criteria, this);
 }
 
+//! delete this object from the database.
 //!
+//! @param force
+//!  if true, any objects linked by relationships will
+//!  be deleted as well. this can result in a large number of records being deleted,
+//!  so care should be exercised when using this option.
 int delete(void|int force, void|.DataModelContext c)
 {
    return master_object->delete(c||context, force, this);

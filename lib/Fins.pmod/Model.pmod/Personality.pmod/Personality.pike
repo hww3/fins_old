@@ -65,7 +65,7 @@ string unquote_binary(string s)
 
 mapping map_field(mapping t, string table)
 {
-//  log->debug("mapping field %O.", t);
+  log->debug("mapping field %O.", t);
   mapping field = ([]);
 
   field->name = t->name;

@@ -1,7 +1,23 @@
 //! This is an object that defines a Model-domain Data Mapping for a given table/data type.
-//! This class is singleton for a given data type. Use a
-//! DataObjectInstance object to retrieve data for a given
-//! data type.
+//! This class is singleton for a given data type. Use a DataObjectInstance object to 
+//! retrieve data for a given data type.
+//! 
+//! The Fins model builder utility (pike -x fins model) will create the appropriate Pike 
+//! module to contain the data mappings as well as any data mapping classes needed for
+//! a given database. The default mapping module for the "default" model definition
+//! is "Appname.DataMappings," for additional model definitions, the base module name is
+//! specified in the "definition_module" configuration attribute of the model definition.
+//! For example, if the model definition section specifies "ExternalDB" as the value of the
+//! "definition_module" attribute, the data mapping classes would be stored in the module
+//! "ExternalDB.DataMappings."
+//!
+//! Models are configured by @[Fins.FinsModel], using either database reflection or by 
+//! implementing the @[define] method. By default, an object that inherits this class will 
+//! automatically configure the mapping based on its name. For instance, a class named "User" 
+//! will be configured from a table called "users" in the specified database. If this 
+//! mapping were configured for the "default" model definition, this would be 
+//! "Appname.DataMappings.User."
+//! 
 
 object log = Tools.Logging.get_logger("model.dataobject");
 
@@ -40,8 +56,8 @@ object my_undef = .Undefined;
 mapping|Tools.Mapping.MappingCache  objs = ([]);
 mapping|Tools.Mapping.MappingCache  objs_by_alt = ([]);
 
-//!
-mapping fields = ([]);
+//! contains the list of field mappings. normally, this mapping should not be modified directly; use @[add_field] instead.
+mapping(string:.Field) fields = ([]);
 
 static  array _fields = ({});
 static  mapping _fieldnames = ([]);
@@ -67,7 +83,8 @@ string table_name = "";
 //! used by @[Fins.ScaffoldController] to determine the order fields are displayed in generated forms.
 array(.Field) field_order = ({});
 
-//! repo is retained, context is not.
+//! repo is retained, context is not. Data mapping objects that inherit this type are
+//! automatically created by the model configuration mechanism provided by @[Fins.FinsModel].
 void create(.DataModelContext context, .Repository repo)
 {
   repository = repo;
@@ -86,8 +103,36 @@ void create(.DataModelContext context, .Repository repo)
 
    if(post_define && functionp(post_define))
      post_define(context);
+
+   gen_fields();
+
 }
 
+//! enables or disables autosave of objects.
+//!
+//! if autosave is enabled, each set of a field will result in
+//! the data being instantly saved to the database. in this situation,
+//! use @[set_atomic] to change multiple fields simultaneously.
+//!
+//! if disabled, changes will be stored until the changes are commited
+//! using the @[save] function.
+void set_autosave(int(0..1) enabled)
+{
+  autosave = enabled;
+}
+
+//! sets the cache period for objects of this data type.
+//! 
+//! Queries for objects by id (primary key) or by alternate key will consult the
+//! data cache before querying the database. 
+//! 
+//! By default, values for each data object (database row) are cached until all 
+//! objects using them are destroyed, at which point the data will be  eligible 
+//! for expiration at the next garbage collection interval.
+//!
+//! @param timeout
+//!  the number of seconds values for an object should be cached before a 
+//!  reload from the database is forced.
 void set_cacheable(int timeout)
 {
   if(timeout)
@@ -121,7 +166,8 @@ string describe(object i)
   if(e) return "unidentified";
 }
 
-//!
+//! @returns
+//! the primary key field object for this data type.
 .PrimaryKeyField get_primary_key()
 {
   return primary_key;
@@ -134,7 +180,8 @@ string describe(object i)
 void define(.DataModelContext context);
 
 //! define the object's fields and relationships; useful for adding custom attributes
-//! when also using automatic definition.
+//! when also using automatic definition. If defined, this method will be called
+//! whether using automatic or manual configuration.
 void post_define(.DataModelContext context);
 
 //! set the default operator to use when querying on multiple fields.
@@ -148,9 +195,12 @@ void set_operator(int oper_type)
 }
 
 //! validates the data being set for an object.
-//! runs for each individual or atomic change. all applicable validation methods
-//! will be called, and if any errors have been registered in the @[Fins.Errors.Validation]
-//! object, the error object will be thrown.
+//!
+//! runs for each individual or atomic change. If defined, this method will be called
+//! for creation and update events regardless of whether @[validate_on_update] or 
+//! @[validate_on_create] are defined. If any validation errors have been registered in 
+//! the @[Fins.Errors.Validation] object passed as the second argument, the error object 
+//! will be thrown.
 //!
 //! @param changes
 //!  a mapping containing the field-value pairs changed.
@@ -163,6 +213,7 @@ void set_operator(int oper_type)
 void validate(mapping changes, Fins.Errors.Validation errors, .DataObjectInstance i);
 
 //! validates the data being set for an object.
+//!
 //! runs for each individual or atomic change on updates only. all applicable validation methods
 //! will be called, and if any errors have been registered in the @[Fins.Errors.Validation]
 //! object, the error object will be thrown.
@@ -178,6 +229,7 @@ void validate(mapping changes, Fins.Errors.Validation errors, .DataObjectInstanc
 void validate_on_update(mapping changes, Fins.Errors.Validation errors, .DataObjectInstance i);
 
 //! validates the data being set for an object.
+//!
 //! runs for atomic changes at object creation time. all applicable validation methods
 //! will be called, and if any errors have been registered in the @[Fins.Errors.Validation]
 //! object, the error object will be thrown.
@@ -239,7 +291,8 @@ void do_add_field(.DataModelContext context, mapping field)
   log->debug("adding field %O.", field);
       if(field->type == "integer")
       {
-        add_field(context, .IntField(field->name, field->length, !field->not_null, field->default?(int)field->default:Fins.Model.Undefined));
+        add_field(context, .IntField(field->name, field->length, !field->not_null, 		
+			field->default?(int)field->default:Fins.Model.Undefined));
       }
       if(field->type == "float")
       {
@@ -374,24 +427,27 @@ void add_ref(.DataObjectInstance o)
   }
 }
 
-//!
+//! sets the instance name of this data mapping (typically the class name)
 void set_instance_name(string _name)
 {
   instance_name = _name;
 }
 
+//! @returns
+//!  the name of the database table this data type maps to.
 string get_table_name()
 {
   return table_name;
 }
 
-//!
+//! sets the name of the database table this data type maps to.
 void set_table_name(string _name)
 {
   table_name = _name;
 }
 
-//!
+//! specifies the name of the primary key field, using the Pike-name of the 
+//! field, if it differs from that defined in the database.
 void set_primary_key(string _key)
 {
   if(!fields[_key])
@@ -401,7 +457,10 @@ void set_primary_key(string _key)
 }
 
 
-//!
+//! sets the alternate key field to be used for this data type. Specify using the Pike-name
+//! of the field, if it differs from that defined in the database.
+//! 
+//! any alternate keys should be deined as UNIQUE key fields in the corresponding database table.
 void set_alternate_key(string _key)
 {
   if(!fields[_key])
@@ -419,7 +478,10 @@ void add_default_value_object(.DataModelContext context, string field, string ob
      default_values[field] = lambda(){ return repository->old_find(context, objecttype, criteria);};
 }
 
-//!
+//! add a mapping of a Pike-name index in the data object to (typically) a
+//! field in the database table for this type.
+//! 
+//! overwrites the field definition if it already exists.
 void add_field(.DataModelContext context, .Field f)
 {
    f->set_context(context);
@@ -431,16 +493,16 @@ void add_field(.DataModelContext context, .Field f)
      relationships[f->name] = f;
    }
 
-   gen_fields();
 }
 
-void gen_fields()
+static void gen_fields()
 {
   string fn;
 
   _fields = ({});
   _fieldnames = ([]);
   _fieldnames_low = ([]);
+
      foreach(fields;; .Field f)
      {
        string mfn = (f->get_table?f->get_table():table_name) + "__" + f->field_name;
@@ -464,19 +526,13 @@ void gen_fields()
 
    }      
 
-/*
-  foreach(fields;; .Field f)
-   if(f->field_name)
-   {
-      string mfn = table_name + "__" + f->field_name;
-      _fields += ({ table_name + "." + f->field_name + " AS " + mfn});
-      _fieldnames += ([f:mfn]);
-   }
-*/
    _fields_string = (_fields * ", ");
 }
 
 //! perform a query
+//!
+//! @note
+//!   this method is not normally called by end-user code.
 //!
 //! @param qualifiers
 //!   a mapping containing a series of field -> value pairs.
@@ -580,19 +636,6 @@ void load(.DataModelContext context, mixed id, .DataObjectInstance i, int|void f
 
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
-
-/*
-     mapping _fieldnames = ([]);
-     array _fields = ({});
-     foreach(fields;; .Field f)
-     {
-       if(!f->field_name) continue;
-       string mfn = (f->get_table?f->get_table():table_name) + "__" + f->field_name;
-       _fieldnames[f] = mfn;
-       _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name + " AS " + mfn});
-     }      
-
-*/
      string query = sprintf(single_select_query, (_fields_string), 
        table_name, primary_key->field_name, primary_key->encode(id));
 
@@ -626,18 +669,7 @@ void load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, 
    if(force || !(id  && objs_by_alt[id])) // not a new object, so there might be an opportunity to load from cache.
    {
      log->debug("load_alternate(%O, %O): loading from database.", id, i);
-/*
-     mapping _fieldnames = ([]);
-     array _fields = ({});
 
-     foreach(fields;; .Field f)
-     {
-       if(!f->field_name) continue;
-       string mfn = (f->get_table?f->get_table():table_name) + "__" + f->field_name;
-       _fieldnames[f] = mfn;
-       _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name + " AS " + mfn});
-     }  
-*/
      string query = sprintf(single_select_query, (_fields_string), 
        table_name, alternate_key->field_name, alternate_key->encode(id));
 
@@ -669,7 +701,7 @@ void load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, 
   }
 }
 
-void low_load(mapping row, .DataObjectInstance i, /*mapping|void fieldnames*/)
+static void low_load(mapping row, .DataObjectInstance i, /*mapping|void fieldnames*/)
 {
   mixed id = i->get_id();
   if(!objs[id]) objs[id] = ([]);
@@ -948,6 +980,12 @@ static mapping mk_validate_fields(object i, multiset fields_set, mapping object_
   return vf;
 }
 
+//! performs validation checking on the object without performing any database operations.
+//! useful for determining whether a save or update would be successful.
+//! 
+//! this method does not verify that the changed data would be acceptable outside the scope of
+//! the validation functions. for example, this function will not check that dates are used
+//! to set date fields and so on.
 Fins.Errors.Validation valid(object i)
 {
    Fins.Errors.Validation er;
@@ -1079,7 +1117,7 @@ static int commit_changes(.DataModelContext context, multiset fields_set, mappin
          string values_clause = "(" + (qvalues * ", ") + ")";
 
          query = sprintf(insert_query, table_name, fields_clause, values_clause);
-werror("%O\n", context);
+
   		 if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
       }
       else

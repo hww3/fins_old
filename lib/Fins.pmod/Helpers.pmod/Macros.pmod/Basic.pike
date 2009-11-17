@@ -10,8 +10,8 @@ string simple_macro_sessionid(Fins.Template.TemplateData data, mapping|void args
 string simple_macro_LOCALE(Fins.Template.TemplateData data, mapping|void args)
 {
 	object r = data->get_request();
-	
-//	werror("project: %O, language: %O", r->get_project(), r->get_lang());
+if(!r)
+  werror("backtrace: %O\n", backtrace());	
 	return Locale.translate(r->get_project(), r->get_lang(), 
 					(int)args["id"], args["string"]);
 }

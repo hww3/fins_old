@@ -505,7 +505,7 @@ class PikeBlock
        macros_used[cmd] ++;
 
        return ("{mixed e = catch{"
-              " buf->add(__macro_" + cmd + "(__d, " + argify(arg) + "));};if(e)werror(\"An error occurred while calling macro " + cmd + ":\" + e[0] + \"\\n\");}");
+              " buf->add(__macro_" + cmd + "(__d, " + argify(arg) + "));};if(e)werror(\"An error occurred while calling macro " + cmd + "(\"" + sprintf("%O", arg) + "\"):\" + e[0] + \"\\n\");}");
        break;
    }
 

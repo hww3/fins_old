@@ -1,9 +1,0 @@
-[model]
-class=model
-#datasource=sqlurl
-
-[controller]
-class=controller
-
-[view]
-class=view

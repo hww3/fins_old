@@ -287,6 +287,9 @@ static void reflect_definition(.DataModelContext context)
 
 void do_add_field(.DataModelContext context, mapping field)
 {
+  // some default values are returned from the database already quoted. we want to remove that.
+  if(field->default && has_prefix(field->default, "'") && has_suffix(field->default, "'"))
+    sscanf(field->default, "'%s'", field->default);
 
   log->debug("adding field %O.", field);
       if(field->type == "integer")
@@ -414,17 +417,16 @@ void has_many_to_many(.DataModelContext context, string join_table, string that_
 
 void add_ref(.DataObjectInstance o)
 {
- werror("add_ref(%O)\n", o);
+// werror("add_ref(%O)\n", o);
 
   // FIXME: we shouldn't have to do this in more than one location!
-  if(!objs[o->get_id()])
-  {
-    mapping m = ([]);
-    o->object_data_cache = m;
-    objs[o->get_id()] = m;
-    if(alternate_key)
-      objs_by_alt[o[alternate_key->name]] = m;
-  }
+//  if(!objs[o->get_id()])
+//  {
+//    mapping m = ([]);
+//    objs[o->get_id()] = m;
+//    if(alternate_key)
+//      objs_by_alt[o[alternate_key->name]] = m;
+//  }
 }
 
 //! sets the instance name of this data mapping (typically the class name)
@@ -631,8 +633,16 @@ void generate_sort_order()
 	_default_sort_order_cached = o;
 }
 
-void load(.DataModelContext context, mixed id, .DataObjectInstance i, int|void force)
+int(0..1) load(.DataModelContext context, mixed id, .DataObjectInstance i, int|void force)
 {
+   // NOTE: zero is an invalid id... we use it to refer to a key reference that hasn't been set.
+
+   if(context->debug)
+     log->debug("%O: loading object with id=%O, force=%d\n", Tools.Function.this_function(), id, force);
+
+   if(!id) return 0;
+   if(context->debug)
+     log->debug("%O: %O\n", Tools.Function.this_function(), force || !(id && objs[id]));
 
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
@@ -649,6 +659,7 @@ void load(.DataModelContext context, mixed id, .DataObjectInstance i, int|void f
      }
 //     else
 //       if(context->debug) werror("got results from query: %s\n", query);
+     if(!result[0]) return 0;
 
      i->set_id(id);
      i->set_new_object(0);
@@ -662,9 +673,11 @@ void load(.DataModelContext context, mixed id, .DataObjectInstance i, int|void f
      i->set_new_object(0);
      i->object_data_cache = objs[i->get_id()];
   }
+
+  return 1;
 }
 
-void load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, int|void force)
+int(0..1) load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, int|void force)
 {
    if(force || !(id  && objs_by_alt[id])) // not a new object, so there might be an opportunity to load from cache.
    {
@@ -686,6 +699,7 @@ void load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, 
 //       if(context->debug) werror("got results from query: %s\n", query);
 
      //werror("RESULT: %O, %O\n", result[0], _fieldnames);
+     if(!result[0]) return 0;
 
      i->set_id(primary_key->decode(result[0][_fieldnames[primary_key]]));
      i->set_new_object(0);
@@ -699,6 +713,8 @@ void load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, 
      i->set_new_object(0);
      i->object_data_cache = objs_by_alt[i->get_id()];
   }
+
+  return 1;
 }
 
 static void low_load(mapping row, .DataObjectInstance i, /*mapping|void fieldnames*/)
@@ -732,6 +748,7 @@ static void low_load(mapping row, .DataObjectInstance i, /*mapping|void fieldnam
        r[fn] = row[fnl];
     }
   }
+
   i->object_data_cache = r;
   if(alternate_key)
     objs_by_alt[r[alternate_key->name]] = r;
@@ -759,6 +776,7 @@ mixed get(.DataModelContext context, string field, .DataObjectInstance i)
    {
      throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
    }
+
    int id = i->get_id();
 
    if(objs[id] && has_index(objs[id], field))
@@ -832,12 +850,14 @@ int set_atomic(.DataModelContext context, mapping values, int|void no_validation
       mixed key;
       commit_changes(context, fields_set, object_data, no_validation, 0, i);
       key = primary_key->get_id(i);
+      if(context->debug)
+        log->debug("%O: created new object with id=%O\n", Tools.Function.this_function(), key);
       i->set_id(key);
       i->set_new_object(0);
       i->set_saved(1);
-      add_ref(i);
       i->object_data = ([]);
       i->fields_set = (<>);      
+      //add_ref(i);
    }
    else
      commit_changes(context, fields_set, object_data, no_validation, i->get_id(), i);
@@ -1088,25 +1108,34 @@ static int commit_changes(.DataModelContext context, multiset fields_set, mappin
          {
             // we can skip the primary key for existing objects.
          }
-         else if(!fields_set[f->name] && default_values[f->name])
+         else if(!has_index(fields_set, f->name) && default_values[f->name])
          {
+	        //if(context->debug)
+			//log->debug("encode field %s using default value %O to %O", f->name, object_data[f->name],f->encode(default_values[f->name]()));
             qfields += ({f->field_name});
             qvalues += ({f->encode(default_values[f->name]())});
          }
          // have we set nothing, and are allowed to?
          // if we're updating, it's not required.
-         else if((!fields_set[f->name] && f->null) || 
+         else if((!has_index(fields_set, f->name) && f->null) || 
                     (!fields_set[f->name] && update_id))
          {
+	     //if(context->debug)
+		 //	log->debug("skipping field %s", f->name);
          }
-         else if(!fields_set[f->name] && !f->null)
+         else if(!has_index(fields_set, f->name) && !f->null)
          {
+	     //if(context->debug)
+		 //	log->debug("encode field %s zero value %O to %O", f->name, object_data[f->name], f->encode(.Undefined));
             qfields += ({f->field_name});
             qvalues += ({f->encode(.Undefined)});
          }
          else
          {
             qfields += ({f->field_name});
+	      //if(context->debug)
+		  //	log->debug("encode field %s value %O to %O\n", f->name, object_data[f->name], f->encode(object_data[f->name]));
+
             qvalues += ({f->encode(object_data[f->name])});
          }
       }
@@ -1145,10 +1174,13 @@ int save(.DataModelContext context, int|void no_validation, .DataObjectInstance 
       mixed key;
       commit_changes(context, i->fields_set, i->object_data, no_validation, 0, i);
       key = primary_key->get_id(i);
+      if(context->debug)
+        log->debug("%O: created new object with id=%O\n", Tools.Function.this_function(), key);
+
       i->set_id(key);
       i->set_new_object(0);
       i->set_saved(1);
-      add_ref(i);
+      //add_ref(i);
       i->object_data = ([]);
       i->fields_set = (<>);      
    }

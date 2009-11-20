@@ -47,7 +47,12 @@ static string string_without_suffix(string k, string s)
 
 static program get_model_component(string ot)
 {
-  mixed m = context->repository->get_model_module();
+  if(!ot)
+   {
+     throw(Error.Generic("no model component\n"));
+//      werror()
+   }
+   mixed m = context->repository->get_model_module();
 
   array x = indices(m);
   array y = values(m);
@@ -56,6 +61,7 @@ static program get_model_component(string ot)
     x[i] = lower_case(v);
 
   m = mkmapping(x,y);
+ //Tools.Logging.Log.debug("%O: %s in %O", Tools.Function.this_function(), ot, m);
 
   return m[ot];
 }
@@ -93,11 +99,16 @@ static function get_func(mixed k)
 
   if(has_suffix(k, "_by_id"))
   {
+
     ot = string_without_suffix(k, "_by_id");
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
+	{
+		Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
+
       return lambda(mixed ... args){ return context->find_by_id(p, @args);};
+	}
   }
   if(has_suffix(k, "_by_query"))
   {
@@ -105,7 +116,10 @@ static function get_func(mixed k)
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
+	{
+		Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
       return lambda(mixed ... args){ return context->find_by_query(p, @args);};
+    }
   }
   else if(has_suffix(k, "_by_alternate"))
   {
@@ -113,7 +127,10 @@ static function get_func(mixed k)
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
+	{
+	  Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
       return lambda(mixed ... args){ return context->find_by_alternate(p, @args);};
+    }
   }
   else if(has_suffix(k, "_by_alt"))
   {
@@ -121,7 +138,10 @@ static function get_func(mixed k)
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
+	{
+   	  Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
       return lambda(mixed ... args){ return context->find_by_alternate(p, @args);};
+    }
   }
 /*
   else if((i = search(k, "_by_")) != -1)
@@ -141,15 +161,21 @@ werror("ot: %O, %O\n", get_model_component(ot)->master_object, k[(i+4)..]);
     ot = Tools.Language.Inflect.singularize(ot);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
+	{
+	  Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
       return lambda(){ return context->old_find(p, ([]));};
+    }
   }
   else
   {
     ot = Tools.Language.Inflect.singularize(k);
 //    ot = String.capitalize(ot);
+	if(!ot) return 0;
     if(p=get_model_component(ot))
+	{
+	  Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
       return lambda(mixed ... args){ return context->old_find(p, @args);};
-    
+    }    
   }
 
   return f;

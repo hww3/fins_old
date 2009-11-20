@@ -16,6 +16,15 @@ constant SORT_ASCENDING = 0;
 
 protected mapping contexts = ([]);
 
+private object default_finder;
+//object find;
+
+mixed `->find()
+{
+  if(!default_finder) default_finder = master()->resolv("Fins.Model.find_provider")();
+  return default_finder;
+}
+
 //! returns the default model context defined for the application
 //!
 //! @throws

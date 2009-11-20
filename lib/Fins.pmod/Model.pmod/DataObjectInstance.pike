@@ -175,7 +175,7 @@ object find_by_alternate(mixed id, void|.DataModelContext c)
     return new_object;
 }
 
-//!
+//! an id must be a non-zero integer.
 object find_by_id(int id, void|.DataModelContext c)
 {
    program p = object_program(this);
@@ -183,7 +183,7 @@ object find_by_id(int id, void|.DataModelContext c)
 
     master_object->load(c||context, id, new_object);
 //    master_object->add_ref(new_object);
-   return new_object;
+     return new_object;
 }
 
 //!

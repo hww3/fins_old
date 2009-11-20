@@ -27,8 +27,8 @@ object load_app(string app_dir, string config_name)
   program p;
 
   cn = "application";
-  p = (program)(cn);
-
+  p = master()->cast_to_program(cn);
+werror("PROGRAM: %O\n", p);
   a = p(config);
 
   return a;

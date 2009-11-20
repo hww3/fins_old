@@ -154,7 +154,7 @@ int do_startup()
 
 function genlogger(object al)
 {
-  return lambda(mapping m){al->do_msg(10,"", m);};
+  return lambda(mapping m){al->do_msg(10,"%O", m);};
 }
 void session_startup()
 {

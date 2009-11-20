@@ -41,7 +41,7 @@ mixed validate(mixed value, void|.DataObjectInstance i)
    }
 
    else if(value == .Undefined && !null && default_value)
-   {
+   {  //werror("default value %s\n", default_value);
      return default_value;
    }
  
@@ -68,6 +68,7 @@ mixed validate(mixed value, void|.DataObjectInstance i)
 string encode(mixed value, void|.DataObjectInstance i)
 {
   value = validate(value);
+//werror("validated value " + value + "\n");
   if(value == .Undefined)
     return "NULL";
   else

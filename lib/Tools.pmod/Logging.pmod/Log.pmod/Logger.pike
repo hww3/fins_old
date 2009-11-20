@@ -71,6 +71,8 @@ public void set_appenders(array a)
 //! only use for special occasions.
 public void do_msg(int level, string m, mixed|void ... extras)
 {
+
+//if(!log_strs[level]) werror(master()->describe_backtrace(backtrace()) + "\n");
 //werror("DEBUG: %d, %d\n", level, loglevel);
   if(level < loglevel)
     return;

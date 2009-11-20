@@ -291,3 +291,9 @@ string simple_macro_friendly_date(Fins.Template.TemplateData data, mapping|void 
   return Tools.String.friendly_date(args->var);
 }
 
+//! provides the context root of this application, if any
+//!
+string simple_macro_context_root(Fins.Template.TemplateData data, mapping|void args)
+{
+  return data->get_request()->fins_app->context_root;
+}

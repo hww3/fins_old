@@ -136,7 +136,7 @@ void initialize_links(object ctx)
   {
     if(!a->my_name) a->my_name = a->other_type;
     if(!a->my_field) a->my_field = lower_case(a->other_type + "_" + ctx->repository->get_object(a->other_type)->primary_key->field_name);    
-    a->obj->add_field(ctx, Model.KeyReference(a->my_name, a->my_field, a->other_type));
+    a->obj->add_field(ctx, Model.KeyReference(a->my_name, a->my_field, a->other_type, 0, ));
   }
 
   foreach(ctx->builder->has_many;; mapping a)
@@ -180,7 +180,7 @@ void initialize_links(object ctx)
       log->debug("considering %s as a possible field linkage.", mln);
       if(pln == lower_case(mln))
       {
-        pl->obj->add_field(ctx, Model.KeyReference(od->instance_name, pl->field->name, od->instance_name));
+        pl->obj->add_field(ctx, Model.KeyReference(od->instance_name, pl->field->name, od->instance_name, 0, !(pl->field->not_null)));
         od->add_field(ctx, Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(pl->obj->instance_name), pl->obj->instance_name, od->instance_name));
         ctx->builder->possible_links -= ({pl});
       }

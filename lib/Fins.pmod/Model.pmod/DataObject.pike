@@ -638,18 +638,18 @@ int(0..1) load(.DataModelContext context, mixed id, .DataObjectInstance i, int|v
    // NOTE: zero is an invalid id... we use it to refer to a key reference that hasn't been set.
 
    if(context->debug)
-     log->debug("%O: loading object with id=%O, force=%d\n", Tools.Function.this_function(), id, force);
+     log->debug("%O: loading object with id=%O, force=%d", Tools.Function.this_function(), id, force);
 
    if(!id) return 0;
    if(context->debug)
-     log->debug("%O: %O\n", Tools.Function.this_function(), force || !(id && objs[id]));
+     log->debug("%O: must ask db? %O\n", Tools.Function.this_function(), force || !(id && objs[id]));
 
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
      string query = sprintf(single_select_query, (_fields_string), 
        table_name, primary_key->field_name, primary_key->encode(id));
 
-     if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
+     if(context->debug) log->debug("%O: %O", Tools.Function.this_function(), query);
 
      array result = context->sql->query(query);
 
@@ -769,6 +769,8 @@ mapping get_atomic(.DataModelContext context, .DataObjectInstance i)
 
 mixed get(.DataModelContext context, string field, .DataObjectInstance i)
 {
+   if(context->debug) log->debug("%O(%O, %O, %O)", Tools.Function.this_function(), context, field, i);
+
    if(field == "_id")
      field = primary_key->name;
 
@@ -778,26 +780,31 @@ mixed get(.DataModelContext context, string field, .DataObjectInstance i)
    }
 
    int id = i->get_id();
+	 if(context->debug) log->debug("%O(): field is %O.", Tools.Function.this_function(), fields[field]);	  
 
    if(objs[id] && has_index(objs[id], field))
    {
+	 if(context->debug) log->debug("%O: have field in cache.", Tools.Function.this_function());
      return fields[field]->decode(objs[id][field], i);
    }     
 
    else if(i->is_new_object())
    {
+	 if(context->debug) log->debug("%O(): have field in new object cache.", Tools.Function.this_function());
      return i->object_data[field];
    }
 
-   load(context, id, i, 0);
+   if(context->debug) log->debug("%O(): loading data from db.", Tools.Function.this_function());
+//   load(context, id, i, 0);
 
-   if(objs[id] && has_index(objs[id], field))
+   if(objs[id])
    {
+	 if(context->debug) log->debug("%O(): have field in cache.", Tools.Function.this_function());
      return fields[field]->decode(objs[id][field], i);
    }     
    else 
    {
-     werror("Error finding data for id %O; Here's the cache: %O\n", id, objs);
+     werror("Error finding data for id %O; Here's the cache: %O\n\n %O\n", id, objs, fields);
      throw(Error.Generic("get failed on object without a data cache.\n"));
    }
 
@@ -805,7 +812,7 @@ mixed get(.DataModelContext context, string field, .DataObjectInstance i)
    string query = sprintf(single_select_query, fields[field]->field_name, table_name, 
      primary_key->field_name, primary_key->encode(id), i);
 
-  if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
+  if(context->debug) log->debug("%O(): %O\n", Tools.Function.this_function(), query);
 
    mixed result = context->sql->query(query);
 

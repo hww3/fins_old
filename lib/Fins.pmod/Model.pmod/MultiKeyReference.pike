@@ -28,7 +28,7 @@ static void create(object p, string _name, string _mappingtable, string _my_mapp
 // value will be null in a foreign key, as we're not in an object where that's a real field. 
 mixed decode(string value, void|.DataObjectInstance i) 
 { 
-    return .MultiObjectArray(this, i);
+    return .MultiObjectArray(this, i, i->context);
 }
 
 // value should be a dataobject instance of the type we're looking to set.
@@ -67,7 +67,7 @@ string get(mixed name, mixed value, .DataObjectInstance i)
    if(value)
    {
      v = mappingtable + "." + my_mappingfield + "=" + name->get_id() + " AND " + 
-	    name->master_object->context->repository->get_object(otherobject)->table_name + "." + 
+	    context->repository->get_object(otherobject)->table_name + "." + 
 	    otherkey + "=" + mappingtable + "." + other_mappingfield ;
    }
    return v;

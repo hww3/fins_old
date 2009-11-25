@@ -1,5 +1,7 @@
 inherit .Relationship;
 
+import Tools.Logging;
+
 mixed default_value = .Undefined;
 int null = 0;
 .Criteria criteria;
@@ -18,13 +20,15 @@ static void create(string _name, string _myfield, string _otherobject, void|.Cri
 mixed decode(string value, void|.DataObjectInstance i)
 {
 //	werror("INSTANCE: %O\n", i);
-  return i->master_object->context->repository["find_by_id"](otherobject, (int)value);
+  return i->context->find_by_id(otherobject, (int)value);
 }
 
 // value should be a dataobject instance of the type we're looking to set.
 string encode(int|.DataObjectInstance value, void|.DataObjectInstance i)
 {
+Log.debug("%O(%O, %O)", Tools.Function.this_function(), value, i);
   value = validate(value);
+Log.debug("%O(): validate() returns %O", Tools.Function.this_function(), value);
 
   if(intp(value)) return (string)value;
 
@@ -39,6 +43,8 @@ string encode(int|.DataObjectInstance value, void|.DataObjectInstance i)
 
 mixed validate(mixed value, void|.DataObjectInstance i)
 {
+Log.debug("%O(%O, %O)", Tools.Function.this_function(), value, i);
+
    if(intp(value)) return value;
 
    if(value == .Undefined && !null && default_value == .Undefined)

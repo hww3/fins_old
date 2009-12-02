@@ -8,7 +8,7 @@ void add_rule(object r)
 
 class Rule
 {
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
     return 0;
   }
@@ -23,7 +23,7 @@ class InvariantRule(multiset words)
 {
   inherit Rule;
 
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
     return words[word];
   }
@@ -38,7 +38,7 @@ class CategoryRule(multiset words, string suffix, string to)
 {
   inherit Rule;
   
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
     return words[word];
   }
@@ -53,7 +53,7 @@ class MappingRule(mapping words)
 {
   inherit Rule;
 
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
     return (words[word])?1:0;
   }
@@ -64,13 +64,15 @@ class MappingRule(mapping words)
   }
 }
 
-class RegexRule(string regex, string suffix, string to)
+class RegexRule(string regex, string suffix, string to, int(0..1)|void proper_nouns_only)
 {
   inherit Rule;
 
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
-    return Regexp(regex)->match(word);
+    if(proper_nouns_only && is_proper_noun)
+      return Regexp(regex)->match(word);
+    else return 0;
   }
 
   string apply(string word)
@@ -84,7 +86,7 @@ class SuffixAddRule(string suffix, string add)
 {
   inherit Rule;
 
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
     return has_suffix(word, suffix);
   }
@@ -100,7 +102,7 @@ class SuffixReplaceRule(string suffix, string to)
 {
   inherit Rule;
 
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
     return has_suffix(word, suffix);
   }
@@ -115,7 +117,7 @@ class MatchRule(string from, string to)
 {
   inherit Rule;
 
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
     return (word == from);
   }
@@ -130,7 +132,7 @@ class DefaultRule()
 {
   inherit Rule;
 
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
     return 1;
   }
@@ -146,7 +148,7 @@ class ReverseDefaultRule()
 {
   inherit Rule;
 
-  int match(string word)
+  int match(string word, int(0..1)|void is_proper_noun)
   {
     return has_suffix(word, "s");
   }

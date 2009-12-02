@@ -267,7 +267,9 @@ void create()
   add_rule(RegexRule("[nlw]ife$", "fe", "ves"));
 
   add_rule(RegexRule("[aeiou]y$", "y", "ys"));
-  add_rule(RegexRule("[A-Z].*y$", "y", "ys"));
+
+  // the one rule that applies if a word is a proper noun.
+  add_rule(RegexRule("[A-Z].*y$", "y", "ys", 1));
 //  add_rule(RegexRule("[A-Z].*es$", "es", "es"));
   add_rule(SuffixReplaceRule("y", "ies"));
 

@@ -9,11 +9,11 @@ string humanize(string word)
 }
 
 //!
-string pluralize(string word)
+string pluralize(string word, int(0..1)|void is_proper_noun)
 {
   foreach(.PluralizeRules.rules;; object r)
   {
-    if(r->match(word))
+    if(r->match(word, is_proper_noun))
     {
 #if INFLECTION_DEBUG
       werror("INFLECTION: %s matched rule %O.\n", word, r);
@@ -24,11 +24,11 @@ string pluralize(string word)
 }
 
 //!
-string singularize(string word)
+string singularize(string word, int(0..1)|void is_proper_noun)
 {
   foreach(.SingularizeRules.rules;; object r)
   {
-    if(r->match(word))
+    if(r->match(word, is_proper_noun))
     {
 #if INFLECTION_DEBUG
       werror("INFLECTION: %s matched rule %O.\n", word, r);

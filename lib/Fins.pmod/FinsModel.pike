@@ -94,8 +94,16 @@ object configure_context(mapping config_section, int is_default)
 
  register_types(d);
  initialize_links(d);
-
+ rebuild_fields(d);
   return d;
+}
+
+void rebuild_fields(object ctx)
+{
+   foreach(ctx->repository->object_definitions;; object d)
+   {
+	 d->gen_fields();
+   }
 }
 
 //!
@@ -163,14 +171,14 @@ void initialize_links(object ctx)
 	  my_name = lower_case(my_name);
 	}
 	
-    a->obj->add_field(ctx, Model.KeyReference(my_name, my_field, a->other_type, 0, ));
+    a->obj->add_field(ctx, Model.KeyReference(my_name, my_field, a->other_type, 0, a->nullable ));
     remove_field_from_possibles(ctx, my_field, a->other_type);
   }
 
   foreach(ctx->builder->has_many;; mapping a)
   {
     if(!a->my_name) a->my_name = Tools.Language.Inflect.pluralize(a->other_type);
-    if(!a->other_field) a->other_field = a->obj->instance_name;    
+    if(!a->other_field) a->other_field = ctx->repository->get_object(a->other_type)->primary_key->name	;    
 
 	string my_name = a->my_name;
 	string other_field = a->other_field;
@@ -229,7 +237,7 @@ void initialize_links(object ctx)
       log->debug("  - considering %s as a possible field linkage.", mln);
       if(pln == lower_case(mln))
       {
-		log->debug("adding reference for %s in %s", od->instance_name, pl->obj->instance_name);
+		log->debug("adding reference for %s in %s id=%O", od->instance_name, pl->obj->instance_name, pl->obj->primary_key->name);
 
 		string this_name = od->instance_name;
 		string that_name = pl->obj->instance_name;
@@ -241,7 +249,7 @@ void initialize_links(object ctx)
 		}
 
         pl->obj->add_field(ctx, Model.KeyReference(this_name, pl->field->name, od->instance_name, 0, !(pl->field->not_null)));
-        od->add_field(ctx, Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(that_name), pl->obj->instance_name, od->instance_name));
+        od->add_field(ctx, Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(that_name), pl->obj->instance_name, pl->obj->primary_key->name));
         ctx->builder->possible_links -= ({pl});
       }
     }
@@ -263,6 +271,7 @@ void initialize_links(object ctx)
     foreach(table_components;; mapping q)
     {
       if(q->tn == o->tn) continue;  // skip self-self relationships :)
+    log->debug(" - checking %s.", q->tn);
 
       if(available_tables[o->tn + "_" + q->tn])
       {

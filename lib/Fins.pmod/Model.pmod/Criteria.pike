@@ -15,7 +15,7 @@ static void create(string _criteria)
 }
 
 //!
-string get(string|void name, object|void datao)
+string get(string|void name, .DataObjectInstance|void datai)
 {
    return criteria;
 }

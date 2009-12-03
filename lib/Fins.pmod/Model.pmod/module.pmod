@@ -19,6 +19,11 @@ protected mapping contexts = ([]);
 private object default_finder;
 //object find;
 
+static void create()
+{
+  
+}
+
 mixed `->find()
 {
   if(!default_finder) default_finder = master()->resolv("Fins.Model.find_provider")();
@@ -51,6 +56,11 @@ object get_context(string model_id)
   //	werror("context [%s] = %O\n", model_id, contexts[model_id]);
 	 return contexts[model_id];
  }
-  else throw(Error.Generic("No model context defined for " + model_id + " (yet).\n"));
+ else throw(Error.Generic("No model context defined for " + model_id + " (yet).\n"));
 
+}
+
+object get_context_quiet(string model_id)
+{
+	 return contexts[model_id];
 }

@@ -27,8 +27,10 @@ static void create(string _name, int(0..1) _null, mixed|void _default)
 {
    name = _name;
    null = _null;
-   if(_default != UNDEFINED) 
+   if(_default != UNDEFINED)
+   { 
      default_value = _default;
+   }
    else default_value = .Undefined;
 
    ::create();
@@ -46,7 +48,7 @@ object decode(string value, void|.DataObjectInstance i)
 
 string encode(mixed value, void|.DataObjectInstance i)
 {
-  value = validate(value);
+  value = validate(value, i);
 
   if(value == .Undefined)
   {
@@ -74,6 +76,10 @@ mixed validate(mixed value, void|.DataObjectInstance i)
    {
      if(functionp(default_value) || programp(default_value))
        return default_value();
+
+	// uuuugly!
+     if(default_value == "NULL")
+       return .Undefined;
      else return default_value;
    }
 

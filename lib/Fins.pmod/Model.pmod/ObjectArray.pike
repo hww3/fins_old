@@ -10,8 +10,8 @@ static void create(.Field f, object parent, void|.DataModelContext c)
   Tools.Logging.Log.debug("%O(%O, %O, %O)", Tools.Function.this_function(), f, parent, c);
   field = f; 
   parentobject = parent;
-  context = c;
-  otherobject = c->repository["get_object"](field->otherobject);
+  context = c || parent->context;
+  otherobject = context->repository["get_object"](field->otherobject);
   changed = 1;
 }
 
@@ -74,6 +74,8 @@ int(0..1) _is_type(string t)
 
 void get_contents()
 {
+
+  werror("%O\n", mkmapping(indices(field), values(field)));
   contents = context->old_find(otherobject, ([ field->otherkey :
                                   (int) parentobject->get_id()]));
 

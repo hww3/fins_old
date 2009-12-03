@@ -267,7 +267,7 @@ static void reflect_definition(.DataModelContext context)
         if(field->type!="integer") continue;
 
         log->debug("reflect_definition: have a primary key.");  
-        add_field(context, .PrimaryKeyField(field->name));        
+        add_field(context, field->type_class||.PrimaryKeyField(field->name));        
         set_primary_key(field->name);
       }
 
@@ -288,42 +288,42 @@ static void reflect_definition(.DataModelContext context)
 void do_add_field(.DataModelContext context, mapping field)
 {
   // some default values are returned from the database already quoted. we want to remove that.
-  if(field->default && has_prefix(field->default, "'") && has_suffix(field->default, "'"))
+  if(field->default && stringp(field->default) && has_prefix(field->default, "'") && has_suffix(field->default, "'"))
     sscanf(field->default, "'%s'", field->default);
 
   log->debug("adding field %O.", field);
       if(field->type == "integer")
       {
-        add_field(context, .IntField(field->name, field->length, !field->not_null, 		
+        add_field(context, (field->type_class||.IntField)(field->name, field->length, !field->not_null, 		
 			field->default?(int)field->default:Fins.Model.Undefined));
       }
       if(field->type == "float")
       {
-        add_field(context, .FloatField(field->name, field->length, !field->not_null, field->default?(float)field->default:0));
+        add_field(context, (field->type_class||.FloatField)(field->name, field->length, !field->not_null, field->default?(float)field->default:0));
       }
       if(field->type == "timestamp")
       {
-        add_field(context, .TimeStampField(field->name, 0));
+        add_field(context, (field->type_class||.TimeStampField)(field->name, 0));
       }
       else if(field->type == "date")
       {
-        add_field(context, .DateField(field->name, !field->not_null, field->default));
+        add_field(context, (field->type_class||.DateField)(field->name, !field->not_null, field->default));
       }
       else if(field->type == "datetime")
       {
-        add_field(context, .DateTimeField(field->name, !field->not_null, field->default));
+        add_field(context, (field->type_class||.DateTimeField)(field->name, !field->not_null, field->default));
       }
       else if(field->type == "time")
       {
-        add_field(context, .TimeField(field->name, !field->not_null, field->default));
+        add_field(context, (field->type_class||.TimeField)(field->name, !field->not_null, field->default));
       }
       else if(field->type == "string")
       {
-        add_field(context, .StringField(field->name, field->length, !field->not_null, field->default));
+        add_field(context, (field->type_class||.StringField)(field->name, field->length, !field->not_null, field->default));
       }
       else if(field->type == "binary_string")
       {
-        add_field(context, .BinaryStringField(field->name, field->length, !field->not_null, field->default));
+        add_field(context, (field->type_class||.BinaryStringField)(field->name, field->length, !field->not_null, field->default));
       }
    if(field->unique && ! alternate_key)
      set_alternate_key(field->name);
@@ -344,9 +344,9 @@ void do_add_field(.DataModelContext context, mapping field)
 //!   datatype. if not specified, this defaults to the singular inflection of the
 //!   other datatype, and the database field name of the other data type's primary
 //!   key, separated by an underscore.
-void belongs_to(.DataModelContext context, string other_type, string|void my_name, string|void my_field)
+void belongs_to(.DataModelContext context, string other_type, string|void my_name, string|void my_field, mapping|void args)
 {
-  context->builder->belongs_to += ({ (["my_name": my_name, "other_type": other_type, "my_field": my_field, "obj": this]) });
+  context->builder->belongs_to += ({ (["my_name": my_name, "other_type": other_type, "my_field": my_field, "obj": this, "nullable": args?args->nullable:0]) });
 }
 
 //! define a one to many relationship in which the local object is referred to
@@ -475,9 +475,9 @@ void set_alternate_key(string _key)
 void add_default_value_object(.DataModelContext context, string field, string objecttype, mapping criteria, int unique)
 {
    if(unique)
-     default_values[field] = lambda(){ return repository->old_find(context, objecttype, criteria)[0];};
+     default_values[field] = lambda(){ return context->old_find(objecttype, criteria)[0];};
    else
-     default_values[field] = lambda(){ return repository->old_find(context, objecttype, criteria);};
+     default_values[field] = lambda(){ return context->old_find(objecttype, criteria);};
 }
 
 //! add a mapping of a Pike-name index in the data object to (typically) a
@@ -497,7 +497,7 @@ void add_field(.DataModelContext context, .Field f)
 
 }
 
-static void gen_fields()
+ string gen_fields()
 {
   string fn;
 
@@ -508,27 +508,25 @@ static void gen_fields()
      foreach(fields;; .Field f)
      {
        string mfn = (f->get_table?f->get_table():table_name) + "__" + f->field_name;
-
        if(f->field_name)
        {
          _fieldnames[f] = mfn;
          _fields += ({ (f->get_table?f->get_table():table_name) + "." + f->field_name + " AS " + mfn});
+         fn = mfn;
        }
 
-      if(!f->field_name)
-      {
+      else {
         if(f->get_table)
           fn = f->get_table()  + "." + f->field_name;
         else 
           fn = table_name + "." + f->field_name;
       }
-      else
-        fn = mfn;
+
       _fieldnames_low[f->name] = fn;
 
    }      
 
-   _fields_string = (_fields * ", ");
+  return _fields_string = (_fields * ", ");
 }
 
 //! perform a query
@@ -593,7 +591,7 @@ array find(.DataModelContext context, mapping qualifiers, .Criteria|void criteri
   // criteria always overrides default sorting.
   if(criteria)
   {
-     query += " " + criteria->get("", this);
+     query += " " + criteria->get("", i);
   }
   else if(default_sort_fields)
   {
@@ -647,7 +645,7 @@ int(0..1) load(.DataModelContext context, mixed id, .DataObjectInstance i, int|v
    if(force || !(id  && objs[id])) // not a new object, so there might be an opportunity to load from cache.
    {
      string query = sprintf(single_select_query, (_fields_string), 
-       table_name, primary_key->field_name, primary_key->encode(id));
+       table_name, primary_key->field_name, primary_key->encode(id, i));
 
      if(context->debug) log->debug("%O: %O", Tools.Function.this_function(), query);
 
@@ -684,7 +682,7 @@ int(0..1) load_alternate(.DataModelContext context, mixed id, .DataObjectInstanc
      log->debug("load_alternate(%O, %O): loading from database.", id, i);
 
      string query = sprintf(single_select_query, (_fields_string), 
-       table_name, alternate_key->field_name, alternate_key->encode(id));
+       table_name, alternate_key->field_name, alternate_key->encode(id, i));
 
   if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
 
@@ -780,11 +778,11 @@ mixed get(.DataModelContext context, string field, .DataObjectInstance i)
    }
 
    int id = i->get_id();
-	 if(context->debug) log->debug("%O(): field is %O.", Tools.Function.this_function(), fields[field]);	  
+	 if(context->debug) log->debug("%O(): field is %O: %O.", Tools.Function.this_function(), fields[field], objs[id]);	  
 
    if(objs[id] && has_index(objs[id], field))
    {
-	 if(context->debug) log->debug("%O: have field in cache.", Tools.Function.this_function());
+	 if(context->debug) log->debug("%O: have field in cache: %O.", Tools.Function.this_function(), objs[id][field]);
      return fields[field]->decode(objs[id][field], i);
    }     
 
@@ -810,7 +808,7 @@ mixed get(.DataModelContext context, string field, .DataObjectInstance i)
 
 /*
    string query = sprintf(single_select_query, fields[field]->field_name, table_name, 
-     primary_key->field_name, primary_key->encode(id), i);
+     primary_key->field_name, primary_key->encode(id, i));
 
   if(context->debug) log->debug("%O(): %O\n", Tools.Function.this_function(), query);
 
@@ -895,8 +893,8 @@ int set(.DataModelContext context, string field, mixed value, int|void no_valida
    
    if(!i->is_new_object() && autosave)
    {
-     string new_value = fields[field]->encode(value);
-     string key_value = primary_key->encode(i->get_id());
+     string new_value = fields[field]->encode(value, i);
+     string key_value = primary_key->encode(i->get_id(), i);
 
      if(!no_validation)
      {
@@ -947,7 +945,7 @@ int set(.DataModelContext context, string field, mixed value, int|void no_valida
 int delete(.DataModelContext context, int|void force, .DataObjectInstance i)
 {
    // first, check to see what we link to.
-   string key_value = primary_key->encode(i->get_id());
+   string key_value = primary_key->encode(i->get_id(), i);
 
    // we need to check any relationships to see of we're referenced 
    // anywhere. this will be tricky, because we need to maintain
@@ -1118,9 +1116,13 @@ static int commit_changes(.DataModelContext context, multiset fields_set, mappin
          else if(!has_index(fields_set, f->name) && default_values[f->name])
          {
 	        //if(context->debug)
-			//log->debug("encode field %s using default value %O to %O", f->name, object_data[f->name],f->encode(default_values[f->name]()));
-            qfields += ({f->field_name});
-            qvalues += ({f->encode(default_values[f->name]())});
+			//log->debug("encode field %s using default value %O to %O", f->name, object_data[f->name],f->encode(default_values[f->name](), i));
+            string ev = f->encode(default_values[f->name](), i);
+			if(ev)
+			{
+              qfields += ({f->field_name});
+              qvalues += ({ev});
+			}
          }
          // have we set nothing, and are allowed to?
          // if we're updating, it's not required.
@@ -1134,16 +1136,23 @@ static int commit_changes(.DataModelContext context, multiset fields_set, mappin
          {
 	     //if(context->debug)
 		 //	log->debug("encode field %s zero value %O to %O", f->name, object_data[f->name], f->encode(.Undefined));
-            qfields += ({f->field_name});
-            qvalues += ({f->encode(.Undefined)});
+		   string ev = f->encode(.Undefined, i);
+		   if(ev)
+		   {
+             qfields += ({f->field_name});
+             qvalues += ({ev});
+           }
          }
          else
          {
-            qfields += ({f->field_name});
+			string ev = f->encode(object_data[f->name], i);
+			if(ev)
+			{
 	      //if(context->debug)
 		  //	log->debug("encode field %s value %O to %O\n", f->name, object_data[f->name], f->encode(object_data[f->name]));
-
-            qvalues += ({f->encode(object_data[f->name])});
+              qfields += ({f->field_name});
+              qvalues += ({ev});
+            }
          }
       }
       
@@ -1168,7 +1177,7 @@ static int commit_changes(.DataModelContext context, multiset fields_set, mappin
 
          set_clause = (set * ", ");
          
-         query = sprintf(multi_update_query, table_name, set_clause, primary_key->field_name, primary_key->encode(update_id));
+         query = sprintf(multi_update_query, table_name, set_clause, primary_key->field_name, primary_key->encode(update_id, i));
   if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), query);
       }
       context->sql->query(query);

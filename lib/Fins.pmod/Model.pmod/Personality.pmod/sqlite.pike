@@ -29,7 +29,7 @@ string get_limit_clause(int limit, int|void start)
   return "LIMIT " + limit + (start?(" OFFSET " + ((start-1)||"0")):"");
 }
 
-mapping get_field_info(string table, string field)
+mapping get_field_info(string table, string field, mapping info)
 {  
   if(!indexes[table])
     load_indexes(table);
@@ -44,6 +44,20 @@ mapping get_field_info(string table, string field)
       if(ind->unique == "1") m->unique = 1;
     }
   }
+
+  if(info && (<"datetime", "timestamp", "date", "time">)[info->type])
+  {
+	switch(upper_case(info->default))
+	{
+		case "CURRENT_TIME":
+		case "CURRENT_DATE":
+		case "CURRENT_TIMESTAMP":
+		werror("******\n******\n******\n");
+			m->default = Fins.Model.Undefined;
+			m->type_class = Fins.Model.SqliteDateTimeField;
+	}
+  }
+
   return m;
 }
 

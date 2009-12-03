@@ -16,7 +16,7 @@ string output_unit_format = "%Y-%M-%D %h:%m:%s";
 
 string encode(mixed value, void|.DataObjectInstance i)
 {
-  value = validate(value);
+  value = validate(value, i);
 
   if(value == .Undefined)
   {

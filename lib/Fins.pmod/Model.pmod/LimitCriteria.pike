@@ -13,9 +13,9 @@ static void create(int _limit, int|void _start)
    if(_start) start= _start;
 }
 
-string get(string|void name, object|void datao)
+string get(string|void name, .DataObjectInstance|void datai)
 {
-   return datao->context->personality->get_limit_clause(limit, start);
+   return datai->context->personality->get_limit_clause(limit, start);
 }
 
 string get_criteria_type()

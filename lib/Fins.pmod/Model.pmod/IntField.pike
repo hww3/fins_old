@@ -43,7 +43,7 @@ int decode(string value, void|.DataObjectInstance i)
 
 string encode(mixed value, void|.DataObjectInstance i)
 {
-  value = validate(value);
+  value = validate(value, i);
 
   if(value == .Undefined)
   {

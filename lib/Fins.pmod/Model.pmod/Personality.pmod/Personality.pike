@@ -5,6 +5,8 @@ object context;
 int use_datadir;
 string datadir;
 
+mapping get_field_info(string table, string field, mapping|void info);
+
 static void create(object s, object c)
 {
   sql = s;
@@ -74,16 +76,20 @@ mapping map_field(mapping t, string table)
     t->flags = ([]);
 
   field->primary_key = t->flags->primary_key;
-  if(t->default)
-    field->default = t->default;
 
   if(this->get_field_info)
   { 
-    mapping x = this->get_field_info(t->table, t->name);
-    if(t->type == "unknown")
-      t->type = x->type;
-    t->unique = x->unique;
+    mapping x = this->get_field_info(t->table, t->name, t);
+    if(t->type != "unknown")
+      m_delete(x, "type");
+
+	t = t + x;
   }
+
+  if(t->default)
+    field->default = t->default;
+  if(t->type_class)
+    field->type_class = t->type_class;
 
   log->debug("Field %s.%s is a %s.", t->table, t->name, t->type); 
 

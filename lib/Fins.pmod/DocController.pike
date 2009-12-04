@@ -3,6 +3,10 @@ import Tools.Logging;
 Fins.Template.Template __layout;
 int __checked_layouts; 
 
+//! set this to a particular template type if you don't want to use the default type defined in your application's view class
+protected program __default_template;
+
+
 //! set this flag to true to turn off notices for events which have no 
 //! corresponding template file.
 int __quiet;
@@ -84,7 +88,7 @@ object __get_layout(object request)
 
   foreach(paths;; string p)
   {
-    e = catch(l = view->low_get_template(view->default_template, p, 0, 1));
+    e = catch(l = view->low_get_template(__default_template || view->default_template, p, 0, 1));
     if(!e)
       break;
     else
@@ -132,7 +136,7 @@ private class DocRunner(function req)
     if(layout)
       Log.debug("Have a layout: %O\n", layout);
 
-    mixed e = catch(lview = view->get_view(request->not_args));
+    mixed e = catch(lview = view->low_get_view(__default_template||view->default_template, request->not_args));
 
     if(e && objectp(e) && e->is_templatecompile_error)
 	{

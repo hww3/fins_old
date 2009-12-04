@@ -213,7 +213,7 @@ static object low_load_controller(string controller_name)
 
   foreach( ({""}) + get_program_path();; string p)
   {
-	werror("looking in %O\n", p);
+//	werror("looking in %O\n", p);
     f = Stdio.append_path(p, cn);
     object stat = file_stat(f);
      
@@ -224,7 +224,7 @@ static object low_load_controller(string controller_name)
     else f = 0;
   }
 
-werror("file: %O\n",f);
+//werror("file: %O\n",f);
   if(f)
   {
     c = compile_string(Stdio.read_file(f), f);
@@ -291,16 +291,20 @@ int controller_updated(object controller, object container, string cn)
 
   if(stat && stat->mtime > controller->__last_load)
   {
-    Log.debug("Reloading controllers: %O", container);
-	if(object_program(container) == object_program(this))
-	  load_controller();
-    container->start();
-    action_path_cache = ([]);
-    controller_path_cache = ([]);
+	reload_controllers();
     return 1;
   }
 
   return 0;
+}
+
+void reload_controllers()
+{
+  Log.debug("Reloading controllers.");
+//  if(object_program(container) == object_program(this))
+  load_controller();
+  action_path_cache = ([]);
+  controller_path_cache = ([]);
 }
 
 //! gets the controller object which will handle a given path,  not

@@ -20,7 +20,11 @@ static void create(string _name, string _myfield, string _otherobject, void|.Cri
 mixed decode(string value, void|.DataObjectInstance i)
 {
 //	werror("INSTANCE: %O\n", i);
-  return i->context->find_by_id(otherobject, (int)value);
+	object ot = context->repository->get_object(otherobject);
+	mixed val = ot->primary_key->decode(value);
+	if(val)
+      return i->context->find_by_id(ot, val);
+    else return 0;
 }
 
 // value should be a dataobject instance of the type we're looking to set.

@@ -778,17 +778,17 @@ mixed get(.DataModelContext context, string field, .DataObjectInstance i)
    }
 
    int id = i->get_id();
-	 if(context->debug) log->debug("%O(): field is %O: %O.", Tools.Function.this_function(), fields[field], objs[id]);	  
+//	 if(context->debug) log->debug("%O(): field is %O: %O.", Tools.Function.this_function(), fields[field], objs[id]);	  
 
    if(objs[id] && has_index(objs[id], field))
    {
-	 if(context->debug) log->debug("%O: have field in cache: %O.", Tools.Function.this_function(), objs[id][field]);
+//	 if(context->debug) log->debug("%O: have field in cache: %O.", Tools.Function.this_function(), objs[id][field]);
      return fields[field]->decode(objs[id][field], i);
    }     
 
    else if(i->is_new_object())
    {
-	 if(context->debug) log->debug("%O(): have field in new object cache.", Tools.Function.this_function());
+//	 if(context->debug) log->debug("%O(): have field in new object cache.", Tools.Function.this_function());
      return i->object_data[field];
    }
 
@@ -797,7 +797,7 @@ mixed get(.DataModelContext context, string field, .DataObjectInstance i)
 
    if(objs[id])
    {
-	 if(context->debug) log->debug("%O(): have field in cache.", Tools.Function.this_function());
+//	 if(context->debug) log->debug("%O(): have field in cache.", Tools.Function.this_function());
      return fields[field]->decode(objs[id][field], i);
    }     
    else 

@@ -53,8 +53,8 @@ mapping default_values = ([]);
 object my_undef = .Undefined;
 
 //!
-mapping|Tools.Mapping.MappingCache  objs = ([]);
-mapping|Tools.Mapping.MappingCache  objs_by_alt = ([]);
+mapping|Tools.Mapping.MappingCache  _objs = ([]);
+mapping|Tools.Mapping.MappingCache  _objs_by_alt = ([]);
 
 //! contains the list of field mappings. normally, this mapping should not be modified directly; use @[add_field] instead.
 mapping(string:.Field) fields = ([]);
@@ -98,8 +98,8 @@ void create(.DataModelContext context, .Repository repo)
      reflect_definition(context);
    }
 
-   set_weak_flag(objs, Pike.WEAK);
-   set_weak_flag(objs_by_alt, Pike.WEAK);
+   set_weak_flag(_objs, Pike.WEAK);
+   set_weak_flag(_objs_by_alt, Pike.WEAK);
 
    if(post_define && functionp(post_define))
      post_define(context);
@@ -137,15 +137,15 @@ void set_cacheable(int timeout)
 {
   if(timeout)
   {
-    objs = Tools.Mapping.MappingCache(timeout);
-    objs_by_alt = Tools.Mapping.MappingCache(timeout);
+    _objs = Tools.Mapping.MappingCache(timeout);
+    _objs_by_alt = Tools.Mapping.MappingCache(timeout);
   }
   else  
   {
-    objs = ([]);
-    set_weak_flag(objs, Pike.WEAK);
-    objs_by_alt = ([]);
-    set_weak_flag(objs_by_alt, Pike.WEAK);
+    _objs = ([]);
+    set_weak_flag(_objs, Pike.WEAK);
+    _objs_by_alt = ([]);
+    set_weak_flag(_objs_by_alt, Pike.WEAK);
   }
 }
 
@@ -418,15 +418,6 @@ void has_many_to_many(.DataModelContext context, string join_table, string that_
 void add_ref(.DataObjectInstance o)
 {
 // werror("add_ref(%O)\n", o);
-
-  // FIXME: we shouldn't have to do this in more than one location!
-//  if(!objs[o->get_id()])
-//  {
-//    mapping m = ([]);
-//    objs[o->get_id()] = m;
-//    if(alternate_key)
-//      objs_by_alt[o[alternate_key->name]] = m;
-//  }
 }
 
 //! sets the instance name of this data mapping (typically the class name)
@@ -604,13 +595,30 @@ array find(.DataModelContext context, mapping qualifiers, .Criteria|void criteri
   
   array qr = context->sql->query(query);
 
+
+  mapping objs, objs_by_alt;
+
+  if(context->in_xa)
+  {
+    objs = context->xa_storage[instance_name];      
+    if(!objs) objs = context->xa_storage[instance_name] = ([]);
+
+    objs_by_alt = context->xa_storage[instance_name + "_by_alt"];      
+    if(!objs_by_alt) objs_by_alt = context->xa_storage[instance_name + "_by_alt"] = ([]);
+  }
+  else
+  {
+    objs_by_alt = _objs_by_alt;
+    objs = _objs;
+  }
+
   foreach(qr;; mapping row)
   {
     string fn = table_name + "__" + primary_key->field_name;
     object item = object_program(i)(UNDEFINED, context);
     item->set_id(primary_key->decode(row[fn]));
     item->set_new_object(0);
-    low_load(row, item, /*_fieldnames*/);
+    low_load(row, item, objs, objs_by_alt);
 //    add_ref(item);
     results+= ({ item  });
   }
@@ -635,10 +643,27 @@ int(0..1) load(.DataModelContext context, mixed id, .DataObjectInstance i, int|v
 {
    // NOTE: zero is an invalid id... we use it to refer to a key reference that hasn't been set.
 
+mapping objs, objs_by_alt;
+
    if(context->debug)
      log->debug("%O: loading object with id=%O, force=%d", Tools.Function.this_function(), id, force);
 
    if(!id) return 0;
+
+if(context->in_xa)
+{
+  objs = context->xa_storage[instance_name];      
+  if(!objs) objs = context->xa_storage[instance_name] = ([]);
+
+  objs_by_alt = context->xa_storage[instance_name + "_by_alt"];      
+  if(!objs_by_alt) objs_by_alt = context->xa_storage[instance_name + "_by_alt"] = ([]);
+}
+else
+{
+  objs_by_alt = _objs_by_alt;
+  objs = _objs;
+}
+
    if(context->debug)
      log->debug("%O: must ask db? %O\n", Tools.Function.this_function(), force || !(id && objs[id]));
 
@@ -662,7 +687,7 @@ int(0..1) load(.DataModelContext context, mixed id, .DataObjectInstance i, int|v
      i->set_id(id);
      i->set_new_object(0);
      i->set_initialized(1);
-     low_load(result[0], i, /*_fieldnames*/);
+     low_load(result[0], i, objs, objs_by_alt);
   }
   else // guess we need this here, also.
   {
@@ -677,6 +702,22 @@ int(0..1) load(.DataModelContext context, mixed id, .DataObjectInstance i, int|v
 
 int(0..1) load_alternate(.DataModelContext context, mixed id, .DataObjectInstance i, int|void force)
 {
+mapping objs, objs_by_alt;
+
+if(context->in_xa)
+{
+  objs = context->xa_storage[instance_name];      
+  if(!objs) objs = context->xa_storage[instance_name] = ([]);
+
+  objs_by_alt = context->xa_storage[instance_name + "_by_alt"];      
+  if(!objs_by_alt) objs_by_alt = context->xa_storage[instance_name + "_by_alt"] = ([]);
+}
+else
+{
+  objs_by_alt = _objs_by_alt;
+  objs = _objs;
+}
+
    if(force || !(id  && objs_by_alt[id])) // not a new object, so there might be an opportunity to load from cache.
    {
      log->debug("load_alternate(%O, %O): loading from database.", id, i);
@@ -702,7 +743,7 @@ int(0..1) load_alternate(.DataModelContext context, mixed id, .DataObjectInstanc
      i->set_id(primary_key->decode(result[0][_fieldnames[primary_key]]));
      i->set_new_object(0);
      i->set_initialized(1);
-     low_load(result[0], i, /*_fieldnames*/);
+     low_load(result[0], i, objs, objs_by_alt);
   }
   else // guess we need this here, also.
   {
@@ -715,36 +756,16 @@ int(0..1) load_alternate(.DataModelContext context, mixed id, .DataObjectInstanc
   return 1;
 }
 
-static void low_load(mapping row, .DataObjectInstance i, /*mapping|void fieldnames*/)
+static void low_load(mapping row, .DataObjectInstance i, mapping objs, mapping objs_by_alt)
 {
   mixed id = i->get_id();
   if(!objs[id]) objs[id] = ([]);
   mapping r = objs[id];
   int n = 0;
-  // NOTE: are we shooting ourselves in the foot by doing this?
-  /*
-  if(fieldnames)
-  {
-    foreach(fields; string fn; .Field f)
-    {
-      string fn;
-      if(fieldnames && fieldnames[f] && f->field_name)
-        fn = fieldnames[f];
-      else if(f->get_table)
-        fn = f->get_table()  + "." + f->field_name;
-       else 
-        fn = table_name + "." + f->field_name;
-      r[f->name] = row[fn];
-      n++;
-    }
-  }
-  else
-  */
-  {
-    foreach(_fieldnames_low; string fn; string fnl)
-    {  
-       r[fn] = row[fnl];
-    }
+    
+  foreach(_fieldnames_low; string fn; string fnl)
+  {  
+     r[fn] = row[fnl];
   }
 
   i->object_data_cache = r;
@@ -767,6 +788,8 @@ mapping get_atomic(.DataModelContext context, .DataObjectInstance i)
 
 mixed get(.DataModelContext context, string field, .DataObjectInstance i)
 {
+mapping objs, objs_by_alt;
+
    if(context->debug) log->debug("%O(%O, %O, %O)", Tools.Function.this_function(), context, field, i);
 
    if(field == "_id")
@@ -779,6 +802,21 @@ mixed get(.DataModelContext context, string field, .DataObjectInstance i)
 
    int id = i->get_id();
 //	 if(context->debug) log->debug("%O(): field is %O: %O.", Tools.Function.this_function(), fields[field], objs[id]);	  
+
+
+if(context->in_xa)
+{
+  objs = context->xa_storage[instance_name];      
+  if(!objs) objs = context->xa_storage[instance_name] = ([]);
+
+  objs_by_alt = context->xa_storage[instance_name + "_by_alt"];      
+  if(!objs_by_alt) objs_by_alt = context->xa_storage[instance_name + "_by_alt"] = ([]);
+}
+else
+{
+  objs_by_alt = _objs_by_alt;
+  objs = _objs;
+}
 
    if(objs[id] && has_index(objs[id], field))
    {
@@ -944,6 +982,8 @@ int set(.DataModelContext context, string field, mixed value, int|void no_valida
 //! related to this object being deleted.
 int delete(.DataModelContext context, int|void force, .DataObjectInstance i)
 {
+mapping objs, objs_by_alt;
+
    // first, check to see what we link to.
    string key_value = primary_key->encode(i->get_id(), i);
 
@@ -990,7 +1030,23 @@ int delete(.DataModelContext context, int|void force, .DataObjectInstance i)
 
   if(context->debug) log->debug("%O: %O\n", Tools.Function.this_function(), delete_query);
    context->sql->query(delete_query);
+
+
+if(context->in_xa)
+{
+  objs = context->xa_storage[instance_name];      
+  if(!objs) objs = context->xa_storage[instance_name] = ([]);
+
+  objs_by_alt = context->xa_storage[instance_name + "_by_alt"];      
+  if(!objs_by_alt) objs_by_alt = context->xa_storage[instance_name + "_by_alt"] = ([]);
+}
+else
+{
+  objs_by_alt = _objs_by_alt;
+  objs = _objs;
+}
    m_delete(objs, i->get_id());
+   m_delete(objs_by_alt, i->get_alt());
    destruct(i);
    return 1;
 }

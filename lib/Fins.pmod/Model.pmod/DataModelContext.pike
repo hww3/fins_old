@@ -22,6 +22,9 @@ object app;
 object model;
 
 //!
+mapping xa_storage = ([]);
+
+//!
 Sql.Sql sql;
 string sql_url;
 
@@ -115,6 +118,7 @@ int commit_transaction()
 	throw(Error.Generic("Not currently in a transaction.\n"));
 
   personality->commit_transaction();
+  xa_storage = ([]);
   in_xa = 0;
 }
 

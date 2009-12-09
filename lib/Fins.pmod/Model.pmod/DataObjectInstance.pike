@@ -254,6 +254,15 @@ mixed get_id()
    return key_value;
 }
 
+mixed get_alt()
+{
+  if(master_object->alternate_key)
+    return get(master_object->alternate_key->name);
+
+  else return 0;
+
+}
+
 //!
 void add(string field, mixed value)
 {

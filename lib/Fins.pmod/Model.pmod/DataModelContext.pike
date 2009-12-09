@@ -91,7 +91,7 @@ object clone()
 	d->sql_url = sql_url;
 	d->sql = Sql.Sql(sql_url);
 	d->initialize();
-	
+	d->debug = debug;
 	return d;
 }
 

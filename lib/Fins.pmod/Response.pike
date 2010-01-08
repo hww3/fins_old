@@ -328,8 +328,8 @@
             response["extra_heads"]["content-type"] = template->get_type() + "; charset=utf-8";
 		}
 		else
-            response["extra_heads"]["content-type"] = template->get_type() + "; charset=utf-8";
-//          response["extra_heads"]["content-type"] = template->get_type();
+//            response["extra_heads"]["content-type"] = template->get_type() + "; charset=utf-8";
+          response["extra_heads"]["content-type"] = template->get_type();
         response->file = 0;
         __rendered = 1;
      }

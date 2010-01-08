@@ -26,7 +26,12 @@ Protocols.HTTP.Server.Port port;
 program server = Protocols.HTTP.Server.Port;
 
 #if constant(_Protocols_DNS_SD)
+
+#if constant(Protocols.DNS_SD.Service);
+
 Protocols.DNS_SD.Service bonjour;
+
+#endif
 #endif
 int hilfe_mode = 0;
 string project = "default";
@@ -140,10 +145,12 @@ int do_startup()
     port->request_program = Fins.HTTPRequest;
 
 #if constant(_Protocols_DNS_SD)
+#if constant(Protocols.DNS_SD.Service);
     bonjour = Protocols.DNS_SD.Service("Fins Application (" + project + "/" + config_name + ")",
                      "_http._tcp", "", (int)my_port);
 
     logger->info("Advertising this application via Bonjour.");
+#endif
 #endif
 
     logger->info("FinServe listening on port " + my_port);

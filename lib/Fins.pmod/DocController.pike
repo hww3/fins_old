@@ -65,13 +65,21 @@ static mixed `[](mixed a)
 
 object __get_layout(object request)
 {
+//werror("__get_layout(%O)\n", request);
+
   if(__layout) return __layout;
+//werror("  dont have layout yet\n");
+
   if(__checked_layouts && !request->pragma["no-cache"]) return 0;
+//werror("  wooh\n");
+
   mixed e;
   object l;
   __checked_layouts = 1;
   array paths = ({
   });
+
+//werror("  calculating paths\n");
 
   foreach(request->controller_path/"/";; string p)
   {
@@ -97,7 +105,7 @@ object __get_layout(object request)
     }
   }
 
-  return l;
+  return __layout = l;
 }
 
 private class DocRunner(function req)

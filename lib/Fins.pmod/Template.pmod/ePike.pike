@@ -43,6 +43,7 @@ string parse_psp(string file, string realname, object|void compilecontext)
 	mapping data = __d->get_data();
 	function yield=lambda()
 	  { 
+//werror(\"yield: %O - %O\\n\", is_layout, __view);
 		if(is_layout)
 		{
 			if(__view) __view->render(buf, __d);

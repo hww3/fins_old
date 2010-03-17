@@ -99,3 +99,9 @@ constant __components = ({
   "./Tools.pmod/",
   "./Tools.pmod/Tar.pmod"
  });
+
+//!
+string version()
+{
+  return "Fins " + __version;
+}

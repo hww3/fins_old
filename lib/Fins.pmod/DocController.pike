@@ -78,7 +78,6 @@ object __get_layout(object request)
   __checked_layouts = 1;
   array paths = ({
   });
-
 //werror("  calculating paths\n");
 
   foreach(request->controller_path/"/";; string p)

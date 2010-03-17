@@ -10,7 +10,7 @@ static mapping(object:object) scaffold_controllers = ([]);
 static object model_module;
 static object object_module;
 
-object log = Tools.Logging.get_logger("model");
+object log = Tools.Logging.get_logger("fins.model");
 
 object Objects = objects(this);
 

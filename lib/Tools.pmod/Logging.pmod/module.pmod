@@ -113,7 +113,10 @@ Tools.Logging.Log.Logger create_logger_from_config(string loggername)
       ));
 
     if(sizeof(ln)) my_logger_name = ln[-1];
-    cx = config_values[my_logger_name];
+    if(sizeof(ln) > 1) 
+    cx = config_values[ln[-2]];
+    else cx = ([]);
+    cx += config_values[my_logger_name];
   }
 
   if(!cx) return 0;
@@ -141,6 +144,7 @@ Tools.Logging.Log.Logger create_logger_from_config(string loggername)
     if(!gotlevel) nlevel = config_values["logger.default"]->level;
     cx->level = nlevel;
   }
+
   cx->name = loggername;
 
   cx = insert_config_variables(cx);

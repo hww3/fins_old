@@ -41,8 +41,19 @@ appender=default_debuglog
 appender=access_log
 class=Tools.Logging.Log.AccessLogger
 
-[logger.model.personality]
+[logger.session]
 level=INFO
+appender=default_console
+appender=default_debuglog
+
+# this is the base logger for fins
+[logger.fins]
+level=INFO
+appender=default_console
+appender=default_debuglog
+
+[logger.fins.model]
+level=DEBUG
 
 [appender.default_console]
 class=Tools.Logging.Log.ConsoleAppender

@@ -5,6 +5,8 @@ inherit Fins.Helpers.Macros.JavaScript;
 inherit Fins.Helpers.Macros.Basic;
 inherit Fins.Helpers.Macros.Scaffolding;
 
+object log = get_logger("fins.view");
+
 //! the default class to be used for templates in this application
 program default_template = Fins.Template.Simple;
 program default_string_template = Fins.Template.StringSimple;
@@ -32,7 +34,7 @@ static void load_macros()
 {
   foreach(glob("simple_macro_*", indices(this)); ; string mf)
   {
-    Log.debug("loading macro %O", mf[13..]);
+    log->debug("loading macro %O", mf[13..]);
     add_simple_macro(mf[13..], this[mf]);
   }
 }

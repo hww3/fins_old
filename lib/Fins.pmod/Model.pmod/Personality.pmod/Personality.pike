@@ -1,4 +1,4 @@
-object log = Tools.Logging.get_logger("model.personality");
+object log = Tools.Logging.get_logger("fins.model.personality");
 object sql;
 object context;
 

@@ -3,7 +3,7 @@ inherit FinsBase;
 
 int lower_case_link_names = 0;
 
-object log = Tools.Logging.get_logger("model");
+object log = Tools.Logging.get_logger("fins.model");
 
 static void create(Fins.Application a)
 {
@@ -117,7 +117,7 @@ void register_types(object ctx)
   object im = ctx->repository->get_object_module();
   object mm = ctx->repository->get_model_module();
 
- werror("mm: %O\n", mm);
+// werror("mm: %O\n", mm);
   foreach(mkmapping(indices(mm), values(mm));string n; program c)
   {
     object d = c(ctx);

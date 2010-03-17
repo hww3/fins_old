@@ -19,7 +19,7 @@
 //! "Appname.DataMappings.User."
 //! 
 
-object log = Tools.Logging.get_logger("model.dataobject");
+object log = Tools.Logging.get_logger("fins.model.dataobject");
 
 string default_operator = " AND ";
 

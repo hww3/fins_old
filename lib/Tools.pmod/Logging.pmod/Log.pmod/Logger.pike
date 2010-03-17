@@ -40,12 +40,8 @@ static void create(mapping|void config)
 {
   // NOTE: we probably shouldn't do this...
 //  if(!config) werror("Logger.create(%O)\n", backtrace());
-  if(!config)
-  {
-    set_appenders(({ .ConsoleAppender(([])) }));
-    set_level(DEBUG);
-  }
-  else configure(config);
+
+  configure(config||([]));
   local_vars["name"] = config?(config->name):"default";
 }
 
@@ -57,23 +53,25 @@ void configure(mapping config)
   else
     set_level(DEBUG);
 
-  array appenders = Tools.Logging["get_appenders"](arrayp(config->appender)?config->appender:({config->appender}));
+  if(!config->appender)
+  {
+    set_appenders(({ .ConsoleAppender(([])) }));
+  }
+  else
+  {
+    array appenders = Tools.Logging["get_appenders"](arrayp(config->appender)?config->appender:({config->appender}));
   set_appenders(appenders);
-
+  }
 }
 
-public void set_appenders(array a)
+protected public void set_appenders(array a)
 {
 //  werror("set_appenders: %O\n", a);
   appenders = a;
 }
 
-//! only use for special occasions.
-public void do_msg(int level, string m, mixed|void ... extras)
+public void low_do_msg(string loggername, int level, string m, mixed|void ... extras)
 {
-
-//if(!log_strs[level]) werror(master()->describe_backtrace(backtrace()) + "\n");
-//werror("DEBUG: %d, %d\n", level, loglevel);
   if(level < loglevel)
     return;
 
@@ -87,7 +85,17 @@ public void do_msg(int level, string m, mixed|void ... extras)
   lt->mon += 1;
   lt->timezone /= 3600;
 
-  appenders->write(local_vars + lt + (["level": log_strs[level], "msg": m]));
+  appenders->write(local_vars + lt + (["name": loggername, "level": log_strs[level], "msg": m]));
+    
+}
+
+//! only use for special occasions.
+public void do_msg(int level, string m, mixed|void ... extras)
+{
+   low_do_msg(local_vars->name, level, m, @extras);
+//if(!log_strs[level]) werror(master()->describe_backtrace(backtrace()) + "\n");
+//werror("DEBUG: %d, %d\n", level, loglevel);
+
 
 //  stderr->write("%02d:%02d:%02d %s %s - %s\n", lt->hour, lt->min, lt->sec, log_strs[level], 
 //                      function_name(backtrace()[-3][2]), m);
@@ -143,7 +151,7 @@ void set_level(int level)
   loglevel = level;
 }
 
-string _sprintf(mixed ... args)
+static string _sprintf(mixed ... args)
 {
   return "logger()";//, appenders);
 }

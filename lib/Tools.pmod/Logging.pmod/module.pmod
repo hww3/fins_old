@@ -13,6 +13,7 @@ object default_logger = Tools.Logging.Log.Logger();
 //!  configuration file is standard ini-style.
 //!
 //!  [logger.logger_name] <-- configures a logger named "logger_name"
+//!  level=DEBUG|INFO|WARN|ERROR <-- optional log level for this logger
 //!  appender=appender_name <-- use the appender "appender_name"
 //!  class=Some.Pike.Class <-- use the specified pike class for appending,
 //!    defaults to Tools.Logging.Log.Logger
@@ -37,7 +38,7 @@ static void create_default_appender()
 
 object get_default_logger()
 {
-	return default_logger;
+  	  return default_logger;
 }
 
 void set_config_variables(mapping vars)
@@ -93,7 +94,7 @@ Tools.Logging.Log.Logger create_logger(string loggername)
   // go with a default.
   if(!l) {	
     default_logger->debug("no defined logger " + loggername + ", using default.");
-   l = Tools.Logging.Log.Logger();
+   l = Tools.Logging.Log.Logger((["name":loggername]));
   }
   return l;
 }

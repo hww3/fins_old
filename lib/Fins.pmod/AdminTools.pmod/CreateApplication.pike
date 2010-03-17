@@ -41,6 +41,9 @@ appender=default_debuglog
 appender=access_log
 class=Tools.Logging.Log.AccessLogger
 
+[logger.model.personality]
+level=INFO
+
 [appender.default_console]
 class=Tools.Logging.Log.ConsoleAppender
 

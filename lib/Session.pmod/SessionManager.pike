@@ -1,14 +1,14 @@
 // our default timeout is 1 hour.
 static int default_timeout = 3600;
 static int cleaner_interval = 3600;
+import Tools.Logging;
 
-Tools.Logging.Log.Logger log;
+Tools.Logging.Log.Logger log = get_logger(this_program);
 
 array session_storage = ({});
 
 void create()
 {
-  log = Tools.Logging.get_logger("session");
   call_out(start_session_cleaner, 5);
 
 }

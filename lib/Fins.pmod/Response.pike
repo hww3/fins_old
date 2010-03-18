@@ -367,7 +367,8 @@
        array _cookies = ({});
        foreach(indices(cookies), string name)
 	 if (name != "__expiration__")
-	   _cookies += ({ sprintf("%s=%s;", Protocols.HTTP.http_encode_cookie(name), Protocols.HTTP.http_encode_cookie(cookies[name])) });
+	   _cookies += ({ sprintf("%s=%s;", Protocols.HTTP.http_encode_cookie(name), 		
+						Protocols.HTTP.http_encode_cookie(cookies[name])) });
         _cookies += ({ "path=/;" });
 	if (cookies["__expiration__"])
 	  ({ sprintf("expires=%s", Protocols.HTTP.Server.http_date(cookies["__expiration__"])) });

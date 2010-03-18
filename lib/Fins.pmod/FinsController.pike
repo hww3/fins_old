@@ -16,6 +16,8 @@ import Tools.Logging;
 //!   When using FinServe, an event that produces no output will return a "unable to find a handler" 
 //!   404 error. The event will still fire, though.
 
+Log.Logger log = get_logger("fins.controller");
+
 //! set this to zero to avoid session redirects
 constant __uses_session = 1;
 
@@ -72,7 +74,7 @@ static object load_controller(string controller_name)
   }
   else return 0;
 
-  if(!c) Log.error("Unable to load controller %s", controller_name);
+  if(!c) log->error("Unable to load controller %s", controller_name);
 
   
   object o = c(app);
@@ -144,13 +146,13 @@ static void after_filter(function|object filter)
 //!  method to load up your controllers.
 static void create(object a)
 {  
-  Log.debug("%O->create()", this);
+  log->debug("%O->create()", this);
   __last_load = time();
   ::create(a);
 
   if(functionp(start))
   {
-  //  Log.debug("scheduling startup of controller %O.\n", this);
+  //  log->debug("scheduling startup of controller %O.\n", this);
     call_out(start, 0);
   }
 }

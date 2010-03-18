@@ -5,6 +5,7 @@ import Tools.Logging;
 //!
 //!
 
+Log.Logger log = get_logger("fins.cache");
 static mapping(string:array) values = ([]);
 
 static void create()
@@ -87,6 +88,6 @@ void cleanup()
     }
   }
   if(cleaned)
-    Log.info("FinsCache(): cleaned " + cleaned + " objects.\n");
+    log->info("FinsCache(): cleaned " + cleaned + " objects.\n");
   call_out(cleanup, random(60) + 60);
 }

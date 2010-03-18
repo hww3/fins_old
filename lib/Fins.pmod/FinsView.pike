@@ -5,7 +5,7 @@ inherit Fins.Helpers.Macros.JavaScript;
 inherit Fins.Helpers.Macros.Basic;
 inherit Fins.Helpers.Macros.Scaffolding;
 
-object log = get_logger("fins.view");
+Tools.Logging.Log.Logger log = get_logger("fins.view");
 
 //! the default class to be used for templates in this application
 program default_template = Fins.Template.Simple;

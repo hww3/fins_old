@@ -3,6 +3,8 @@ import Tools.Logging;
 
 //! this is the base application class.
 
+Log.Logger log = get_logger("fins.application");
+
 object __fin_serve;
 
 //! provide any context root (location in the virtual filesystem) for this application.  this setting
@@ -70,7 +72,7 @@ static void create(.Configuration _config)
 	// and set up the l10n system for our app.
   config = _config;
   static_dir = Stdio.append_path(config->app_dir, "static");
-werror(Stdio.append_path(config->app_dir, "translations/%L/%P.xml") + "\n");
+//werror(Stdio.append_path(config->app_dir, "translations/%L/%P.xml") + "\n");
    Locale.set_default_project_path(Stdio.append_path(config->app_dir, "translations/%L/%P.xml"));
 
   if(config["application"] && config["application"]["context_root"])
@@ -82,9 +84,9 @@ werror(Stdio.append_path(config->app_dir, "translations/%L/%P.xml") + "\n");
   controller_autoreload = (int)(config["controller"]["reload"]);
  
   if(controller_autoreload)
-    Log.info("Automatic reload of controllers is enabled.");
+    log->info("Automatic reload of controllers is enabled.");
   else if(cache_events)
-    Log.info("Event caching is enabled.");
+    log->info("Event caching is enabled.");
 
   // next, let's load up the various components of our application.
   load_breakpoint();
@@ -132,17 +134,17 @@ static void load_processor(string proc)
 
   if(proc)
     processor = ((program)proc)(this);
-  else Log.debug("No processor defined!");
+  else log->debug("No processor defined!");
 
   if(!Program.implements(object_program(processor), Fins.Processor))
   {
-    Log.error("class %s does not implement Fins.Processor.", proc);
+    log->error("class %s does not implement Fins.Processor.", proc);
   }
   else
   {
     foreach(processor->supported_protocols();; string protocol)
     {
-      Log.info("Loaded processor for " + protocol);
+      log->info("Loaded processor for " + protocol);
       processors[protocol] = processor;
     }
   }   
@@ -165,7 +167,7 @@ static void load_breakpoint()
     bpbet = Thread.Thread(lambda(){ do { catch(bpbe()); } while (1); });
 
     if((int)config["application"]["breakpoint_port"]) breakpoint_port_no = (int)config["application"]["breakpoint_port"];
-    Log.info("Starting Breakpoint Server on port %d.", breakpoint_port_no);
+    log->info("Starting Breakpoint Server on port %d.", breakpoint_port_no);
     breakpoint_port = Stdio.Port(breakpoint_port_no, handle_breakpoint_client);
     breakpoint_port->set_backend(bpbe);
   }
@@ -173,7 +175,7 @@ static void load_breakpoint()
 
 static void load_cache()
 {
-  Log.info("Starting Cache.");
+  log->info("Starting Cache.");
 
   cache = .FinsCache();
 }
@@ -183,7 +185,7 @@ static void load_view()
   string viewclass = (config["view"] ? config["view"]["class"] :0);
   if(viewclass)
     view = ((program)viewclass)(this);
-  else Log.debug("No view defined!");
+  else log->debug("No view defined!");
 }
 
 object get_master_for_thread()
@@ -201,7 +203,7 @@ array get_program_path()
 
 static object low_load_controller(string controller_name)
 {
-	werror("low_load_controller(%O)\n", controller_name);
+//	werror("low_load_controller(%O)\n", controller_name);
   program c;
   string cn;
   string f;
@@ -231,13 +233,13 @@ static object low_load_controller(string controller_name)
   }
   else return 0;
 
-  if(!c) Log.error("Unable to load controller %s", controller_name);
+  if(!c) log->error("Unable to load controller %s", controller_name);
 
   
   object o = c(this);
   o->__controller_name = cn;
   o->__controller_source = f;
-werror("controller loaded: %O\n", o);
+//werror("controller loaded: %O\n", o);
   return o;
 }
 
@@ -254,7 +256,7 @@ werror("controller loaded: %O\n", o);
 //!  } 
 static void load_controller()
 {
-  Log.debug("%O->load_controller()", this);
+  log->debug("%O->load_controller()", this);
   string conclass = (config["controller"]? config["controller"]["class"] :0);
   if(conclass)
   {
@@ -267,7 +269,7 @@ static void load_controller()
 //     controller->__controller_name = conclass;
 // 
   }
-  else Log.debug("No controller defined!");
+  else log->debug("No controller defined!");
 }
 
 // instantiates the model class defined in the configuration file
@@ -276,10 +278,10 @@ static void load_model()
   string modclass = (config["model"] ? config["model"]["class"] : 0);
   if(modclass)
   {
-    Log.info("loading model from " + modclass);
+    log->info("loading model from " + modclass);
     model = ((program)modclass)(this);
   }
-  else Log.debug("No model defined!");
+  else log->debug("No model defined!");
 }
 
 // checks to see if a given controller object has been updated on disk 
@@ -300,7 +302,7 @@ int controller_updated(object controller, object container, string cn)
 
 void reload_controllers()
 {
-  Log.debug("Reloading controllers.");
+  log->debug("Reloading controllers.");
 //  if(object_program(container) == object_program(this))
   load_controller();
   action_path_cache = ([]);
@@ -519,7 +521,7 @@ public mixed handle_request(.Request request)
   request->fins_app = this;
   request->controller_path="";
 
-  //  Log.info("SESSION INFO: %O", request->misc->session_variables);
+  //  log->info("SESSION INFO: %O", request->misc->session_variables);
 
   if(request->low_protocol == "HTTP")
   {
@@ -576,7 +578,7 @@ public mixed handle_http(.Request request)
 
     if(er)
     {
-       Log.exception(sprintf("An exception occurred while executing event %O", event), er);
+       log->exception(sprintf("An exception occurred while executing event %O", event), er);
       er = Error.mkerror(er);
       {
 //		werror("handling error %O.\n", er);
@@ -730,7 +732,7 @@ array get_event(.Request request)
 
   cc = controller;
   request->controller = cc;
-werror("controller: %O\n", cc);
+//werror("controller: %O\n", cc);
   request->controller_name = cc->__controller_name;
 
 
@@ -755,7 +757,7 @@ werror("controller: %O\n", cc);
 	    }
 	    else
 	    {
-	      Log.info("Controller has no index method: %O", cc);
+	      log->info("Controller has no index method: %O", cc);
 	    }
 	    break;
       }
@@ -943,7 +945,7 @@ public void breakpoint(string desc, mapping state)
   }
   else
   {
-    Log.debug("breakpoints disabled, skipping breakpoint set from %O",
+    log->debug("breakpoints disabled, skipping breakpoint set from %O",
                  backtrace()[-2][2]);
   }
   return;
@@ -955,7 +957,7 @@ private void do_breakpoint(string desc, mapping state, array bt)
    object key = bp_lock->lock();
   breakpoint_cond = Thread.Condition();
   bpbe->call_out(lambda(){breakpoint_hilfe = Helpers.Hilfe.BreakpointHilfe(breakpoint_client, this, state, desc, bt);}, 0);
-  Log.info("Hilfe started for Breakpoint on %s.", desc);
+  log->info("Hilfe started for Breakpoint on %s.", desc);
   breakpoint_cond->wait(key);
   key = 0;
   // now, we must wait for the hilfe session to end.

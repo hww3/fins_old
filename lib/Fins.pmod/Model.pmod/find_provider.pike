@@ -11,6 +11,8 @@
 //! users_by_alt(string alternate_id)
 //! users_by_alternate(string alternate_id)
 
+object log = Tools.Logging.get_logger("fins.model");
+
 .DataModelContext context;
 
 static void create(void|.DataModelContext c)
@@ -61,7 +63,7 @@ static program get_model_component(string ot)
     x[i] = lower_case(v);
 
   m = mkmapping(x,y);
- //Tools.Logging.Log.debug("%O: %s in %O", Tools.Function.this_function(), ot, m);
+ //log->debug("%O: %s in %O", Tools.Function.this_function(), ot, m);
 
   return m[ot];
 }
@@ -90,7 +92,7 @@ static function get_func(mixed k)
 
   if(!context)
   {
-	Tools.Logging.Log.debug("initializing %O with default model context.", this);
+	log->debug("initializing %O with default model context.", this);
     context = Fins.Model.get_default_context();
   }
 
@@ -105,7 +107,7 @@ static function get_func(mixed k)
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
 	{
-		Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
+		log->debug("%O found %s component %O", this, k, p);
 
       return lambda(mixed ... args){ return context->find_by_id(p, @args);};
 	}
@@ -117,7 +119,7 @@ static function get_func(mixed k)
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
 	{
-		Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
+		log->debug("%O found %s component %O", this, k, p);
       return lambda(mixed ... args){ return context->find_by_query(p, @args);};
     }
   }
@@ -128,7 +130,7 @@ static function get_func(mixed k)
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
 	{
-	  Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
+	  log->debug("%O found %s component %O", this, k, p);
       return lambda(mixed ... args){ return context->find_by_alternate(p, @args);};
     }
   }
@@ -139,7 +141,7 @@ static function get_func(mixed k)
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
 	{
-   	  Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
+   	  log->debug("%O found %s component %O", this, k, p);
       return lambda(mixed ... args){ return context->find_by_alternate(p, @args);};
     }
   }
@@ -162,7 +164,7 @@ werror("ot: %O, %O\n", get_model_component(ot)->master_object, k[(i+4)..]);
 //    ot = String.capitalize(ot);
     if(p=get_model_component(ot))
 	{
-	  Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
+	  log->debug("%O found %s component %O", this, k, p);
       return lambda(){ return context->old_find(p, ([]));};
     }
   }
@@ -173,7 +175,7 @@ werror("ot: %O, %O\n", get_model_component(ot)->master_object, k[(i+4)..]);
 	if(!ot) return 0;
     if(p=get_model_component(ot))
 	{
-	  Tools.Logging.Log.debug("%O found %s component %O", this, k, p);
+	  log->debug("%O found %s component %O", this, k, p);
       return lambda(mixed ... args){ return context->old_find(p, @args);};
     }    
   }

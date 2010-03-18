@@ -123,7 +123,7 @@ int do_startup()
   Log.info("Loading application " + project + " using configuration " + config_name);
   
   load_application();
-  logger=Tools.Logging.get_default_logger();
+  logger=Tools.Logging.get_logger("fins.server");
 
   app->__fin_serve = this;
 
@@ -169,7 +169,7 @@ void session_startup()
 {
   Session.SessionStorage s;
 
-  Log.info("Starting Session Manager.");
+  logger->info("Starting Session Manager.");
 
   session_manager = Session.SessionManager();
 
@@ -186,25 +186,25 @@ void session_startup()
   switch(session_storagetype)
   {
     case "file":
-      Log.info("SessionManager will use files in " + session_storagedir + " to store session data.");
+      logger->info("SessionManager will use files in " + session_storagedir + " to store session data.");
       s = Session.FileSessionStorage();
       s->set_storagedir(session_storagedir);
       break;
 
     case "sqlite":
-      Log.info("SessionManager will use SQLite database " + session_storagedir + " to store session data.");
+      logger->info("SessionManager will use SQLite database " + session_storagedir + " to store session data.");
       s = Session.SQLiteSessionStorage();
       s->set_storagedir(session_storagedir);
       break;
 
     case "ram":
-      Log.info("SessionManager will use RAM to store session data.");
+      logger->info("SessionManager will use RAM to store session data.");
       s = Session.RAMSessionStorage();
       break;
 	
     default:
-      Log.warn("Unknown session storage type '" + session_storagetype + "'."); 
-      Log.info("SessionManager will use RAM to store session data.");
+      logger->warn("Unknown session storage type '" + session_storagetype + "'."); 
+      logger->info("SessionManager will use RAM to store session data.");
       s = Session.RAMSessionStorage();
       break;
   }
@@ -241,7 +241,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
   if(e)
   {
 //describe_backtrace(e);
-    Log.exception("Error occurred while handling request!", e);
+    logger->exception("Error occurred while handling request!", e);
     mapping response = ([]);
     response->error=500;
     response->type="text/html";
@@ -273,8 +273,8 @@ void handle_request(Protocols.HTTP.Server.Request request)
     }
     else
     {
-      Log.debug("Got nothing from the application for the request %O, referrer: %O. Probably means the request passed through an index action unhandled.\n", request, request->referrer);
-      if(e) Log.exception("An error occurred while processing the request\n", e);
+      logger->debug("Got nothing from the application for the request %O, referrer: %O. Probably means the request passed through an index action unhandled.\n", request, request->referrer);
+      if(e) logger->exception("An error occurred while processing the request\n", e);
       mapping response = ([]);
       response->server="FinServe " + my_version;
       response->type = "text/html";
@@ -320,7 +320,7 @@ void load_application()
 
   if(!application)
   {
-    Log.critical("No Application!");
+    logger->critical("No Application!");
     exit(1);
   }
 

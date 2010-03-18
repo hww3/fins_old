@@ -78,8 +78,10 @@ void load_config_file()
   config_values = Public.Tools.ConfigFiles.Config.read(fc);  
 }
 
-Tools.Logging.Log.Logger get_logger(string loggername)
+Tools.Logging.Log.Logger get_logger(string|program loggername)
 {
+  if(programp(loggername))
+    loggername = replace(lower_case(sprintf("%O", loggername)), "/", ".");
  // werror("get_logger(%s)\n", loggername);
   if(!loggers[loggername]) 
     loggers[loggername] = create_logger(loggername);

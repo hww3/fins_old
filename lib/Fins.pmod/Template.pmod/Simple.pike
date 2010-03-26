@@ -216,9 +216,9 @@ string parse_psp(string file, string realname, object|void compilecontext)
   string ps = "", h = "" , header = "", initialization = "", pikescript = "";
  
   [ps, h] = render_psp(contents, "", "", compilecontext);
-
+  header += ("Tools.Logging.Log.Logger __log = Tools.Logging.get_logger(\"fins.template.render\");");
   header += ("int is_layout = " + is_layout + "; inherit Fins.Helpers.Macros.Base;\n");
-
+  
 //  werror("MACROS: %O\n", macros_used);
   foreach(macros_used; string macroname;)
   {
@@ -499,13 +499,18 @@ class PikeBlock
        string rx = "";
        function f = context->view->get_simple_macro(cmd);
        if(!f)
-         throw(Fins.Errors.TemplateCompile(sprintf("PSP format error: invalid command at line %d.\n", (int)start)));
+         throw(Fins.Errors.TemplateCompile(sprintf("PSP format error: invalid macro command at line %d.\n", (int)start)));
 
 //werror("adding macro " + cmd + "\n");
        macros_used[cmd] ++;
 
        return ("{mixed e = catch{"
-              " buf->add(__macro_" + cmd + "(__d, " + argify(arg) + "));};if(e)werror(\"An error occurred while calling macro " + cmd + "(\"" + sprintf("%O", arg) + "\"):\" + e[0] + \"\\n\");}");
+              " buf->add(__macro_" + cmd + 
+              "(__d, " + argify(arg) + 
+              "));};if(e)__log->warn(\"An error occurred while calling macro " 
+              + cmd + " at " + "\" +e[1][-1][0] + \":\" + e[1][-1][1] + \"" + 
+              " called from \"+ e[1][-2][0] + \":\" + e[1][-2][1] + \"" +  
+              "(\"" + sprintf("%O", arg) + "\"):\" + e[0] + \"\\n\");}");
        break;
    }
 

@@ -53,13 +53,16 @@ public function get_simple_macro(string name)
 
 //!
 public string render_partial(string view, mapping data, 
-                                 string|void collection_name, mixed|void collection)
+                                 string|void collection_name, mixed|void collection, void|Fins.Request request)
 {
+//werror("render_partial(%O)\n", request);
 	string result = "";
 	object v = get_view(view);
 
 	if(collection_name)
 	{
+		if(request)
+                  v->data->set_request(request);
 		foreach(collection;mixed i; mixed c)
 		{
 			mapping d = data + ([]);
@@ -72,6 +75,8 @@ public string render_partial(string view, mapping data,
 	}
         else
 	{
+		if(request)
+                  v->data->set_request(request);
 		v->data->set_data(data);
 		result += v->render();
 	}	

@@ -26,6 +26,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Tools.Logging.Log.Appender now encodes output as UTF-8 in order to
+     prevent exceptions when writing log messages with wide strings.
 - Macros output exception information to the main logging system (in the 
      logger fins.template.render) and should be more useful, including 
      source template and line as well as macro code and line.

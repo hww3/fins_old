@@ -12,7 +12,7 @@ static void create(mapping config)
 
 mixed write(mapping args)
 {
-  return output->write(format_function(args) );
+  return output->write(encode_string(format_function(args) ));
 }
 
 string _sprintf(mixed ... args)
@@ -20,3 +20,10 @@ string _sprintf(mixed ... args)
   return sprintf("appender(%O)", output);
 }
 
+
+// we shouldn't assume the output should be utf8, but it will allow us to avoid
+// errors when trying to write log messages with wide strings.
+string encode_string(string input)
+{
+  return string_to_utf8(input);
+}

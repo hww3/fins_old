@@ -11,7 +11,7 @@ void create()
 
 void clean_sessions(int default_timeout)
 {
-  sql->query("DELETE FROM SESSIONS WHERE last_updated + " + default_timeout + " < CURRENT_TIMESTAMP");
+  sql->query("DELETE FROM SESSIONS WHERE timeout + " + default_timeout + " < CURRENT_TIMESTAMP");
 }
 
 void set_storagedir(string directory)
@@ -19,12 +19,13 @@ void set_storagedir(string directory)
   mixed e;
   e = catch 
   {
-    sql = Sql.Sql("SQLite://" + directory);
+    sql = Sql.Sql("sqlite://" + directory);
   };
   if(e) throw(Error.Generic("Unable to create session storage database " + directory + ".\n"));
   storage_dir = directory;
 
-  if(!sizeof(sql->query("PRAGMA table_info(SESSIONS)")))
+  mixed rs = sql->query("PRAGMA table_info(SESSIONS)");
+  if(!rs || !sizeof(rs))
   {
     werror("creating sessions table...\n");
     sql->query("CREATE TABLE SESSIONS(sessionid varchar(15) PRIMARY KEY, data text, timeout timestamp)");

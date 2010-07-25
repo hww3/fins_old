@@ -17,6 +17,9 @@ int null;
 mixed default_value;
 string name;
 
+function encode_get = encode;
+function validate_get = validate;
+
 //! @param _default
 //! default may be either a Calendar object, a calendar class
 //! or a function that returns a calendar object.
@@ -96,6 +99,12 @@ mixed validate(mixed value, void|.DataObjectInstance i)
    {
      return unit_parse(value);
    }
+
+   if(objectp(value) && value->is_timerange)
+   {
+     return value;
+   }
+
    if(objectp(value) && Program.implements(object_program(value), unit_program))
    {
      return value;
@@ -179,4 +188,21 @@ mixed from_form(mapping value, void|.DataObjectInstance i)
   object c = Calendar.dwim_time(sprintf("%04d-%02d-%02d", (int)value->year_no, (int)value->month_no, (int)value->month_day));
         return c;
 }
+
+
+string make_qualifier(mixed v)
+{
+	if(objectp(v))
+	{
+		if(v->is_second)
+		   return field_name + " = " + encode_get(v);
+		else if(v->beginning && v->end)
+		{
+			return "(" + field_name  + " >= " + encode_get(v->beginning()) + " AND " + field_name + " < " + encode_get(v->end()) + ")";
+		}
+	}
+	else
+  		return field_name + "=" + encode_get(v);
+}
+
 

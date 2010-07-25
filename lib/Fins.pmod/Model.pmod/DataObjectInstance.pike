@@ -159,7 +159,7 @@ void refresh()
 //!
 //! @note
 //!   no record is created in the underlying database for this object until @[save] is called.
-object new(void|.DataModelContext c)
+object(this_program) new(void|.DataModelContext c)
 {
    program p = object_program(this);
    object new_object = p(UNDEFINED, c||context);  
@@ -169,7 +169,7 @@ object new(void|.DataModelContext c)
 }
 
 //!
-object find_by_alternate(mixed id, void|.DataModelContext c)
+object(this_program) find_by_alternate(mixed id, void|.DataModelContext c)
 {
     program p = object_program(this);
     object new_object = p(UNDEFINED, c||context);  
@@ -178,7 +178,7 @@ object find_by_alternate(mixed id, void|.DataModelContext c)
 }
 
 //! an id must be a non-zero integer.
-object find_by_id(int id, void|.DataModelContext c)
+object(this_program) find_by_id(int id, void|.DataModelContext c)
 {
    program p = object_program(this);
    object new_object = p(UNDEFINED, c||context);  
@@ -189,13 +189,13 @@ object find_by_id(int id, void|.DataModelContext c)
 }
 
 //!
-array(object(.DataObjectInstance)) find_all(void|.DataModelContext c)
+array(object(this_program)) find_all(void|.DataModelContext c)
 {
   return find(([]), c||context);
 }
 
 //!
-array(object(.DataObjectInstance)) find(mapping qualifiers, .Criteria|void criteria, void|.DataModelContext c)
+array(object(this_program)) find(mapping qualifiers, .Criteria|void criteria, void|.DataModelContext c)
 {
   return master_object->find(c||context, qualifiers, criteria, this);
 }

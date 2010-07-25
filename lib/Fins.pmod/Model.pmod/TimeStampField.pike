@@ -13,6 +13,8 @@ program unit_program = Calendar.Second;
 function unit_parse = Calendar.ISO.dwim_time;
 string output_unit_format = "%Y-%M-%D %h:%m:%s";
 
+function validate_get = ::validate;
+
 string get_editor_string(void|mixed value, void|.DataObjectInstance i)
 { return 0; }
 

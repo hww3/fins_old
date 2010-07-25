@@ -14,6 +14,21 @@ program unit_program = Calendar.Second;
 function unit_parse = Calendar.ISO.dwim_time;
 string output_unit_format = "%Y-%M-%D %h:%m:%s";
 
+function encode_get = _encode_get;
+
+string _encode_get(mixed value, void|.DataObjectInstance i)
+{
+  value = validate_get(value);
+
+  if(value == .Undefined)
+  {
+    return "NULL";
+  }
+
+  if(stringp(value)) return sprintf("'%s'", value);
+  return "'" + value->format_time() + "'";
+}
+
 string encode(mixed value, void|.DataObjectInstance i)
 {
   value = validate(value, i);

@@ -225,3 +225,48 @@ array find_by_query(string|program|object ot, string query)
   return  repository->get_instance(o->instance_name)(UNDEFINED, this);
 }
 
+.DataObjectInstance import_xml_node(Parser.XML.Tree.SimpleNode node)
+{
+   string instance_name;
+   .DataObject instance_type;
+
+   mapping attributes = ([]);
+
+   instance_name = node->get_tag_name();
+
+   if(!(instance_type = repository->get_object(instance_name)))
+     throw(Error.Generic("invalid object type '" + instance_name + "'.\n"));
+
+	object instance = new(instance_type);
+
+    foreach(node->get_children();;object child)
+	{
+		werror("child: %O\n", child);
+		if(child->get_node_type() != Parser.XML.Tree.XML_ELEMENT)
+		  continue;
+		mapping cattrs = child->get_attributes();
+		werror("cattrs: %O\n", cattrs);
+		if(cattrs->key == "true") // should we use the key as it's provided by the exporting system?
+		{
+//			n->set_id(key)
+			continue;
+		}
+		
+		if(!cattrs->reference_type)
+		{
+			// child should just be a plain old simple value (we hope!)
+			object ve = child->get_children()[0];
+			if(ve->get_node_type() == Parser.XML.Tree.XML_TEXT)
+			{
+			  attributes[child->get_tag_name()] = ve->get_text();
+  			  instance[child->get_tag_name()] = ve->get_text();
+			}
+		}
+		
+	}
+
+//	instance->set_atomic(attributes);
+werror("Attributes: %O\n", attributes);
+    return instance;
+}
+

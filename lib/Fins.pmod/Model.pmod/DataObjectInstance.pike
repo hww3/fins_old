@@ -254,6 +254,7 @@ mixed get_id()
    return key_value;
 }
 
+//!
 mixed get_alt()
 {
   if(master_object->alternate_key)
@@ -291,6 +292,89 @@ int is_saved()
 int is_new_object()
 { 
    return new_object;
+}
+
+string render_xml()
+{
+  object root = Parser.XML.Tree.SimpleRootNode();
+
+  root->add_child(Parser.XML.Tree.SimpleNode(Parser.XML.Tree.XML_HEADER, "xml", (["version": "1.0"]), ""));
+  root->add_child(render_xml_node());
+
+  return root->render_xml();
+}
+
+//! renders the attributes of the current object as an XML node object. This method does not perform a 
+//! recursive or deep traversion of any attached objects linked from this object
+Parser.XML.Tree.SimpleNode render_xml_node()
+{
+  object obj = Parser.XML.Tree.SimpleNode(Parser.XML.Tree.XML_ELEMENT, master_object->instance_name, ([]), "");
+
+  foreach(_indices();; string i)
+  {
+	string indval = "";
+	mapping attrs = ([]);
+	
+	if(master_object->fields[i]->is_shadow) continue;	
+	if(master_object->primary_key == master_object->fields[i])
+		attrs["key"] = "true";
+	mixed m = get(i);
+	if(objectp(m))
+	{
+		// we don't need to include foreign keys, as they're not stored here.
+		if(Program.inherits(object_program(master_object->fields[i]), Fins.Model.InverseForeignKeyReference))
+		  continue;
+
+		else if(Program.implements(object_program(m), Fins.Model.DataObjectInstance))
+		{
+			// TODO
+			// perhaps we should check to see if there's an alternate id field and use that instead.
+			attrs["referred_type"] = m->master_object->instance_name;
+			attrs["reference_type"] = (m->master_object->alternate_key ?
+										m->master_object->alternate_key->name :
+										m->master_object->primary_key->name);
+			
+			indval = m->master_object->alternate_key?(string)m->get_alt():(string)m->get_id();
+		}
+
+		else if(Program.implements(object_program(m), master()->resolv("Fins.Model.MultiObjectArray")))
+		{
+			attrs["reference_type"] = "many-to-many";
+			object val = Parser.XML.Tree.SimpleNode(Parser.XML.Tree.XML_ELEMENT, i, attrs, "");
+
+			foreach(m;;object f)
+			{
+				object ref = Parser.XML.Tree.SimpleNode(Parser.XML.Tree.XML_ELEMENT, "reference", ([ "reference_type": (f->master_object->alternate_key?f->master_object->alternate_key->name:f->master_object->primary_key->name), "referred_type": f->master_object->instance_name]), "");
+				ref->add_child(Parser.XML.Tree.SimpleNode(Parser.XML.Tree.XML_TEXT, "", ([]), (string)f->get_id()));
+				val->add_child(ref);
+			}
+			obj->add_child(val);
+			continue;
+		}
+	}
+	else if(arrayp(m))
+	{
+	}
+	else if(mappingp(m))
+	{
+		
+	}
+	else if(multisetp(m))
+	{
+		
+	}
+	else
+	{
+	  	indval = (string)m;
+	}
+	
+//	attrs->type = master_object->fields[i]->type;
+	object val = Parser.XML.Tree.SimpleNode(Parser.XML.Tree.XML_ELEMENT, i, attrs, "");
+	val->add_child( Parser.XML.Tree.SimpleNode(Parser.XML.Tree.XML_TEXT, "", ([]), indval));
+	obj->add_child(val);
+  }
+
+  return obj;
 }
 
 //!

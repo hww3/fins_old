@@ -6,6 +6,8 @@ import Tools.Logging;
 function access_logger;
 object logger;
 
+function(object:void) ready_callback;
+
 constant default_port = 8080;
 constant my_version = "0.1";
 int my_port;
@@ -14,10 +16,10 @@ string session_storagetype = "ram";
 //string session_storagetype = "file";
 //string session_storagetype = "sqlite";
 //string session_storagedir = "/tmp/scriptrunner_storage";
-string session_storagedir = "/tmp/scriptrunner_storage.db";
+string session_storagedir = "/tmp/monotype_storage.sqlite3";
 string logfile_path = "/tmp/scriptrunner.log";
 string session_cookie_name = "PSESSIONID";
-int session_timeout = 3600;
+int session_timeout = 7200;
 
 Session.SessionManager session_manager;
 
@@ -37,12 +39,19 @@ int hilfe_mode = 0;
 string project = "default";
 string config_name = "dev";
 int go_background = 0;
+private int has_started = 0;
 void print_help()
 {
 	werror("Help: fin_serve [-p portnum|--port=portnum|--hilfe] [-c|--config configname] [-d]  appname\n");
 }
 
 array tool_args;
+
+int(0..1) started()
+{
+  if(port && has_started) return 1;
+  else return 0;
+}
 
 void create(array args)
 {
@@ -117,13 +126,10 @@ int do_startup()
 #endif /* fork() */
 
   Log.info("FinServe starting on port " + my_port);
-  call_out(session_startup, 0);
 
-  Log.info("FinServe running %s/%s", Fins.version(), version());
-  Log.info("Loading application " + project + " using configuration " + config_name);
-  
+  Log.info("FinServe loading application " + project + " using configuration " + config_name);
   load_application();
-  logger=Tools.Logging.get_logger("fins.server");
+  logger=Tools.Logging.get_default_logger();
 
   app->__fin_serve = this;
 
@@ -155,8 +161,14 @@ int do_startup()
 #endif
 #endif
 
+    call_out(session_startup, 0);
     logger->info("FinServe listening on port " + my_port);
     logger->info("Application ready for business.");
+    if(ready_callback)
+	call_out(ready_callback, 0, this);
+
+    has_started = 1;
+
     return -1;
   }
 }
@@ -169,7 +181,7 @@ void session_startup()
 {
   Session.SessionStorage s;
 
-  logger->info("Starting Session Manager.");
+  Log.info("Starting Session Manager.");
 
   session_manager = Session.SessionManager();
 
@@ -186,25 +198,25 @@ void session_startup()
   switch(session_storagetype)
   {
     case "file":
-      logger->info("SessionManager will use files in " + session_storagedir + " to store session data.");
+      Log.info("SessionManager will use files in " + session_storagedir + " to store session data.");
       s = Session.FileSessionStorage();
       s->set_storagedir(session_storagedir);
       break;
 
     case "sqlite":
-      logger->info("SessionManager will use SQLite database " + session_storagedir + " to store session data.");
+      Log.info("SessionManager will use SQLite database " + session_storagedir + " to store session data.");
       s = Session.SQLiteSessionStorage();
       s->set_storagedir(session_storagedir);
       break;
 
     case "ram":
-      logger->info("SessionManager will use RAM to store session data.");
+      Log.info("SessionManager will use RAM to store session data.");
       s = Session.RAMSessionStorage();
       break;
 	
     default:
-      logger->warn("Unknown session storage type '" + session_storagetype + "'."); 
-      logger->info("SessionManager will use RAM to store session data.");
+      Log.warn("Unknown session storage type '" + session_storagetype + "'."); 
+      Log.info("SessionManager will use RAM to store session data.");
       s = Session.RAMSessionStorage();
       break;
   }
@@ -221,7 +233,7 @@ void session_startup()
 void handle_request(Protocols.HTTP.Server.Request request)
 {
   mixed r;
-
+access_logger(request);
   // Do we have either the session cookie or the PSESSIONID var?
   if(request->cookies && request->cookies[session_cookie_name]
          || request->variables[session_cookie_name] )
@@ -241,7 +253,7 @@ void handle_request(Protocols.HTTP.Server.Request request)
   if(e)
   {
 //describe_backtrace(e);
-    logger->exception("Error occurred while handling request!", e);
+    Log.exception("Error occurred while handling request!", e);
     mapping response = ([]);
     response->error=500;
     response->type="text/html";
@@ -273,8 +285,8 @@ void handle_request(Protocols.HTTP.Server.Request request)
     }
     else
     {
-      logger->debug("Got nothing from the application for the request %O, referrer: %O. Probably means the request passed through an index action unhandled.\n", request, request->referrer);
-      if(e) logger->exception("An error occurred while processing the request\n", e);
+      Log.debug("Got nothing from the application for the request %O, referrer: %O. Probably means the request passed through an index action unhandled.\n", request, request->referrer);
+      if(e) Log.exception("An error occurred while processing the request\n", e);
       mapping response = ([]);
       response->server="FinServe " + my_version;
       response->type = "text/html";
@@ -315,12 +327,12 @@ void handle_request(Protocols.HTTP.Server.Request request)
 void load_application()
 {
   object application;
-
-  application = Fins.Loader.load_app(combine_path(getcwd(), project), config_name);
-
-  if(!application)
+  mixed err = catch(
+  application = Fins.Loader.load_app(combine_path(getcwd(), project), config_name));
+  if(err || !application)
   {
-    logger->critical("No Application!");
+    if(err) Log.error("An error occurred while loading the application.", err);
+    else Log.critical("An error occurred while loading the application.");
     exit(1);
   }
 
@@ -343,3 +355,9 @@ void load_application()
 
     logger->debug( "Created new session sid='%s' host='%s'",ssid,request->get_client_addr());
   }
+
+void destroy()
+{
+  if(logger) logger->info("Shutting down Fins application.");
+  if(port) destruct(port);
+}

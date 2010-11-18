@@ -27,10 +27,13 @@ object load_app(string app_dir, string config_name)
   program p;
 
   cn = "application";
+mixed err = catch 
+{
   p = master()->cast_to_program(cn);
-//werror("PROGRAM: %O\n", p);
   a = p(config);
-
+};
+if(err)
+  Log.error("error occurred while loading the application.", Error.mkerror(err));
   return a;
 }
 

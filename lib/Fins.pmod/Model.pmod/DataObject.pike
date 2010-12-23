@@ -19,7 +19,7 @@
 //! "Appname.DataMappings.User."
 //! 
 
-object log = Tools.Logging.get_logger("fins.model.dataobject");
+object log = Tools.Logging.get_logger("model.dataobject");
 
 string default_operator = " AND ";
 
@@ -987,6 +987,11 @@ mapping objs, objs_by_alt;
    // first, check to see what we link to.
    string key_value = primary_key->encode(i->get_id(), i);
 
+   mixed _id, _alt;
+
+  _id = i->get_id();
+  _alt = i->get_alt();
+
    // we need to check any relationships to see of we're referenced 
    // anywhere. this will be tricky, because we need to maintain
    // data integrity, but we also don't want to delete referenced records
@@ -1045,8 +1050,8 @@ else
   objs_by_alt = _objs_by_alt;
   objs = _objs;
 }
-   m_delete(objs, i->get_id());
-   m_delete(objs_by_alt, i->get_alt());
+   m_delete(objs, _id);
+   m_delete(objs_by_alt, _alt);
    destruct(i);
    return 1;
 }

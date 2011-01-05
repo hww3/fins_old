@@ -3,7 +3,7 @@ inherit FinsBase;
 
 int lower_case_link_names = 0;
 
-object log = Tools.Logging.get_logger("fins.model");
+object log = Tools.Logging.get_logger("model");
 
 static void create(Fins.Application a)
 {
@@ -52,12 +52,22 @@ void load_model()
    }
 }
 
+object get_context(mapping config_section)
+{
+	return master()->resolv("Fins.Model.DataModelContext")();
+}
+
+object get_repository(mapping config_section)
+{
+	return Fins.Model.Repository();
+}
+
 object configure_context(mapping config_section, int is_default)
 {
   object repository;
   string definition_module;
 
-  repository = Fins.Model.Repository();
+  repository = get_repository(config_section);
 
   object o;
 
@@ -78,11 +88,10 @@ object configure_context(mapping config_section, int is_default)
     repository->set_object_module(o);
 
  string url = config_section["datasource"];
- object s = Sql.Sql(url);
- object d = Fins.Model.DataModelContext();
+ object d = get_context(config_section);
  d->context_id = config_section["id"] || "_default";
- d->sql = s;
- d->sql_url = url;
+ d->set_url(url);
+ d->sql = d->get_connection();
  d->debug = (int)config_section["debug"];
  d->repository = repository;
  d->cache = cache;
@@ -112,12 +121,12 @@ void register_types(object ctx)
   if(!ctx->repository->get_object_module())
   {
     log->warn("Using automatic model registration, but no datatype_definition_module set. Skipping.");
-    return;
+    return 0;
   }
   object im = ctx->repository->get_object_module();
   object mm = ctx->repository->get_model_module();
 
-// werror("mm: %O\n", mm);
+ werror("mm: %O\n", mm);
   foreach(mkmapping(indices(mm), values(mm));string n; program c)
   {
     object d = c(ctx);
@@ -150,7 +159,7 @@ protected void remove_field_from_possibles(object ctx, string field_name, string
 void initialize_links(object ctx)
 {
   if(!ctx->repository->object_definitions || 
-     !sizeof(ctx->repository->object_definitions)) return;
+     !sizeof(ctx->repository->object_definitions)) return 0;
 
   foreach(ctx->builder->belongs_to;; mapping a)
   {

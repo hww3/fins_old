@@ -88,11 +88,23 @@ object clone()
 	d->cache = cache;
 	d->app = app;
 	d->model = model;
+	
+	// don't need to call the setter here, right?
 	d->sql_url = sql_url;
-	d->sql = Sql.Sql(sql_url);
+	d->sql = d->get_connection();
 	d->initialize();
 	d->debug = debug;
 	return d;
+}
+
+void set_url(string url)
+{
+	sql_url = url;
+}
+
+object get_connection()
+{
+	return master()->resolv("Sql.Sql")(sql_url);
 }
 
 //!
@@ -223,50 +235,5 @@ array find_by_query(string|program|object ot, string query)
      o = ot;
   if(!o) throw(Error.Generic("Object type " + ot + " does not exist.\n"));
   return  repository->get_instance(o->instance_name)(UNDEFINED, this);
-}
-
-.DataObjectInstance import_xml_node(Parser.XML.Tree.SimpleNode node)
-{
-   string instance_name;
-   .DataObject instance_type;
-
-   mapping attributes = ([]);
-
-   instance_name = node->get_tag_name();
-
-   if(!(instance_type = repository->get_object(instance_name)))
-     throw(Error.Generic("invalid object type '" + instance_name + "'.\n"));
-
-	object instance = new(instance_type);
-
-    foreach(node->get_children();;object child)
-	{
-		werror("child: %O\n", child);
-		if(child->get_node_type() != Parser.XML.Tree.XML_ELEMENT)
-		  continue;
-		mapping cattrs = child->get_attributes();
-		werror("cattrs: %O\n", cattrs);
-		if(cattrs->key == "true") // should we use the key as it's provided by the exporting system?
-		{
-//			n->set_id(key)
-			continue;
-		}
-		
-		if(!cattrs->reference_type)
-		{
-			// child should just be a plain old simple value (we hope!)
-			object ve = child->get_children()[0];
-			if(ve->get_node_type() == Parser.XML.Tree.XML_TEXT)
-			{
-			  attributes[child->get_tag_name()] = ve->get_text();
-  			  instance[child->get_tag_name()] = ve->get_text();
-			}
-		}
-		
-	}
-
-//	instance->set_atomic(attributes);
-werror("Attributes: %O\n", attributes);
-    return instance;
 }
 

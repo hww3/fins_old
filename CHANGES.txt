@@ -26,6 +26,7 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- ScaffoldController is now a DocController for consistency purposes.
 - Added some abstraction functions to FinsModel and DataModelContext in
      order to enable models and context configuration to be overriden.
 - Tools.Logging.Log.Appender now encodes output as UTF-8 in order to

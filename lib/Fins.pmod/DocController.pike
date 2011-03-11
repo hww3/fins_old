@@ -44,6 +44,11 @@ static int __has_errors;
 
 mapping __vc = ([]);
 
+//! perform some standard boilerplate functionality for each request
+void populate_template(Fins.Request request, Fins.Response response, Fins.Template.View lview, mixed args)
+{
+}
+
 static mixed `[](mixed a)
 {
   mixed v; 
@@ -61,6 +66,11 @@ static mixed `[](mixed a)
   {
     return UNDEFINED;
   }
+}
+
+object __get_view(mixed path)
+{
+   return view->low_get_view(__default_template||view->default_template, path);
 }
 
 object __get_layout(object request)
@@ -143,7 +153,7 @@ private class DocRunner(function req)
     if(layout)
       log->debug("Have a layout: %O\n", layout);
 
-    mixed e = catch(lview = view->low_get_view(__default_template||view->default_template, request->not_args));
+    mixed e = catch(lview = __get_view(request->not_args));
 
     if(e && objectp(e) && e->is_templatecompile_error)
 	{
@@ -166,6 +176,11 @@ private class DocRunner(function req)
       lview->set_layout(layout);
     if(lview)
       response->set_view(lview);
+
+    populate_template(request, response, lview, args);
+
+    werror("Running %O(%O, %O, %O, %O)\n", req, request, response, lview, args);
+    
     req(request, response, lview, args);    
 
     return;

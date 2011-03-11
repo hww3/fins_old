@@ -33,7 +33,7 @@ mixed err = catch
   a = p(config);
 };
 if(err)
-  Log.error("error occurred while loading the application.", Error.mkerror(err));
+  Log.exception("error occurred while loading the application.", Error.mkerror(err));
   return a;
 }
 

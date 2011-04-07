@@ -14,7 +14,7 @@ object load_app(string app_dir, string config_name)
   master()->add_module_path(combine_path(app_dir, "modules")); 
 
   string logcfg = combine_path(app_dir, "config", "log_" + config_name+".cfg");
-  Tools.Logging.set_config_variables((["appdir": app_dir, "config": config_name ]));
+  Tools.Logging.set_config_variables((["appdir": app_dir, "config": config_name, "home": getenv("HOME") ]));
 
   Log.info("Loading log configuration from " + logcfg + ", if present.");
 

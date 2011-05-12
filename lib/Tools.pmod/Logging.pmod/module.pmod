@@ -116,9 +116,9 @@ Tools.Logging.Log.Logger create_logger_from_config(string loggername)
 
     if(sizeof(ln)) my_logger_name = ln[-1];
     if(sizeof(ln) > 1) 
-    cx = config_values[ln[-2]];
-    else cx = ([]);
-    cx += (config_values[my_logger_name]||([]));
+     cx = config_values[ln[-2]];
+    if(!cx) cx = ([]);
+    cx += config_values[my_logger_name] || ([]);
   }
 
   if(!cx) return 0;

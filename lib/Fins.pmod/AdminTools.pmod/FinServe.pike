@@ -331,7 +331,7 @@ void load_application()
   application = Fins.Loader.load_app(combine_path(getcwd(), project), config_name));
   if(err || !application)
   {
-    if(err) Log.error("An error occurred while loading the application.", err);
+    if(err) Log.exception("An error occurred while loading the application.", err);
     else Log.critical("An error occurred while loading the application.");
     exit(1);
   }

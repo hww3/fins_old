@@ -1,10 +1,10 @@
-//!
+//
 //! A controller that impliments CRUD functionality
 //! for a given Model component.
 //!
 
 import Fins;
-inherit Fins.FinsController;
+inherit Fins.DocController;
 import Tools.Logging;
 
 //! this should be the name of your object type and is used to link this
@@ -124,6 +124,24 @@ string new_template_string =
   <%action_link action=\"list\"%>Return to List</a><p>
   </body></html>";
 
+object __get_view(mixed path)
+{  
+  object v;
+  mixed e = catch(v = ::__get_view(path));
+
+  if(e || !v)
+  {
+    Log.debug("load of view from template failed, using default template string.\n");
+    Log.exception("Error follows", e);
+
+    string pc = ((path/"/")[-1]) + "_template_string";
+    string x = `->(this, pc);
+werror("getting simple view for %O: %O, %O\n", pc, x, indices(this));    
+    v = view->get_string_view(x);
+  }
+
+  return v;
+}
 
 static object get_view(function f, string x)
 {
@@ -153,9 +171,9 @@ public void index(Fins.Request request, Fins.Response response, mixed ... args)
   response->redirect(action_url(list));
 }
 
-public void list(Fins.Request request, Fins.Response response, mixed ... args)
+public void list(Fins.Request request, Fins.Response response, Fins.Template.View v, mixed ... args)
 {
-  object v = get_view(list, list_template_string);
+//  object v = get_view(list, list_template_string);
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 
@@ -175,9 +193,9 @@ public void list(Fins.Request request, Fins.Response response, mixed ... args)
   response->set_view(v);
 }
 
-public void display(Fins.Request request, Fins.Response response, mixed ... args)
+public void display(Fins.Request request, Fins.Response response, Fins.Template.View v, mixed ... args)
 {
-  object v = get_view(display, display_template_string);
+//  object v = get_view(display, display_template_string);
 
   object item = model_context->find_by_id(model_object, (int)request->variables->id);
   v->add("type", make_nice(model_object->instance_name));
@@ -196,7 +214,7 @@ public void display(Fins.Request request, Fins.Response response, mixed ... args
   response->set_view(v);
 }
 
-public void do_pick(Request id, Response response, mixed ... args)
+public void do_pick(Request id, Response response, Fins.Template.View v, mixed ... args)
 {
   if(!(id->variables->for && id->variables->for_id))
   {
@@ -219,7 +237,7 @@ public void do_pick(Request id, Response response, mixed ... args)
   response->redirect(action_url(action, ({}), id->variables));
 }
 
-public void pick_one(Request id, Response response, mixed ... args)
+public void pick_one(Request id, Response response, Fins.Template.View v, mixed ... args)
 {
 werror("data: %O\n", id->variables);
 
@@ -257,7 +275,7 @@ werror("data: %O\n", id->variables);
   
 }
 
-public void delete(Request id, Response response, mixed ... args)
+public void delete(Request id, Response response, Fins.Template.View v, mixed ... args)
 {
   if(!id->variables->id)
   {
@@ -267,7 +285,7 @@ public void delete(Request id, Response response, mixed ... args)
   response->redirect(action_url(dodelete, 0, (["id": id->variables->id])));
 }
 
-public void dodelete(Request id, Response response, mixed ... args)
+public void dodelete(Request id, Response response, Fins.Template.View v, mixed ... args)
 {
   if(!id->variables->id)
   {
@@ -316,9 +334,9 @@ public void decode_old_values(mapping variables, mapping orig)
 
 }
 
-public void update(Fins.Request request, Fins.Response response, mixed ... args)
+public void update(Fins.Request request, Fins.Response response, Fins.Template.View v, mixed ... args)
 {
-  object v = get_view(update, update_template_string);
+//  object v = get_view(update, update_template_string);
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
   
@@ -384,7 +402,7 @@ static string encode_orig_data(mapping orig)
 
 }
 
-public void doupdate(Fins.Request request, Fins.Response response, mixed ... args)
+public void doupdate(Fins.Request request, Fins.Response response, Fins.Template.View vt, mixed ... args)
 {
 mixed e;
 
@@ -500,7 +518,7 @@ static void decode_from_form(mapping variables, mapping v)
   }
 }
 
-public void donew(Fins.Request request, Fins.Response response, mixed ... args)
+public void donew(Fins.Request request, Fins.Response response, Fins.Template.View vt, mixed ... args)
 {
 mixed e;
 mapping v = ([]);
@@ -586,12 +604,12 @@ if(e)
 }
 
 
-public void new(Fins.Request request, Fins.Response response, mixed ... args)
+public void new(Fins.Request request, Fins.Response response, Fins.Template.View v, mixed ... args)
 {
   array fields = ({});
   mapping orig = ([]);
 
-  object v = get_view(new, new_template_string);
+//  object v = get_view(new, new_template_string);
 
   v->add("type", Tools.Language.Inflect.pluralize(model_object->instance_name));
 

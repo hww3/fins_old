@@ -48,7 +48,6 @@ import Tools.JSON;
 			int          i;
 			int          len = sizeof(s);
 			String.Buffer sb = String.Buffer(len + 4);
-			string       t;
 
 			sb+=("\"");
 			for (i = 0; i < len; i += 1) 

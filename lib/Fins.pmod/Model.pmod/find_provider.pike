@@ -4,9 +4,9 @@
 //! for each registered object type (for example, User), a number of 
 //! methods will be available:
 //!
-//! users_all()
-//! users_by_id( int identifier )
-//! users( mapping criteria )
+//! users_all([sort_criteria])
+//! users_by_id( int identifier, [sort criteria] )
+//! users( mapping criteria, [sort criteria])
 //! users_by_query( string where clause )
 //! users_by_alt(string alternate_id)
 //! users_by_alternate(string alternate_id)
@@ -165,7 +165,7 @@ werror("ot: %O, %O\n", get_model_component(ot)->master_object, k[(i+4)..]);
     if(p=get_model_component(ot))
 	{
 	  log->debug("%O found %s component %O", this, k, p);
-      return lambda(){ return context->old_find(p, ([]));};
+      return lambda(mixed ... args){ return context->old_find(p, ([]), @args);};
     }
   }
   else

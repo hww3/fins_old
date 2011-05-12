@@ -106,7 +106,7 @@ void set_operator(int o)
 //!
 static void create(mixed|void id, object _object_type, .DataModelContext context)
 {
-  werror("create(%O, %O, %O)\n", id, _object_type, context);
+//  werror("create(%O, %O, %O)\n", id, _object_type, context);
 
   if(!_object_type)
     throw(Fins.Errors.ModelError("No Data Object Definition passed to create()\n"));

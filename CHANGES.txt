@@ -26,6 +26,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added mandatory option to input macro that causes a marker to be 
+      placed next to fields that aren't completed.
 - Added Template.View.add_all and input macro, useful for creating 
       forms that auto-populate when being redisplayed after a request.
 - ScaffoldController is now a DocController for consistency purposes.

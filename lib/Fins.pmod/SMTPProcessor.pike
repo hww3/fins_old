@@ -32,11 +32,11 @@ void start()
   else
   {
     int port = (int)(config["smtp"]["listen_port"] || 25);
-    string host = config["smtp"]["listen_host"] || "localhost";
+    string host = config["smtp"]["listen_host"] || "*";
     array|string domains = config["smtp"]["domain"];
     if(stringp(domains)) domains = ({ domains });
     Log.info("Opening SMTP Listener on %s:%d for domains %s.", host, port, domains*", ");
-    smtp = Protocols.SMTP.Server(domains, port, host, 
+    smtp = Protocols.SMTP.Server(domains, port, (host=="*"?0:host), 
 	_cb_mailfrom, _cb_rcptto, _cb_data);
   }
 }

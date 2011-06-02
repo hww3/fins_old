@@ -190,7 +190,7 @@ string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void arg
   return url;
 }
 
-//! args: none required 
+//! args: none required, arg "mandatory" may be specified
 //!
 //! generates an input tag with any args passed along
 //!  and a value in the request's variables mapping used to fill the default value
@@ -217,6 +217,15 @@ werror("vars:%O\n", request->variables);
     buf->add(" " + s + "=\"" + v + "\""); 
   }
   buf->add("/>");
+
+  if(args->mandatory && lower_case(args->mandatory) != "false")
+  {
+	if(!args->value || !sizeof(args->value))
+	{
+		buf->add("<font class=\"mandatory\" *</font>");
+	}
+  }
+
   return buf->get();
 }
 

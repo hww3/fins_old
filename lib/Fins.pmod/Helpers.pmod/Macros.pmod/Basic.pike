@@ -190,6 +190,36 @@ string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void arg
   return url;
 }
 
+//! args: none required 
+//!
+//! generates an input tag with any args passed along
+//!  and a value in the request's variables mapping used to fill the default value
+string simple_macro_input(Fins.Template.TemplateData data, mapping|void args)
+{
+  object controller;
+//werror("******* input\n");
+  object request = data->get_request();
+  string event = args->action;
+//  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
+  mixed v;
+
+  if(!args) args = ([]);
+
+  if(args->name && (v = request->variables[args->name]))
+    args->value = v;
+
+werror("args:%O\n", args);
+werror("vars:%O\n", request->variables);
+  String.Buffer buf = String.Buffer();
+  buf->add("<input");
+  foreach(args;string s;string v)
+  { 
+    buf->add(" " + s + "=\"" + v + "\""); 
+  }
+  buf->add("/>");
+  return buf->get();
+}
+
 
 //! args: var
 string simple_macro_autoformat(Fins.Template.TemplateData data, mapping|void args)

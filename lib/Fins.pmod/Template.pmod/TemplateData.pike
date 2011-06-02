@@ -17,6 +17,12 @@ public void add(string name, mixed item)
    data[name] = item;
 }
 
+//! 
+public void add_all(mapping items)
+{
+  data += items;	
+}
+
 //!
 public void set_data(mapping d)
 {

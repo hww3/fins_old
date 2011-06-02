@@ -26,6 +26,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added Template.View.add_all and input macro, useful for creating 
+      forms that auto-populate when being redisplayed after a request.
 - ScaffoldController is now a DocController for consistency purposes.
 - Added some abstraction functions to FinsModel and DataModelContext in
      order to enable models and context configuration to be overriden.

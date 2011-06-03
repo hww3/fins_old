@@ -1,3 +1,4 @@
+- allow multiple variable expansions int templates, such as someval="$val1/$val2"; see Template.Simple.argify()
 - add support for localized templates localized strings
 - many-to-many support in scaffolding
 - finish making editors for other datatypes

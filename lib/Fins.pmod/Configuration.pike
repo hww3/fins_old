@@ -44,7 +44,10 @@ void set_value(string section, string item, mixed value)
   if(!values[section])
     values[section] = ([]);
 
-  values[section][item] = (string)value;
+  if(arrayp(value))
+    values[section][item] = value;
+  else
+    values[section][item] = (string)value;
 
   Public.Tools.ConfigFiles.Config.write_section(config_file, section, values[section]);
 }

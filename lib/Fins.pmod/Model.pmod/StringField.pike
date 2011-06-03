@@ -57,7 +57,7 @@ mixed validate(mixed value, void|.DataObjectInstance i)
          throw(Error.Generic("Unable to cast " + basetype(value) + " to a string.\n"));
       }
    }
-   if(sizeof(value) > len)
+   if(len && sizeof(value) > len)
    {
       throw(Error.Generic("Value is too long; maximum length is " + len + ".\n"));
    }

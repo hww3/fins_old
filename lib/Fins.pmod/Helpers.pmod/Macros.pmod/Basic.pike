@@ -208,8 +208,6 @@ string simple_macro_input(Fins.Template.TemplateData data, mapping|void args)
   if(args->name && (v = request->variables[args->name]))
     args->value = v;
 
-werror("args:%O\n", args);
-werror("vars:%O\n", request->variables);
   String.Buffer buf = String.Buffer();
   buf->add("<input");
   foreach(args;string s;string v)
@@ -229,6 +227,47 @@ werror("vars:%O\n", request->variables);
   return buf->get();
 }
 
+//! args: none required, arg "mandatory" may be specified
+//!
+//! generates a textarea with any args passed along
+//!  and a value in the request's variables mapping used to fill the default value
+string simple_macro_textarea(Fins.Template.TemplateData data, mapping|void args)
+{
+  object controller;
+//werror("******* input\n");
+  object request = data->get_request();
+  string event = args->action;
+//  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
+  mixed v;
+
+  if(!args) args = ([]);
+
+  if(args->name && (v = request->variables[args->name]))
+    args->value = v;
+
+  string value = args->value || "";
+  m_delete(args, "value");
+
+  String.Buffer buf = String.Buffer();
+  buf->add("<textarea");
+  foreach(args;string s;string v)
+  { 
+    buf->add(" " + s + "=\"" + v + "\""); 
+  }
+  buf->add("/>");
+  buf->add(value);  
+  buf->add("</textarea>");
+
+  if(args->mandatory && lower_case(args->mandatory) != "false")
+  {
+	if(!args->value || !sizeof(args->value))
+	{
+		buf->add("<font class=\"mandatory\" *</font>");
+	}
+  }
+
+  return buf->get();
+}
 
 //! args: var
 string simple_macro_autoformat(Fins.Template.TemplateData data, mapping|void args)

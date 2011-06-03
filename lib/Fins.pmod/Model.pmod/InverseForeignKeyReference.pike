@@ -21,7 +21,7 @@ static void create(string _name, string _otherobject, string _otherkey, .Criteri
 // value will be null in a foreign key, as we're not in an object where that's a real field. 
 mixed decode(string value, void|.DataObjectInstance i) 
 { 
-  //werror("**--> decoding " + name + ", a link to %O from %O\n", otherobject, i);
+  //werror("**--> decoding " + name + ", a link to %O from %O using %O\n", otherobject, i, otherkey);
 
   if(!unique)
   {

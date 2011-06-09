@@ -523,21 +523,30 @@ class PikeBlock
    int keepgoing = 0;
    do{
     keepgoing = 0;
-    string key, value;
-    int r = sscanf(arg,  "%*[ \n\t]%[a-zA-Z0-9_]=\"%s\"%s", key, value, arg);
+    string key, val;
+    array values;
+    int r = sscanf(arg,  "%*[ \n\t]%[a-zA-Z0-9_]=\"%s\"%s", key, val, arg);
     if(r>2) keepgoing=1;
     if(r<=2) break;
 
     if(key && strlen(key))
     {
-      if(value[0] == '$' && value[1] && value[1] != '$')
+      values = val/"/";
+// werror("key: %O, values: %O\n", key, values);
+      array va = ({});
+      foreach(values;; string value)
       {
-        value = "get_var_value(\"" + value + "\", data)";
+        if((sizeof(value)>1) && value[0] == '$' && value[1] && value[1] != '$')
+        {
+          va += ({"get_var_value(\"" + value + "\", data)"});
+        }
+        else va += ({ "\"" + value + "\"" });
       }
-      else value = "\"" + value + "\"";
-      rv += ({"\"" + lower_case(key) + "\":" + value  });
+        rv += ({"\"" + lower_case(key) + "\":" + (va*" + \"/\" + ")  });
      }
    }while(keepgoing);
+
+//werror("rv: %O\n", rv);
    return "([" + rv*", " + "])";
  }
 

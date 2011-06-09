@@ -103,7 +103,7 @@ string simple_macro_action_link(Fins.Template.TemplateData data, mapping|void ar
   array uargs;
 
   if(args->args)
-    uargs = args->args/"/";
+    uargs = ((string)args->args)/"/";
 
   m_delete(args, "controller");
   m_delete(args, "action");
@@ -361,10 +361,19 @@ string simple_macro_describe(Fins.Template.TemplateData data, mapping|void args)
   return rv;
 }
 
-//! display a calendar object in a friendly manner 
+//! display a calendar object as a distance in the past in a friendly manner 
 //!
 //! args: var
 string simple_macro_friendly_date(Fins.Template.TemplateData data, mapping|void args)
+{
+  return Tools.String.friendly_date(args->var);
+}
+
+
+//! display a calendar object in a friendly manner 
+//!
+//! args: var
+string simple_macro_describe_date(Fins.Template.TemplateData data, mapping|void args)
 {
   return Tools.String.describe_date(args->var);
 }

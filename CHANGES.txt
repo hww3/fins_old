@@ -26,6 +26,10 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Extended macro syntax to allow multiple substitution arguments
+      in the form of args="$a/$b/..."; perhaps not general enough
+      but a step in the right direction.
+- Added describe_date macro.
 - Added mandatory option to input macro that causes a marker to be 
       placed next to fields that aren't completed.
 - Added Template.View.add_all and input macro, useful for creating 

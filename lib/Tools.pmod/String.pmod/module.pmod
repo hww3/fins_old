@@ -1,5 +1,12 @@
 //! return a friendly string description of a @[Calendar] object.
 //!
+
+public string describe_date(object c)
+{
+  if(c->nice_print) return c->nice_print();
+  else return "UNKOWN";
+}
+
 public string friendly_date(object c)
 {
    string howlongago;

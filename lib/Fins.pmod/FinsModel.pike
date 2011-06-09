@@ -258,7 +258,7 @@ void initialize_links(object ctx)
 		}
 
         pl->obj->add_field(ctx, Model.KeyReference(this_name, pl->field->name, od->instance_name, 0, !(pl->field->not_null)));
-        od->add_field(ctx, Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(that_name), pl->obj->instance_name, pl->obj->primary_key->name));
+        od->add_field(ctx, Model.InverseForeignKeyReference(Tools.Language.Inflect.pluralize(that_name), pl->obj->instance_name, this_name));
         ctx->builder->possible_links -= ({pl});
       }
     }

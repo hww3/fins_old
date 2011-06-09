@@ -366,7 +366,7 @@ string simple_macro_describe(Fins.Template.TemplateData data, mapping|void args)
 //! args: var
 string simple_macro_friendly_date(Fins.Template.TemplateData data, mapping|void args)
 {
-  return Tools.String.friendly_date(args->var);
+  return Tools.String.describe_date(args->var);
 }
 
 //! provides the context root of this application, if any

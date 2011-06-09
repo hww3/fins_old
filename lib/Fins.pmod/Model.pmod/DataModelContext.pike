@@ -39,6 +39,11 @@ string _sprintf(mixed ... args)
   return "DataModelContext(" + sql->host_info() + ")";
 }
 
+array query(mixed ... args)
+{
+	return sql->query(@args);
+}
+
 string quote(string s)
 {
    return sql->quote(s);

@@ -370,12 +370,23 @@ string simple_macro_friendly_date(Fins.Template.TemplateData data, mapping|void 
 }
 
 
-//! display a calendar object in a friendly manner 
+//! display a calendar object in a friendly manner using a format appropriate to the
+//! time interval the calendar object represents (week, month, second, etc)
 //!
 //! args: var
 string simple_macro_describe_date(Fins.Template.TemplateData data, mapping|void args)
 {
   return Tools.String.describe_date(args->var);
+}
+
+//! display a calendar object as a date and time in a friendly manner
+//!
+//! args: var
+string simple_macro_describe_datetime(Fins.Template.TemplateData data, mapping|void args)
+{
+  if(args->var && args->var->format_ext_time_short)
+    return args->var->format_ext_time_short();
+  else return "N/A";
 }
 
 //! provides the context root of this application, if any

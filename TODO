@@ -8,3 +8,4 @@
 - add transaction support to Model
 - better support for the various default keywords (CURRENT_TIME, 
     CURRENT_DATE or CURRENT_TIMESTAMP), etc.
+- figure out why logging levels don't trickle down to lower level loggers

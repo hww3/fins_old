@@ -371,6 +371,11 @@ void has_many(.DataModelContext context, string other_type, string|void my_name,
   context->builder->has_many += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "obj": this]) });  
 }
 
+void has_many_by_index(.DataModelContext context, string other_type, string index_field, string|void my_name, string|void other_field)
+{
+  context->builder->has_many_index += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "index_field": index_field, "obj": this]) });  
+}
+
 //!  define a many to many relationship in which the local object can be linked to many other objects
 //!  and vice versa. this requires the use of a join table with two fields: one to contain the id
 //!  of each type being linked. Each of the two types will have an attribute that returns the 
@@ -475,8 +480,13 @@ void add_default_value_object(.DataModelContext context, string field, string ob
 //! field in the database table for this type.
 //! 
 //! overwrites the field definition if it already exists.
-void add_field(.DataModelContext context, .Field f)
+void add_field(.DataModelContext context, .Field f, int|void force)
 {
+   if(fields[f->name] && !force) 
+   {
+	 log->info("Ignoring attempt to add existing field " + f->name +".");
+     return;	
+   }
    f->set_context(context);
    fields[f->name] = f;
    field_order += ({f});

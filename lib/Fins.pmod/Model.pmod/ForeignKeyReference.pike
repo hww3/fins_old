@@ -1,3 +1,18 @@
+//! This relationship represents one half (the many or child) of a one-to-many or parent-and-child between 
+//! one type and another. 
+//! Thie "child" uses the direct (ForeignKeyReference) relationship because it contains the field holding the foreign key.
+//! The "parent" uses the "inverse" relationship because it does not contain a reference to the child itself.
+//!
+//! Put more technically, this relationship can be used to access objects of another type (the child) using a 
+//! field on that type containing the object id of an object of this (the parent) type.
+//!
+//! For example:
+//! A type "user" has a primary key field id. A type "preference" has a foreign key field "user_id" that 
+//! indicates the user for which that preference is associated. The definition of the "preference" type 
+//! would contain a reference for the foreign key (a @Fins.Model.ForeignKeyRelationship) whereas the
+//! "user" object definition would contain the inverse relationship (@Fins.Model.InverseForeignKeyRelationship)
+//! which could be used to find all "preference" objects owned by that user.
+
 inherit .Relationship;
 
 constant type="Foreign Key";

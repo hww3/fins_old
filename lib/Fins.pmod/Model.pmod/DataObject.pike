@@ -371,7 +371,26 @@ void has_many(.DataModelContext context, string other_type, string|void my_name,
   context->builder->has_many += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "obj": this]) });  
 }
 
-
+//! define a one to many relationship in which the local object is referred to
+//! by one or more objects of another datatype. the related objects will be placed in
+//! a mapping based on the value of the index field. this method defines (a variation on)
+//! the reverse of @[belongs_to]. note that a datatype that uses this method won't have 
+//! a field in the corresponding "local" database table that contains the reference 
+//! information. as a result, the parameters in this method don't use database
+//! field names at all, unlike @[belongs_to].
+//!
+//! @param other_type
+//!   data type name (not the table name) of the type the field references.
+//!  @param index_field
+//!    the field that supplies the value that the records will be indexed on.
+//! @param my_name
+//!   an optional attribute used to specify the name the object will be available
+//!   as in the current object. The default, if not specified, is the pluralized name of the
+//!   other type.
+//!  @param other_field
+//!   the name of the field in the other datatype (not a database field name) that
+//!   represents the link to this data type. If you used @[belongs_to] and specified an alternate
+//!   value for the my_name attribute, you'll need to provide that value to this parameter as well.
 void has_many_by_index(.DataModelContext context, string other_type, string index_field, string|void my_name, string|void other_field)
 {
   context->builder->has_many_index += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "index_field": index_field, "obj": this]) });  

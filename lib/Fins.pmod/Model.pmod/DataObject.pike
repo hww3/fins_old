@@ -357,7 +357,7 @@ void belongs_to(.DataModelContext context, string other_type, string|void my_nam
 //! field names at all, unlike @[belongs_to].
 //!
 //! @param other_type
-//!   pluralized version of the data type name (not the table name) of the type the field references.
+//!   data type name (not the table name) of the type the field references.
 //! @param my_name
 //!   an optional attribute used to specify the name the object will be available
 //!   as in the current object. The default, if not specified, is the pluralized name of the
@@ -370,6 +370,7 @@ void has_many(.DataModelContext context, string other_type, string|void my_name,
 {
   context->builder->has_many += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "obj": this]) });  
 }
+
 
 void has_many_by_index(.DataModelContext context, string other_type, string index_field, string|void my_name, string|void other_field)
 {

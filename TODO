@@ -9,3 +9,6 @@
 - better support for the various default keywords (CURRENT_TIME, 
     CURRENT_DATE or CURRENT_TIMESTAMP), etc.
 - figure out why logging levels don't trickle down to lower level loggers
+- add indexed relationship where records associated with a relationship are indexed based 
+   on the value of a given field (such as preference records for a given user being 
+   indexed by the preference name)

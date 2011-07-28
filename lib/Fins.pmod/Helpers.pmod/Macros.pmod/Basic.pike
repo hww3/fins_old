@@ -11,7 +11,10 @@ string simple_macro_LOCALE(Fins.Template.TemplateData data, mapping|void args)
 {
 	object r = data->get_request();
 if(!r)
-  werror("backtrace: %O\n", backtrace());	
+{
+  return "default";
+}
+else
 	return Locale.translate(r->get_project(), r->get_lang(), 
 					(int)args["id"], args["string"]);
 }

@@ -760,9 +760,13 @@ else
 
      array result = context->sql->query(query);
 
-     if(sizeof(result) != 1)
+     if(!sizeof(result) )
      {
-       	throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
+       	throw(Fins.Errors.RecordNotFoundError("Unable to load " + instance_name + " id " + id + ".\n"));
+     }
+     else if(sizeof(result) > 1)
+     {
+       	throw(Fins.Errors.DataIntegrityError("Data Integrity Error: Unable to load unique row for " + instance_name + " id " + id + ".\n"));
      }
 //     else
 //       if(context->debug) werror("got results from query: %s\n", query);

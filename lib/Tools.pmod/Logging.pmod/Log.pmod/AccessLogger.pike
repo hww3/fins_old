@@ -30,7 +30,7 @@ static void do_msg(object r /*response*/)
   lt->mon += 1;
   lt->timezone = (int)((lt->timezone / 3600.0)* 100);
 
-  lt["remote_host"] = r->request->get_client_addr();
+  lt["remote_host"] = r->request?r->request->get_client_addr():"-";
   lt["protocol"] = r->request->protocol;
   lt["method"] = r->request->request_type;
   lt["request"] = r->request->not_query + (sizeof(r->request->query)?("?" + r->request->query):"");

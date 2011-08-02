@@ -301,7 +301,7 @@ void initialize_links(object ctx)
     foreach(table_components;; mapping q)
     {
       if(q->tn == o->tn) continue;  // skip self-self relationships :)
-    log->debug(" - checking %s.", q->tn);
+    log->debug(" - checking %s->%s.", q->tn, o->tn + "_" + q->tn);
 
       if(available_tables[o->tn + "_" + q->tn])
       {

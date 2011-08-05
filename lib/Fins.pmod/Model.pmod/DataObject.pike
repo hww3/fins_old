@@ -827,61 +827,61 @@ mapping get_atomic(.DataModelContext context, .DataObjectInstance i)
 
 mixed get(.DataModelContext context, string field, .DataObjectInstance i)
 {
-mapping objs, objs_by_alt;
+  mapping objs, objs_by_alt;
 
-   if(context->debug) log->debug("%O(%O, %O, %O)", Tools.Function.this_function(), context, field, i);
+  if(context->debug) log->debug("%O(%O, %O, %O)", Tools.Function.this_function(), context, field, i);
 
-   if(field == "_id")
-     field = primary_key->name;
+  if(field == "_id")
+    field = primary_key->name;
 
-   if(!fields[field])
-   {
-     throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
-   }
+  if(!fields[field])
+  {
+    throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
+  }
 
-   int id = i->get_id();
+  int id = i->get_id();
 //	 if(context->debug) log->debug("%O(): field is %O: %O.", Tools.Function.this_function(), fields[field], objs[id]);	  
 
 
-if(context->in_xa)
-{
-  objs = context->xa_storage[instance_name];      
-  if(!objs) objs = context->xa_storage[instance_name] = ([]);
+  if(context->in_xa)
+  {
+    objs = context->xa_storage[instance_name];      
+    if(!objs) objs = context->xa_storage[instance_name] = ([]);
 
-  objs_by_alt = context->xa_storage[instance_name + "_by_alt"];      
-  if(!objs_by_alt) objs_by_alt = context->xa_storage[instance_name + "_by_alt"] = ([]);
-}
-else
-{
-  objs_by_alt = _objs_by_alt;
-  objs = _objs;
-}
+    objs_by_alt = context->xa_storage[instance_name + "_by_alt"];      
+    if(!objs_by_alt) objs_by_alt = context->xa_storage[instance_name + "_by_alt"] = ([]);
+  }
+  else
+  {
+    objs_by_alt = _objs_by_alt;
+    objs = _objs;
+  }
 
-   if(objs[id] && has_index(objs[id], field))
-   {
+  if(objs[id] && has_index(objs[id], field))
+  {
 //	 if(context->debug) log->debug("%O: have field in cache: %O.", Tools.Function.this_function(), objs[id][field]);
-     return fields[field]->decode(objs[id][field], i);
-   }     
+    return fields[field]->decode(objs[id][field], i);
+  }     
 
-   else if(i->is_new_object())
-   {
+  else if(i->is_new_object())
+  {
 //	 if(context->debug) log->debug("%O(): have field in new object cache.", Tools.Function.this_function());
-     return i->object_data[field];
-   }
+    return i->object_data[field];
+  }
 
-   if(context->debug) log->debug("%O(): loading data from db.", Tools.Function.this_function());
-//   load(context, id, i, 0);
+  if(context->debug) log->debug("%O(): loading data from db.", Tools.Function.this_function());
+    load(context, id, i, 0);
 
-   if(objs[id])
-   {
+  if(objs[id])
+  {
 //	 if(context->debug) log->debug("%O(): have field in cache.", Tools.Function.this_function());
-     return fields[field]->decode(objs[id][field], i);
-   }     
-   else 
-   {
-     werror("Error finding data for id %O; Here's the cache: %O\n\n %O\n", id, objs, fields);
-     throw(Error.Generic("get failed on object without a data cache.\n"));
-   }
+    return fields[field]->decode(objs[id][field], i);
+  }     
+  else 
+  {
+    werror("Error finding data for id %O; Here's the cache: %O\n\n %O\n", id, objs, fields);
+    throw(Error.Generic("get failed on object without a data cache.\n"));
+  }
 
 /*
    string query = sprintf(single_select_query, fields[field]->field_name, table_name, 

@@ -89,6 +89,7 @@ array(.Field) field_order = ({});
 //! automatically created by the model configuration mechanism provided by @[Fins.FinsModel].
 void create(.DataModelContext context, .Repository repo)
 {
+werror("create(%O, %O)\n", context, repo);
   repository = repo;
 
    if(define && functionp(define))
@@ -106,7 +107,7 @@ void create(.DataModelContext context, .Repository repo)
    if(post_define && functionp(post_define))
      post_define(context);
 
-   gen_fields();
+   gen_fields(context);
 
 }
 
@@ -528,17 +529,20 @@ void add_field(.DataModelContext context, .Field f, int|void force)
 
 }
 
-mixed gen_inherits(object definition)
+mixed gen_inherits(object context, object definition)
 {
+werror("gen_inherits(%O, %O)\n", context,definition);
 	// we need to check to see if there are any inherited types.
     foreach(Program.all_inherits(object_program(definition));;program parent)
     {
 	  // if the parent class is data object, don't investigate it, as it won't have any fields defined.
 	  if(parent == Fins.Model.DataObject) continue;
 	
+werror("is %O defined?\n", parent);
 	  
-	  mixed r = search(context->repository->program_definitions, parent);
-	  if(objectp(r) && Program.inherits(parent))
+	  mixed r = context->repository->program_definitions[parent];
+werror("found %O\n", r);
+	  if(objectp(r) && Program.inherits(parent, .DataObject))
 	  {
 	     log->info("%O has %O as a parent.\n", definition, r);
 	  }
@@ -546,7 +550,7 @@ mixed gen_inherits(object definition)
     
 }
 
- string gen_fields()
+ string gen_fields(object context)
 {
   string fn;
 
@@ -554,7 +558,7 @@ mixed gen_inherits(object definition)
   _fieldnames = ([]);
   _fieldnames_low = ([]);
 
-   gen_inherits(this);
+   gen_inherits(context, this);
 
      foreach(fields;; .Field f)
      {
@@ -603,6 +607,12 @@ array find(.DataModelContext context, mapping qualifiers, .Criteria|void criteri
 
   foreach(qualifiers; mixed name; mixed q)
   {
+     int not = 0;
+     if(stringp(name) && name[0] == '!')
+     {
+       not = 1;
+       name = name[1..];
+     }
      if(objectp(q) && Program.implements(object_program(q), .Criteria))
      {
          _where += ({ q->get(name, this) });
@@ -621,7 +631,10 @@ array find(.DataModelContext context, mapping qualifiers, .Criteria|void criteri
      }
      else
      {
-       _where += ({ fields[name]->make_qualifier(q)});
+       mixed qualifier = fields[name]->make_qualifier(q);
+       if(not)
+          qualifier = .NotCriteria(qualifier)->get();
+       _where += ({ qualifier });
        if(objectp(name) && name->get_table)
          _tables += ({name->get_table(q, i)});
 		 else if(fields[name]->get_table)

@@ -235,16 +235,15 @@ string simple_macro_input(Fins.Template.TemplateData data, mapping|void args)
 //! options may point to an array of strings or an array of 2 element arrays, where the first element
 //! is the value name and the second element is the value to display to the user in the drop-down.
 //!
-//! generates an select tag with any args passed along
+//! generates a select tag with any args passed along
 //!  and a value in the request's variables mapping used to fill the default value
 string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
 {
   object controller;
-//werror("******* input\n");
   object request = data->get_request();
   string event = args->action;
-//  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
   mixed v;
+  String.Buffer buf = String.Buffer();
 
   if(!args) args = ([]);
 
@@ -258,7 +257,6 @@ string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
   m_delete(args, "default_value");
   m_delete(args, "options");
 
-  String.Buffer buf = String.Buffer();
   buf->add("<select");
   foreach(args; string s;string v)
   { 
@@ -266,7 +264,6 @@ string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
   }
 
   buf->add("/>\n");
-
 
   foreach(valid_options;; string|array vo)
   {
@@ -278,17 +275,15 @@ string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
     {
       vn = vo;
       dn = vo;
-    buf->add("<option value=\"" + vn + "\"">");
-    buf->add(dn);
+    }
+    buf->add("<option value=\"" + vn + "\"");
 
     if(v == value)
-      buf->add("selected=\"1\"");
+      buf->add(" selected=\"1\"");
     buf->add(">");
-    buf->add(vo);
+    buf->add(dn);
     buf->add("</option>\n");
-  }
-
-  
+  }  
 
   buf->add("</select>\n");
 
@@ -299,7 +294,6 @@ string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
 		buf->add("<font class=\"mandatory\" *</font>");
 	}
   }
-
   return buf->get();
 }
 
@@ -310,10 +304,8 @@ string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
 string simple_macro_textarea(Fins.Template.TemplateData data, mapping|void args)
 {
   object controller;
-//werror("******* input\n");
   object request = data->get_request();
   string event = args->action;
-//  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
   mixed v;
 
   if(!args) args = ([]);

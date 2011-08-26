@@ -65,9 +65,10 @@ Log.debug("%O(%O, %O)", Tools.Function.this_function(), value, i);
    {
      return .Undefined;
    }
-
-   else if(value->get_type() != otherobject)
-     throw(Error.Generic(sprintf("Got %O object, expected %s.\n", value->get_type(), otherobject)));
+   else if(objectp(value) && value->get_type() != otherobject)
+     throw(Error.Generic(sprintf("Got %O object, expected %s.\n", value->get_value(), otherobject)));
+   else if(!objectp(value))
+     throw(Error.Generic(sprintf("Got a non-object value instead of expected %s.\n", otherobject)));
 
    return value;
 }

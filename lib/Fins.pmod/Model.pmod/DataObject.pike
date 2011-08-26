@@ -41,6 +41,8 @@ string _default_sort_order_cached;
 
 mapping default_values = ([]);
 
+int is_base=1;
+
 //!
 .Field primary_key;
 
@@ -526,6 +528,24 @@ void add_field(.DataModelContext context, .Field f, int|void force)
 
 }
 
+mixed gen_inherits(object definition)
+{
+	// we need to check to see if there are any inherited types.
+    foreach(Program.all_inherits(object_program(definition));;program parent)
+    {
+	  // if the parent class is data object, don't investigate it, as it won't have any fields defined.
+	  if(parent == Fins.Model.DataObject) continue;
+	
+	  
+	  mixed r = search(context->repository->program_definitions, parent);
+	  if(objectp(r) && Program.inherits(parent))
+	  {
+	     log->info("%O has %O as a parent.\n", definition, r);
+	  }
+    }
+    
+}
+
  string gen_fields()
 {
   string fn;
@@ -533,6 +553,8 @@ void add_field(.DataModelContext context, .Field f, int|void force)
   _fields = ({});
   _fieldnames = ([]);
   _fieldnames_low = ([]);
+
+   gen_inherits(this);
 
      foreach(fields;; .Field f)
      {

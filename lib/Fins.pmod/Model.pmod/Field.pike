@@ -36,7 +36,10 @@ static void create()
 
 string make_qualifier(mixed v)
 {
-  return field_name + "=" + encode(v);
+  if(arrayp(v))
+    return InCriteria(v)->get(field_name);
+  else
+    return field_name + "=" + encode(v);
 }
 
 string get_display_string(void|mixed value, void|object i)

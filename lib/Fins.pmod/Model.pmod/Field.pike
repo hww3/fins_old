@@ -37,7 +37,7 @@ static void create()
 string make_qualifier(mixed v)
 {
   if(arrayp(v))
-    return InCriteria(v)->get(field_name);
+    return .InCriteria(v)->get(field_name);
   else
     return field_name + "=" + encode(v);
 }

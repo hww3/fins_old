@@ -32,6 +32,9 @@ string static_dir;
 //!
 Fins.Helpers.Filters.Compress _gzfilter;
 
+//!
+Fins.Helpers.Filters.TemplateParser _templatefilter;
+
 static mapping processors = ([]);
 static mapping controller_path_cache = ([]);
 static mapping action_path_cache = ([]);
@@ -99,6 +102,8 @@ static void create(.Configuration _config)
 #if constant(Fins.Helpers.Filters.Compress)
   _gzfilter = Fins.Helpers.Filters.Compress();
 #endif
+
+  _templatefilter = Fins.Helpers.Filters.TemplateParser();
 
   start();
 }
@@ -910,6 +915,11 @@ array get_event(.Request request)
 
   int _handled;
   string t = response->get_type();
+
+    if (has_suffix(t, "css"))
+    {
+       _templatefilter->filter(request, response);
+    }
 
   // content compression
   if (t && _gzfilter) {

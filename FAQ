@@ -1,0 +1,19 @@
+Q. How do I install Fins?
+A. You don't have to "install" Fins per-se, you just need to make sure that the contents of the Fins lib directory is in your Pike module path. That means you can do one of the following:
+ - copy the contents of Fins/lib/ to you Pike lib/modules directory.
+ - add the path to Fins/lib/ to the PIKE_MODULE_PATH environment variable
+ - specify the path to Fins/lib using the -M command line argument to Pike
+
+Q. How do I know if Fins is ready to go?
+A. If you start the fins tool using the following command:
+
+  pike -x fins
+
+you should get the following result:
+
+  invalid arguments. usage: pike -x fins [command]
+
+Q. How do I create a new Fins app?
+A. First, change directory to the folder you want to create the new app in. Then, run the following command. Fins will create a new directory using the application name you specify and populate it with the Fins application files.
+
+   pike -x fins create MyAppName

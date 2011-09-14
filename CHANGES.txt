@@ -26,6 +26,10 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added TemplateParser filter, which is used by static location
+       controllers to parse static CSS files as Simple Templates.
+- Added DataObject.add_default_value() to provide default values
+       for objects.
 - Extended macro syntax to allow multiple substitution arguments
       in the form of args="$a/$b/..."; perhaps not general enough
       but a step in the right direction.

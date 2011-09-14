@@ -202,6 +202,27 @@ void initialize_links(object ctx)
     remove_field_from_possibles(ctx, other_field, a->other_type);
   }
 
+  foreach(ctx->builder->has_many_index;; mapping a)
+  {
+    if(!a->my_name) a->my_name = Tools.Language.Inflect.pluralize(a->other_type);
+
+//    werror("we'll call the field " + a->my_name + "\n");
+    if(!a->other_field) a->other_field = ctx->repository->get_object(a->other_type)->primary_key->name	;    
+
+	string my_name = a->my_name;
+	string other_field = a->other_field;
+    string index_field = a->index_field;
+
+	if(lower_case_link_names)
+	{
+	  my_name = lower_case(my_name);
+	}
+
+    a->obj->add_field(ctx, Model.MappedForeignKeyReference(my_name, /*Tools.Language.Inflect.singularize*/(a->other_type), other_field, index_field));
+
+    remove_field_from_possibles(ctx, other_field, a->other_type);
+  }
+
   foreach(ctx->builder->has_many_many;; mapping a)
   {
      object this_type;
@@ -280,7 +301,7 @@ void initialize_links(object ctx)
     foreach(table_components;; mapping q)
     {
       if(q->tn == o->tn) continue;  // skip self-self relationships :)
-    log->debug(" - checking %s.", q->tn);
+    log->debug(" - checking %s->%s.", q->tn, o->tn + "_" + q->tn);
 
       if(available_tables[o->tn + "_" + q->tn])
       {

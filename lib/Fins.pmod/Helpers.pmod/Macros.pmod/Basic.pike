@@ -11,7 +11,10 @@ string simple_macro_LOCALE(Fins.Template.TemplateData data, mapping|void args)
 {
 	object r = data->get_request();
 if(!r)
-  werror("backtrace: %O\n", backtrace());	
+{
+  return "default";
+}
+else
 	return Locale.translate(r->get_project(), r->get_lang(), 
 					(int)args["id"], args["string"]);
 }
@@ -215,6 +218,79 @@ string simple_macro_input(Fins.Template.TemplateData data, mapping|void args)
     buf->add(" " + s + "=\"" + v + "\""); 
   }
   buf->add("/>");
+
+  if(args->mandatory && lower_case(args->mandatory) != "false")
+  {
+	if(!args->value || !sizeof(args->value))
+	{
+		buf->add("<font class=\"mandatory\" *</font>");
+	}
+  }
+
+  return buf->get();
+}
+
+//! args: none required, args "mandatory", "default_value", "options"  may be specified
+//!
+//! options may point to an array of strings or an array of 2 element arrays, where the first element
+//! is the value name and the second element is the value to display to the user in the drop-down.
+//!
+//! generates an select tag with any args passed along
+//!  and a value in the request's variables mapping used to fill the default value
+string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
+{
+  object controller;
+//werror("******* input\n");
+  object request = data->get_request();
+  string event = args->action;
+//  if(!event) throw(Error.Generic("action_link: event name must be provided.\n"));
+  mixed v;
+
+  if(!args) args = ([]);
+
+  if(args->name && (v = request->variables[args->name]))
+    args->value = v;
+
+  array valid_options = args->options;
+  string value = args->value || args->default_value;
+
+  m_delete(args, "value");
+  m_delete(args, "default_value");
+  m_delete(args, "options");
+
+  String.Buffer buf = String.Buffer();
+  buf->add("<select");
+  foreach(args; string s;string v)
+  { 
+    buf->add(" " + s + "=\"" + v + "\""); 
+  }
+
+  buf->add("/>\n");
+
+
+  foreach(valid_options;; string|array vo)
+  {
+    string dn = ""; // display name
+    string vn = ""; // value name
+
+    if(arrayp(vo)) { dn = vo[1]; vn = vo[0]; }
+    else 
+    {
+      vn = vo;
+      dn = vo;
+    buf->add("<option value=\"" + vn + "\"">");
+    buf->add(dn);
+
+    if(v == value)
+      buf->add("selected=\"1\"");
+    buf->add(">");
+    buf->add(vo);
+    buf->add("</option>\n");
+  }
+
+  
+
+  buf->add("</select>\n");
 
   if(args->mandatory && lower_case(args->mandatory) != "false")
   {

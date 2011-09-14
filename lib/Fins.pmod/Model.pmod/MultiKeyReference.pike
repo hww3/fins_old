@@ -1,3 +1,7 @@
+//! This relationship object is used to model a many-to-many relationship between two
+//! data types using a third "join" table containing the primary keys of the two types 
+//! to be mapped.
+
 inherit .Relationship;
 
 constant type="Multi Key";

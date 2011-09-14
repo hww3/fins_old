@@ -233,7 +233,7 @@ void session_startup()
 void handle_request(Protocols.HTTP.Server.Request request)
 {
   mixed r;
-access_logger(request);
+//access_logger(request);
   // Do we have either the session cookie or the PSESSIONID var?
   if(request->cookies && request->cookies[session_cookie_name]
          || request->variables[session_cookie_name] )

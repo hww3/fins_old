@@ -1,7 +1,7 @@
 //!
 int debug = 0;
 
-mapping builder = ([ "possible_links" : ({}), "belongs_to" : ({}), "has_many": ({}), "has_many_many": ({}) ]);
+mapping builder = ([ "possible_links" : ({}), "belongs_to" : ({}), "has_many": ({}), "has_many_many": ({}), "has_many_index": ({}) ]);
 
 //! contains the finder object. see also @[Fins.Model.find_provider]
 object find;

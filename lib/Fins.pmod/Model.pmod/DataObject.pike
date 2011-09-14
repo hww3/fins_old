@@ -357,7 +357,7 @@ void belongs_to(.DataModelContext context, string other_type, string|void my_nam
 //! field names at all, unlike @[belongs_to].
 //!
 //! @param other_type
-//!   pluralized version of the data type name (not the table name) of the type the field references.
+//!   data type name (not the table name) of the type the field references.
 //! @param my_name
 //!   an optional attribute used to specify the name the object will be available
 //!   as in the current object. The default, if not specified, is the pluralized name of the
@@ -369,6 +369,31 @@ void belongs_to(.DataModelContext context, string other_type, string|void my_nam
 void has_many(.DataModelContext context, string other_type, string|void my_name, string|void other_field)
 {
   context->builder->has_many += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "obj": this]) });  
+}
+
+//! define a one to many relationship in which the local object is referred to
+//! by one or more objects of another datatype. the related objects will be placed in
+//! a mapping based on the value of the index field. this method defines (a variation on)
+//! the reverse of @[belongs_to]. note that a datatype that uses this method won't have 
+//! a field in the corresponding "local" database table that contains the reference 
+//! information. as a result, the parameters in this method don't use database
+//! field names at all, unlike @[belongs_to].
+//!
+//! @param other_type
+//!   data type name (not the table name) of the type the field references.
+//!  @param index_field
+//!    the field that supplies the value that the records will be indexed on.
+//! @param my_name
+//!   an optional attribute used to specify the name the object will be available
+//!   as in the current object. The default, if not specified, is the pluralized name of the
+//!   other type.
+//!  @param other_field
+//!   the name of the field in the other datatype (not a database field name) that
+//!   represents the link to this data type. If you used @[belongs_to] and specified an alternate
+//!   value for the my_name attribute, you'll need to provide that value to this parameter as well.
+void has_many_by_index(.DataModelContext context, string other_type, string index_field, string|void my_name, string|void other_field)
+{
+  context->builder->has_many_index += ({ (["my_name": my_name, "other_type": other_type, "other_field": other_field, "index_field": index_field, "obj": this]) });  
 }
 
 //!  define a many to many relationship in which the local object can be linked to many other objects
@@ -462,7 +487,8 @@ void set_alternate_key(string _key)
   else alternate_key = fields[_key];
 }
 
-//! 
+//! specify that the default value for a given field should be the result of a search
+//! for an object of a particular objecttype.
 void add_default_value_object(.DataModelContext context, string field, string objecttype, mapping criteria, int unique)
 {
    if(unique)
@@ -471,12 +497,24 @@ void add_default_value_object(.DataModelContext context, string field, string ob
      default_values[field] = lambda(){ return context->old_find(objecttype, criteria);};
 }
 
+//! specify the default value for a given field. if value is a function, this will be called and the
+//! returned value will be used to set the value of the field.
+void add_default_value(.DataModelContext context, string field, mixed value)
+{
+  default_values[field] = value;
+}
+
 //! add a mapping of a Pike-name index in the data object to (typically) a
 //! field in the database table for this type.
 //! 
 //! overwrites the field definition if it already exists.
-void add_field(.DataModelContext context, .Field f)
+void add_field(.DataModelContext context, .Field f, int|void force)
 {
+   if(fields[f->name] && !force) 
+   {
+	 log->info("Ignoring attempt to add existing field " + f->name +".");
+     return;	
+   }
    f->set_context(context);
    fields[f->name] = f;
    field_order += ({f});
@@ -676,10 +714,15 @@ else
 
      array result = context->sql->query(query);
 
-     if(sizeof(result) != 1)
+     if(!sizeof(result) )
      {
-       	throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
+        throw(Fins.Errors.RecordNotFoundError("Unable to load " + instance_name + " id " + id + ".\n"));
      }
+     else if(sizeof(result) > 1)
+     {
+        throw(Fins.Errors.DataIntegrityError("Data Integrity Error: Unable to load unique row for " + instance_name + " id " + id + ".\n"));
+     }
+
 //     else
 //       if(context->debug) werror("got results from query: %s\n", query);
      if(!result[0]) return 0;
@@ -730,9 +773,13 @@ else
 
      array result = context->sql->query(query);
 
-     if(sizeof(result) != 1)
+     if(!sizeof(result) )
      {
-       	throw(Error.Generic("Unable to load " + instance_name + " id " + id + ".\n"));
+       	throw(Fins.Errors.RecordNotFoundError("Unable to load " + instance_name + " id " + id + ".\n"));
+     }
+     else if(sizeof(result) > 1)
+     {
+       	throw(Fins.Errors.DataIntegrityError("Data Integrity Error: Unable to load unique row for " + instance_name + " id " + id + ".\n"));
      }
 //     else
 //       if(context->debug) werror("got results from query: %s\n", query);
@@ -788,61 +835,61 @@ mapping get_atomic(.DataModelContext context, .DataObjectInstance i)
 
 mixed get(.DataModelContext context, string field, .DataObjectInstance i)
 {
-mapping objs, objs_by_alt;
+  mapping objs, objs_by_alt;
 
-   if(context->debug) log->debug("%O(%O, %O, %O)", Tools.Function.this_function(), context, field, i);
+  if(context->debug) log->debug("%O(%O, %O, %O)", Tools.Function.this_function(), context, field, i);
 
-   if(field == "_id")
-     field = primary_key->name;
+  if(field == "_id")
+    field = primary_key->name;
 
-   if(!fields[field])
-   {
-     throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
-   }
+  if(!fields[field])
+  {
+    throw(Error.Generic("Field " + field + " does not exist in " + instance_name + "\n"));
+  }
 
-   int id = i->get_id();
+  int id = i->get_id();
 //	 if(context->debug) log->debug("%O(): field is %O: %O.", Tools.Function.this_function(), fields[field], objs[id]);	  
 
 
-if(context->in_xa)
-{
-  objs = context->xa_storage[instance_name];      
-  if(!objs) objs = context->xa_storage[instance_name] = ([]);
+  if(context->in_xa)
+  {
+    objs = context->xa_storage[instance_name];      
+    if(!objs) objs = context->xa_storage[instance_name] = ([]);
 
-  objs_by_alt = context->xa_storage[instance_name + "_by_alt"];      
-  if(!objs_by_alt) objs_by_alt = context->xa_storage[instance_name + "_by_alt"] = ([]);
-}
-else
-{
-  objs_by_alt = _objs_by_alt;
-  objs = _objs;
-}
+    objs_by_alt = context->xa_storage[instance_name + "_by_alt"];      
+    if(!objs_by_alt) objs_by_alt = context->xa_storage[instance_name + "_by_alt"] = ([]);
+  }
+  else
+  {
+    objs_by_alt = _objs_by_alt;
+    objs = _objs;
+  }
 
-   if(objs[id] && has_index(objs[id], field))
-   {
+  if(objs[id] && has_index(objs[id], field))
+  {
 //	 if(context->debug) log->debug("%O: have field in cache: %O.", Tools.Function.this_function(), objs[id][field]);
-     return fields[field]->decode(objs[id][field], i);
-   }     
+    return fields[field]->decode(objs[id][field], i);
+  }     
 
-   else if(i->is_new_object())
-   {
+  else if(i->is_new_object())
+  {
 //	 if(context->debug) log->debug("%O(): have field in new object cache.", Tools.Function.this_function());
-     return i->object_data[field];
-   }
+    return i->object_data[field];
+  }
 
-   if(context->debug) log->debug("%O(): loading data from db.", Tools.Function.this_function());
-//   load(context, id, i, 0);
+  if(context->debug) log->debug("%O(): loading data from db.", Tools.Function.this_function());
+    load(context, id, i, 0);
 
-   if(objs[id])
-   {
+  if(objs[id])
+  {
 //	 if(context->debug) log->debug("%O(): have field in cache.", Tools.Function.this_function());
-     return fields[field]->decode(objs[id][field], i);
-   }     
-   else 
-   {
-     werror("Error finding data for id %O; Here's the cache: %O\n\n %O\n", id, objs, fields);
-     throw(Error.Generic("get failed on object without a data cache.\n"));
-   }
+    return fields[field]->decode(objs[id][field], i);
+  }     
+  else 
+  {
+    werror("Error finding data for id %O; Here's the cache: %O\n\n %O\n", id, objs, fields);
+    throw(Error.Generic("get failed on object without a data cache.\n"));
+  }
 
 /*
    string query = sprintf(single_select_query, fields[field]->field_name, table_name, 
@@ -1178,12 +1225,15 @@ static int commit_changes(.DataModelContext context, multiset fields_set, mappin
          {
 	        //if(context->debug)
 			//log->debug("encode field %s using default value %O to %O", f->name, object_data[f->name],f->encode(default_values[f->name](), i));
-            string ev = f->encode(default_values[f->name](), i);
-			if(ev)
-			{
+            mixed ev;
+            if(functionp(default_values[f->name]))
+              ev = f->encode(default_values[f->name](), i);
+            else ev = f->encode(default_values[f->name], i);
+  	    if(ev)
+	    {
               qfields += ({f->field_name});
               qvalues += ({ev});
-			}
+	    }
          }
          // have we set nothing, and are allowed to?
          // if we're updating, it's not required.

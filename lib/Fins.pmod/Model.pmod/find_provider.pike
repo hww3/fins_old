@@ -54,8 +54,8 @@ static program get_model_component(string ot)
      throw(Error.Generic("no model component\n"));
 //      werror()
    }
-   mixed m = context->repository->get_model_module();
-
+//   mixed m = context->repository->get_model_module();
+mixed m = context->repository->object_definitions;
   array x = indices(m);
   array y = values(m);
   
@@ -89,6 +89,7 @@ static function get_func(mixed k)
   function f;
   string ot;
   program p;
+  int i;
 
   if(!context)
   {
@@ -145,18 +146,18 @@ static function get_func(mixed k)
       return lambda(mixed ... args){ return context->find_by_alternate(p, @args);};
     }
   }
-/*
+
   else if((i = search(k, "_by_")) != -1)
   {
     object q;
     ot = k[0..(i-1)];
     ot = Tools.Language.Inflect.singularize(ot);
-werror("ot: %O, %O\n", get_model_component(ot)->master_object, k[(i+4)..]);
-    if((p = get_model_component(ot)) && (q = get_object_component(ot))->alternate_key && (k[(i+4) ..] == lower_case(q->alternate_key->name)))
+//werror("ot: %O, %O, %O, %O\n", ot, get_model_component(ot), k[(i+4)..], get_model_component(ot)->alternate_key);
+    if((p = get_model_component(ot)) && p->alternate_key && (k[(i+4) ..] == lower_case(p->alternate_key->name)))
       return lambda(mixed ... args){ return context->find_by_alternate(p, @args);};
 
   }
-*/
+
   else if(has_suffix(k, "_all"))
   {
     ot = string_without_suffix(k, "_all");

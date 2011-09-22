@@ -82,7 +82,7 @@ string make_excerpt(string c)
 string generate_password(int length)
 {
 	object P = .PhoneticPasswords();
-	return p->generate(1, length)[0];
+	return P->generate(1, length)[0];
 }
 
 

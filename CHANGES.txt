@@ -26,6 +26,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Find syntax has been extended to allow "IN" clauses by providing
+      an array of valid values instead of a single value for a field.
 - Added TemplateParser filter, which is used by static location
        controllers to parse static CSS files as Simple Templates.
 - Added DataObject.add_default_value() to provide default values

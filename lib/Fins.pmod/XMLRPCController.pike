@@ -57,7 +57,6 @@ private class XMLRPCRunner(object obj, function indexer)
 
   void run(Fins.Request request, Fins.Response response, mixed ... args)
   {
-        mapping m;
         int off = search(request->raw, "\r\n\r\n");
 
         if(off<=0) error("invalid request format.\n");

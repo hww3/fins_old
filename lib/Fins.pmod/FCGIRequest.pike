@@ -101,7 +101,7 @@ static private void decode_cookies()
       if(name == "RoxenConfig" && strlen(value))
       {
 	array tmpconfig = value/"," + ({ });
-	string m;
+
 	config = aggregate_multiset(@tmpconfig);
       }
     }

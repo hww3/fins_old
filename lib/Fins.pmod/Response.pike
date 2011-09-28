@@ -325,15 +325,15 @@
        template_data->set_request(request);
 
         response->data = template->render(template_data);
-        if(stringp(response->data) && String.width(response->data) > 8)
+        if(stringp(response->data) && has_prefix(template->get_type(), "text"))
         {
-			// TODO: we need to figure out how to encode things. Is utf8 sufficient?
-			response->data = string_to_utf8(response->data);
+            // TODO: do we need to figure out how to encode things? Is utf8 sufficient?
+            response->data = string_to_utf8(response->data);
             response["extra_heads"]["content-type"] = template->get_type() + "; charset=utf-8";
-		}
-		else
-//            response["extra_heads"]["content-type"] = template->get_type() + "; charset=utf-8";
-          response["extra_heads"]["content-type"] = template->get_type();
+        }
+        else
+           response["extra_heads"]["content-type"] = template->get_type();
+
         response->file = 0;
         __rendered = 1;
      }

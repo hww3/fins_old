@@ -12,7 +12,7 @@ string simple_macro_LOCALE(Fins.Template.TemplateData data, mapping|void args)
 	object r = data->get_request();
 if(!r)
 {
-  return "default";
+  return args["string"];
 }
 else
 	return Locale.translate(r->get_project(), r->get_lang(), 
@@ -199,7 +199,6 @@ string simple_macro_action_url(Fins.Template.TemplateData data, mapping|void arg
 //!  and a value in the request's variables mapping used to fill the default value
 string simple_macro_input(Fins.Template.TemplateData data, mapping|void args)
 {
-  object controller;
 //werror("******* input\n");
   object request = data->get_request();
   string event = args->action;
@@ -239,7 +238,6 @@ string simple_macro_input(Fins.Template.TemplateData data, mapping|void args)
 //!  and a value in the request's variables mapping used to fill the default value
 string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
 {
-  object controller;
 //werror("******* input\n");
   object request = data->get_request();
   string event = args->action;
@@ -260,6 +258,7 @@ string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
 
   String.Buffer buf = String.Buffer();
   buf->add("<select");
+
   foreach(args; string s;string v)
   { 
     buf->add(" " + s + "=\"" + v + "\""); 
@@ -278,16 +277,16 @@ string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
     {
       vn = vo;
       dn = vo;
-    buf->add("<option value=\"" + vn + "\"">");
-    buf->add(dn);
+      buf->add("<option value=\"" + vn + "\">");
+      buf->add(dn);
 
-    if(v == value)
-      buf->add("selected=\"1\"");
-    buf->add(">");
-    buf->add(vo);
-    buf->add("</option>\n");
+      if(v == value)
+        buf->add("selected=\"1\"");
+      buf->add(">");
+      buf->add(vo);
+      buf->add("</option>\n");
+    }  
   }
-
   
 
   buf->add("</select>\n");
@@ -303,13 +302,13 @@ string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
   return buf->get();
 }
 
+
 //! args: none required, arg "mandatory" may be specified
 //!
 //! generates a textarea with any args passed along
 //!  and a value in the request's variables mapping used to fill the default value
 string simple_macro_textarea(Fins.Template.TemplateData data, mapping|void args)
 {
-  object controller;
 //werror("******* input\n");
   object request = data->get_request();
   string event = args->action;
@@ -344,7 +343,6 @@ string simple_macro_textarea(Fins.Template.TemplateData data, mapping|void args)
 
   return buf->get();
 }
-
 //! args: var
 string simple_macro_autoformat(Fins.Template.TemplateData data, mapping|void args)
 {

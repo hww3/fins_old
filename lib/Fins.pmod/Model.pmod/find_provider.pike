@@ -149,7 +149,6 @@ static function get_func(mixed k)
 
   else if((i = search(k, "_by_")) != -1)
   {
-    object q;
     ot = k[0..(i-1)];
     ot = Tools.Language.Inflect.singularize(ot);
 //werror("ot: %O, %O, %O, %O\n", ot, get_model_component(ot), k[(i+4)..], get_model_component(ot)->alternate_key);

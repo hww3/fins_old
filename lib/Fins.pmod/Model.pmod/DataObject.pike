@@ -528,6 +528,7 @@ void add_field(.DataModelContext context, .Field f, int|void force)
 
 }
 
+/*
 mixed gen_inherits(object definition)
 {
 	// we need to check to see if there are any inherited types.
@@ -545,7 +546,7 @@ mixed gen_inherits(object definition)
     }
     
 }
-
+*/
  string gen_fields()
 {
   string fn;
@@ -554,7 +555,7 @@ mixed gen_inherits(object definition)
   _fieldnames = ([]);
   _fieldnames_low = ([]);
 
-   gen_inherits(this);
+//   gen_inherits(this);
 
      foreach(fields;; .Field f)
      {

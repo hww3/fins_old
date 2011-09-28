@@ -1,0 +1,9 @@
+TOOLS
+
+migrate_mysql_to_sqlite3.sh
+
+a script that can be used to generate a sqlite3 database from one located in 
+mysql. does the basics, but may not handle all possible situations you might 
+encounter in mysql.
+
+

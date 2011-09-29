@@ -129,25 +129,33 @@ mapping map_field(mapping t, string table)
     case "float":
       field->type = "float";
       break;
+    case "tinyblob":
+      field->type = "binary_string";
+	  if((int)t->length)
+        field->length = t->length;
+      else
+        field->length =  255;
+      break;
     case "blob":
       field->type = "binary_string";
 	  if((int)t->length)
         field->length = t->length;
       else
-      {
-	     if(t->type == "blob")
-	       field->length = 32200;
-	  }
+        field->length = 32200;
       break;
     case "mediumblob":
       field->type = "binary_string";
 	  if((int)t->length)
         field->length = t->length;
       else
-      {
-	     if(t->type == "blob")
-	       field->length = 1664400;
-	  }
+        field->length = 1664400;
+      break;
+    case "longblob":
+      field->type = "binary_string";
+	  if((int)t->length)
+        field->length = t->length;
+      else
+        field->length =  4294967295;
       break;
     default:
       throw(Error.Generic("unknown field type " + t->type + ".\n"));

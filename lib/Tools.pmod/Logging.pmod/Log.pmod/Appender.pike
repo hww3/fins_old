@@ -10,6 +10,18 @@ static void create(mapping config)
   format_function = Tools.String.named_sprintf_func(format + "\n");
 }
 
+//! creates the parent folder for file if it doesn't exist.
+void make_log_directory(string file)
+{
+  string dirname = dirname(file);
+  Stdio.Stat fss = file_stat(dirname);
+  if(!fss)
+  {
+    .module.info("creating directory " + dirname);
+    Stdio.mkdirhier(dirname);
+  }
+}
+
 mixed write(mapping args)
 {
   return output->write(encode_string(format_function(args) ));

@@ -10,7 +10,10 @@ void create(mapping|void config)
     throw(Error.Generic("Configuration File must be specified.\n"));
   }
   else
+  {
+    make_log_directory(config->file);
     output = Stdio.File(config->file, "cwa");
+  }
 
   ::create(config);
 }

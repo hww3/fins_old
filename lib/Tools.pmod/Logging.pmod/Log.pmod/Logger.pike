@@ -60,7 +60,7 @@ void configure(mapping config)
   else
   {
     array appenders = Tools.Logging["get_appenders"](arrayp(config->appender)?config->appender:({config->appender}));
-  set_appenders(appenders);
+    set_appenders(appenders);
   }
 }
 

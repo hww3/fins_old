@@ -292,6 +292,15 @@ void initialize_links(object ctx)
     table_components += ({ (["tn": lower_case(Tools.Language.Inflect.pluralize(on)), "od": od ]) });  
   }
     
+  // Now, we check for link-tables, that is, tables which represent a many-to-many relationship
+  // between two datatypes using a table that contains tuples of the two id fields.
+  //
+  // We do this automatically by searching for any combination of tablea_tableb in the database which 
+  // conforms to the practice of having the fields representing the two linked tables called typeA_id 
+  // and typeB_id where typeA and typeB are singular forms of the table name.
+  // 
+  //  for example a table used to link user and group would be called users_groups and have fields called
+  //  user_id and group_id.
   multiset available_tables = (multiset)ctx->sql->list_tables();
     
   foreach(table_components;; mapping o)

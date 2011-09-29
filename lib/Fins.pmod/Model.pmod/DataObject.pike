@@ -494,7 +494,8 @@ void set_alternate_key(string _key)
 void add_default_value_object(.DataModelContext context, string field, string objecttype, mapping criteria, int unique)
 {
    if(unique)
-     default_values[field] = lambda(){ return context->old_find(objecttype, criteria)[0];};
+     default_values[field] = lambda(){ mixed i; if(catch(i = context->old_find(objecttype, criteria)[0])) 
+														throw(Error.Generic(sprintf("Failed to find %s with criteria: %O", objecttype, criteria))); else return i;};
    else
      default_values[field] = lambda(){ return context->old_find(objecttype, criteria);};
 }

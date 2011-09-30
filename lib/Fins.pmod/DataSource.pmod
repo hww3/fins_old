@@ -11,8 +11,8 @@ static object `->(mixed model_id)
 
 object get(mixed model_id)
 {
-werror("**** get(%O)\n", model_id);
-werror("fds: %O\n", fds);
+// werror("**** get(%O)\n", model_id);
+// werror("fds: %O\n", fds);
   if(fds)
     return fds((string)model_id);
   else

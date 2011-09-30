@@ -10,7 +10,7 @@ void get_contents()
 mixed `+(mixed arg)
 {
 
-werror("otherobject: %O\n", otherobject);
+// werror("otherobject: %O\n", otherobject);
 
   // do we have the right kind of object?
   if(!objectp(arg) || !arg->master_object || arg->master_object != otherobject)

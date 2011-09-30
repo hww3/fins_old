@@ -7,7 +7,7 @@ int changed;
 
 static void create(.Field f, object parent, void|.DataModelContext c)
 {
-  Tools.Logging.Log.debug("%O(%O, %O, %O)", Tools.Function.this_function(), f, parent, c);
+//  Tools.Logging.Log.debug("%O(%O, %O, %O)", Tools.Function.this_function(), f, parent, c);
   field = f; 
   parentobject = parent;
   context = c || parent->context;

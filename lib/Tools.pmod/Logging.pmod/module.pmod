@@ -233,7 +233,6 @@ Tools.Logging.Log.Logger create_logger_from_config(string loggername)
 {
   // get the nearest logger configuration.
   mapping cx;
-  string my_logger_name;
 
   cx = build_logger_config(loggername);
 

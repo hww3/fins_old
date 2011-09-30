@@ -30,9 +30,9 @@ mixed decode(string value, void|.DataObjectInstance i)
 // value should be a dataobject instance of the type we're looking to set.
 string encode(int|.DataObjectInstance value, void|.DataObjectInstance i)
 {
-Log.debug("%O(%O, %O)", Tools.Function.this_function(), value, i);
+//Log.debug("%O(%O, %O)", Tools.Function.this_function(), value, i);
   value = validate(value);
-Log.debug("%O(): validate() returns %O", Tools.Function.this_function(), value);
+//Log.debug("%O(): validate() returns %O", Tools.Function.this_function(), value);
 
   if(intp(value)) return (string)value;
 
@@ -47,7 +47,7 @@ Log.debug("%O(): validate() returns %O", Tools.Function.this_function(), value);
 
 mixed validate(mixed value, void|.DataObjectInstance i)
 {
-Log.debug("%O(%O, %O)", Tools.Function.this_function(), value, i);
+//Log.debug("%O(%O, %O)", Tools.Function.this_function(), value, i);
 
    if(intp(value)) return value;
 
@@ -79,7 +79,7 @@ string get_editor_string(mixed|void value, void|.DataObjectInstance i)
 {
   string desc = "";
   object sc = context->app->model->repository->get_scaffold_controller(context->app->model->repository->get_object(otherobject));
-werror("value for keyreference is %O, scaffold controller is %O\n", value, sc);
+//werror("value for keyreference is %O, scaffold controller is %O\n", value, sc);
   if(!value) desc = "not set";
   else 
   {
@@ -93,14 +93,14 @@ werror("value for keyreference is %O, scaffold controller is %O\n", value, sc);
       desc);
   }
 
-werror("other object is %O\n", otherobject);
+//werror("other object is %O\n", otherobject);
   if(sc && sc->pick_one)
   {
     desc += sprintf(" <a href='javascript:fire_select(%O)'>select</a>",
       context->app->url_for_action(sc->pick_one, ({}), (["selected_field": name, "for": i->master_object->instance_name,"for_id": i->get_id()]))
      );
   }
-werror("returning %O\n", desc);
+//werror("returning %O\n", desc);
   return desc;
 }
   

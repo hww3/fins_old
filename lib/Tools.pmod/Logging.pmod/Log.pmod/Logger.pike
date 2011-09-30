@@ -1,24 +1,27 @@
 //!
-constant DEBUG = 1;
+constant TRACE = 1;
+//!
+constant DEBUG = 2;
 
 //!
-constant INFO = 2;
+constant INFO = 4;
 
 //!
-constant WARN = 4;
+constant WARN = 8;
 
 //!
-constant ERROR = 8;
+constant ERROR = 16;
 
 //!
-constant CRITICAL = 16;
+constant CRITICAL = 32;
 
 //!
 static array appenders = ({});
 
-int loglevel = DEBUG|INFO|WARN|ERROR|CRITICAL;
+int loglevel = TRACE|DEBUG|INFO|WARN|ERROR|CRITICAL;
 
 mapping log_strs = ([
+  TRACE: "TRACE",
   DEBUG: "DEBUG", 
   INFO: "INFO",
   WARN: "WARN",
@@ -27,6 +30,7 @@ mapping log_strs = ([
 ]);
 
 mapping strs_log = ([
+  "TRACE": TRACE,
   "DEBUG": DEBUG, 
   "INFO": INFO,
   "WARN": WARN,

@@ -4,8 +4,11 @@ string app_dir;
 //! name of the application; usually the last element of the full path to the application.
 string app_name;
 
-//! the path to the configuration file in use
+//! the path to the configuration file in use, such as /path/to/config/dev.cfg
 string config_file;
+
+//! the name of the configuration in use, such as dev
+string config_name;
 
 static mapping values;
 
@@ -20,6 +23,9 @@ static void create(string appdir, string|mapping _config_file)
   if(stringp(_config_file))
   {
     config_file = _config_file;
+	array _cn = (basename(config_file)/".")
+	config_name = cn[0..sizeof(cn)-2]*".";
+	
     string fc = Stdio.read_file(config_file);
 
     // the "spec" says that the file is utf-8 encoded.

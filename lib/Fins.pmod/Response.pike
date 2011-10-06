@@ -234,8 +234,10 @@
   public void redirect(string|URI|function|Fins.FinsController to, array|void args, mapping|void vars)
   {
 	string dest;
-    response->error = 301;
-
+	if(request->protocol == "HTTP/1.0")
+      response->error = 302;
+    else
+      response->error = 307;
     dest = get_redirect_url(to, args, vars);
 
     response->extra_heads->location = dest;

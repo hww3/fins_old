@@ -122,7 +122,7 @@ werror("low_get_template(%O, %O, %O, %O)\n", templateType, templateName, context
 	context->view = this;
   }
 
-  if(!templateName || !sizeof(templateName))
+  if(!templateName || !stringp(templateName))
     throw(Error.Generic("get_template(): template name not specified.\n"));
 
   if(!templates[templateType])

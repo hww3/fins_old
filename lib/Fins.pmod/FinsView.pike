@@ -84,7 +84,16 @@ public string render_partial(string view, mapping data,
 	return result;
 }
 
+//! create a view using the template program specified. 
+//! @param templateType
+//!      a program implementing Fins.Template.Template
 //!
+//!  @param tn
+//!     a string passed to the constructor of the template program.
+//!     the meaning of this value will vary depending on the template
+//!     implementation. often, this is the name of the template to load,
+//!     or it may be the actual content of the template, for example in 
+//!     @[Fins.Template.StringSimple].
 public Template.View low_get_view(program templateType, string tn)
 {
   object t;
@@ -98,11 +107,24 @@ public Template.View low_get_view(program templateType, string tn)
   return Template.View(t, d);
 }
 
+//! get a view using the default string template type. 
+//!
+//! @param ts
+//!   a string to be used as the template data
+//!
+//! app config is added as a value to the template data object as the value "config".
 public Template.View get_string_view(string ts)
 {
   return low_get_view(default_string_template, ts);
 }
 
+//! get a view using the default template type. 
+//!
+//! @param
+//!   a string containing the name of the template to load. how this is loaded is dependent on
+//!   the behavior of the specified default template type
+//!
+//! app config is added as a value to the template data object as value "config".
 public Template.View get_view(string tn)
 {
   return low_get_view(default_template, tn);

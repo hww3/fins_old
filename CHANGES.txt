@@ -26,6 +26,9 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+- Added field config_name in Fins.Configuration that contains the 
+       "base" name of the config file in use, that is "dev" for a config
+        file called dev.cfg.
 - Added tools folder to hold useful scripts. First up: a simple
        script for copying a mysql database into a sqlite db file.
 - Find syntax has been extended to allow "IN" clauses by providing

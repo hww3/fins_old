@@ -845,13 +845,18 @@ static void low_load(mapping row, .DataObjectInstance i, mapping objs, mapping o
   return;
 }
 
-mapping get_atomic(.DataModelContext context, .DataObjectInstance i)
+mapping get_atomic(int(0..1)|void recurse, .DataModelContext context, .DataObjectInstance i)
 {
   mapping a = ([]);
 
   foreach(fields;string n; object f )
   {
-    a[f->name] = get(context, f->name, i);
+    mixed v = get(context, f->name, i);
+	if(recurse && objectp(v) && functionp(v->get_atomic))
+	{
+	   v = v->get_atomic(recurse);
+	}
+    a[f->name] = v;
   }
 
   return a;

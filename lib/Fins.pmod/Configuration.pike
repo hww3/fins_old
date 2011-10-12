@@ -23,8 +23,8 @@ static void create(string appdir, string|mapping _config_file)
   if(stringp(_config_file))
   {
     config_file = _config_file;
-	array _cn = (basename(config_file)/".")
-	config_name = cn[0..sizeof(cn)-2]*".";
+	array _cn = (basename(config_file)/".");
+	config_name = _cn[0..sizeof(_cn)-2]*".";
 	
     string fc = Stdio.read_file(config_file);
 

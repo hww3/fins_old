@@ -54,6 +54,26 @@ mixed cast(string t)
   }
 }
 
+string render_json()
+{
+  mapping m = render_mapping();
+  return Tools.JSON.serialize(m);
+}
+
+mapping render_mapping()
+{
+  mapping m = get_atomic();
+  foreach(m; string index; mixed val)
+  {
+    if(objectp(val) && functionp(val->get_atomic))
+	  m[index] = val->get_atomic(1);
+	else if(objectp(val) && functionp(val->format_http))
+	  m[index] = val->format_http();
+  }
+  return m;
+}
+
+
 string describe_value(string key, mixed value)
 {
   return master_object->describe_value(key, value, this);
@@ -231,9 +251,17 @@ int set(string name, string value, int|void no_validation, void|.DataModelContex
 }
 
 //!
-mixed get_atomic(void|.DataModelContext c)
+mixed get_atomic(int(0..1)|void norecurse, void|.DataModelContext c)
 {
-   return master_object->get_atomic(c||context, this);
+  if(norecurse)
+  { 
+    mapping mp = (["_objecttype": master_object->instance_name, "id": get_id()]);
+    string akn = master_object->alternate_key->name;
+    if(master_object->alternate_key) mp[akn] = get(akn);
+    return mp;
+  }
+  else
+    return master_object->get_atomic(norecurse, c||context, this);
 }
 
 //!

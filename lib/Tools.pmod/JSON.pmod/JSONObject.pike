@@ -50,18 +50,24 @@ private array myKeyIndexList;
 			myHashMap      = ([]);
 			myKeyIndexList = ({});
 
-                     if(objectp(x))
+                     if(objectp(x) && object_program(x) == JSONTokener)
                      {
                        fromtokener(x);
                      }
-                     if(stringp(x))
+					 else if (objectp(x))
+					 {
+					//werror("object: %O\n", x);
+						myHashMap      = (mapping)x;
+						myKeyIndexList = indices(myHashMap);
+					 }
+                     else if(stringp(x))
                      {
                        fromtokener(JSONTokener(x));
                      }
-                     if(mappingp(x))
+                     else if(mappingp(x))
                      {
-			myHashMap      = copy_value(x);
-			myKeyIndexList = indices(x);
+					   myHashMap      = copy_value(x);
+					   myKeyIndexList = indices(x);
                      }
 		}
 
@@ -693,6 +699,7 @@ static mixed cast(string to)
                                         }
 					else
 					{
+		//			werror("obj: %O\n", obj);
 						sb+=((string)obj);
 					}
 				}

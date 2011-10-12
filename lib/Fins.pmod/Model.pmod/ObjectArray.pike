@@ -100,6 +100,20 @@ mixed `+(mixed arg)
   return this;
 }
 
+// args is used for function signature compatibility with DataObjectInstance.
+mixed get_atomic(int(0..1)|void norecurse, mixed ... args)
+{
+  int sv = _sizeof();
+  array v = allocate(sv);
+
+  for(int i = 0; i < sv; i++)
+  {
+    v[i] = this[i]->get_atomic(norecurse);
+  }
+
+  return v;
+}
+
 .DataObjectInstance get_element(int e)
 {
   if(changed)

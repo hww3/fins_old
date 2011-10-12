@@ -33,18 +33,17 @@ static void create(string _name, string _transformfield, mixed ... args)
   ::create(_name, _transformfield, get_md, @args);
 }
 
-
    class MetaData
    {
      string fieldname;
      mapping metadata = ([]);
      object obj;
 
-     static mixed cast(string tn)
-     {
-       if(tn == "mapping")
-        return metadata + ([]);
-     }
+static mixed cast(string tn)
+{
+  if(tn == "mapping")
+    return metadata + ([]);
+}
 
      static int(0..1) _is_type(string tn)
      {

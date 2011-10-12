@@ -162,7 +162,7 @@ void start()
   {
 	model_context = Fins.Model.get_context(model_id);
     model_object = model_context->repository->get_object(model_component);
-    model_context->repository->set_scaffold_controller(model_object, this);
+    model_context->repository->set_scaffold_controller("html", model_object, this);
   }
 }
 
@@ -222,7 +222,7 @@ public void do_pick(Request id, Response response, Fins.Template.View v, mixed .
     return;
   }
 
-  object sc = model_context->repository->get_scaffold_controller(model_context->repository->get_object(id->variables["for"]));
+  object sc = model_context->repository->get_scaffold_controller("html", model_context->repository->get_object(id->variables["for"]));
   function action;
 
   if(!(int)id->variables->for_id)
@@ -725,7 +725,7 @@ string describe_object(object m, string key, object o)
 
 string get_view_url(object o)
 {
-  object controller = model_context->repository->get_scaffold_controller(o->master_object);  
+  object controller = model_context->repository->get_scaffold_controller("html", o->master_object);  
   if(!controller)
     return 0;
 

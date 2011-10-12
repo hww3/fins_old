@@ -6,7 +6,7 @@
 mapping(string:.DataObject) object_definitions = ([]);
 mapping(program:.DataObject) program_definitions = ([]);
 mapping(string:program) instance_definitions = ([]);
-static mapping(object:object) scaffold_controllers = ([]);
+static mapping(string:mapping(object:object)) scaffold_controllers = ([]);
 static object model_module;
 static object object_module;
 
@@ -84,15 +84,19 @@ void add_object_type(.DataObject t, program i)
 }
 
 //!
-object get_scaffold_controller(object model_component)
+object get_scaffold_controller(string type, object model_component)
 {
  // werror("get_scaffold_controller(%O) in %O\n", model_component, scaffold_controllers);
 
-  return scaffold_controllers[model_component];
+  if(!scaffold_controllers[type])
+    scaffold_controllers[type] = ([]);
+  return scaffold_controllers[type][model_component];
 }
 
 //!
-void set_scaffold_controller(object model_component, object controller)
+void set_scaffold_controller(string type, object model_component, object controller)
 {
-   scaffold_controllers[model_component] = controller;
+  if(!scaffold_controllers[type])
+    scaffold_controllers[type] = ([]);
+   scaffold_controllers[type][model_component] = controller;
 }

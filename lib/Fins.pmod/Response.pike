@@ -127,6 +127,13 @@
     response->error = 304;
   }
 
+
+  //!
+  public void not_implemented()
+  {
+    response->error = 501;
+  }
+
   //! generate our "best guess" url based on the request.
   public Standards.URI divine_url(Fins.Request req)
   {
@@ -367,6 +374,7 @@
      if(low_response) return response;
      if(!__rendered) render();
 
+werror("response: %O\n", response);
      if(!response->error) return 0;
      if (sizeof(cookies) > 1) 
      {
@@ -383,5 +391,6 @@
  
     response->request = request;
 
+werror("response2: %O\n", response);
     return response;
   }

@@ -38,6 +38,8 @@ import Tools.JSON;
 //!
 //! Ported to C# by Are Bjolseth, teleplan.no
 
+private object myCustomRenderObject;
+
 //!The hash map where the JSONObject's properties are kept.
 private mapping myHashMap;
 
@@ -54,7 +56,11 @@ private array myKeyIndexList;
                      {
                        fromtokener(x);
                      }
-					 else if (objectp(x))
+					 else if (objectp(x) && functionp(x->render_json))
+                                         {
+                                            myCustomRenderObject = x; 
+                                         }
+					else if(objectp(x))
 					 {
 					//werror("object: %O\n", x);
 						myHashMap      = (mapping)x;
@@ -189,7 +195,7 @@ static void `[]=(mixed key, mixed value)
 //!
 static int _sizeof()
 {
-  return sizeof(myHashMap);
+  return sizeof(myCustomRenderObject||myHashMap);
 }
 
 
@@ -203,8 +209,13 @@ static int _sizeof()
 //!  The object associated with the key.
 		public object getValue(string key)
 		{
+			mixed obj;
+
 			//return myHashMap[key];
-			mixed obj = opt(key);
+			if(myCustomRenderObject)
+                           obj = myCustomRenderObject[key];
+			else
+			   obj = opt(key);
 			if (!obj && zero_type(obj))
 			{
 				throw(Error.Generic("No such element"));
@@ -335,6 +346,8 @@ static int _sizeof()
 //!  true if the key exists in the JSONObject.
 		public int(0..1) has(string key)
 		{
+			if(myCustomRenderObject && myCustomRenderObject[key])
+                          return 1;
                         if( myHashMap[key])
   			  return 1;
                         else return 0;
@@ -351,12 +364,14 @@ static int _sizeof()
 //!
 		static array _indices()
 		{
+                        if(myCustomRenderObject) return indices(myCustomRenderObject);
 			return indices(myHashMap);
 		}
 
 //!
 		static array _values()
 		{
+                        if(myCustomRenderObject) return values(myCustomRenderObject);
 			return values(myHashMap);
 		}
 
@@ -369,6 +384,7 @@ static int _sizeof()
 //!  true if there is no value associated with the key or if the valus is the JSONObject.NULL object
 		public int(0..1) isNull(string key)
 		{
+                        if(myCustomRenderObject) return NULLObject.equals(myCustomRenderObject[key]);
 			return NULLObject.equals(opt(key));
 		}
 
@@ -379,6 +395,7 @@ static int _sizeof()
 //!  The number of keys in the JSONObject.
 		public int Length()
 		{
+                        if(myCustomRenderObject) return sizeof(myCustomRenderObject);
 			return sizeof(myHashMap);
 		}
 
@@ -397,6 +414,7 @@ static int _sizeof()
 			{
 				throw(Error.Generic("Null key"));
 			}
+                        if(myCustomRenderObject) return myCustomRenderObject[key];
 			return myHashMap[key];
 		}
 
@@ -414,7 +432,7 @@ static int _sizeof()
 //!  bool value object
 		public int(0..1) optBoolean(string key, void|int(0..1) defaultValue)
 		{
-			mixed obj = opt(key);
+			mixed obj = getValue(key);
 			if (obj)
 			{
 				if (intp(obj))
@@ -667,6 +685,11 @@ static mixed cast(string to)
 		{
 			mixed obj;
 			//string s;
+			if(myCustomRenderObject)
+			  return myCustomRenderObject->render_json();
+			else
+                        {
+
 			String.Buffer sb = String.Buffer();
 
 			sb+=("{");
@@ -706,6 +729,8 @@ static mixed cast(string to)
 			}
 			sb+=("}");
 			return sb->get();
+			}
+
 		}
 
 mapping toNative()

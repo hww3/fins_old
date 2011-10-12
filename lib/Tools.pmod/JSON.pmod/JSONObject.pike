@@ -46,11 +46,19 @@ private mapping myHashMap;
 //! A shadow list of keys to enable access by sequence of insertion
 private array myKeyIndexList;
 
+private void|mixed filter_context;
+
+public void set_filter_context(mixed|void ctx)
+{
+  filter_context = ctx;
+}
+
 //!  Construct a JSONObject, either empty, from a JSON datastream, or a pike mapping.
-		static void create(void|string|Tools.JSON.JSONTokener|mapping x)
+		static void create(void|string|Tools.JSON.JSONTokener|mapping x, mixed|void filter_context)
 		{ 
 			myHashMap      = ([]);
 			myKeyIndexList = ({});
+		     set_filter_context(filter_context);
 
                      if(objectp(x) && object_program(x) == JSONTokener)
                      {
@@ -163,6 +171,7 @@ private array myKeyIndexList;
 			else
 			{
 				a = JSONArray();
+				a->set_filter_context(filter_context);
 				a->put(sizeof(a), obj);
 				a->put(sizeof(a), val);
 				put(key,a);
@@ -660,6 +669,7 @@ static int _sizeof()
 				return UNDEFINED;
 
 			JSONArray ja = JSONArray();
+                        ja->set_filter_context(filter_context);
 			for (int i=0; i<sizeof(names); i++)
 			{
 			  ja->put(sizeof(ja), this->opt(names->getString(i)));
@@ -686,15 +696,30 @@ static mixed cast(string to)
 			mixed obj;
 			//string s;
 			if(myCustomRenderObject)
-			  return myCustomRenderObject->render_json();
+			{
+			  mixed filter_fields;
+			  if(filter_context)
+			  {
+			    filter_fields = filter_context->get_filter_for_program(object_program(myCustomRenderObject));
+                          }
+			  return myCustomRenderObject->render_json(filter_fields);
+			}
 			else
                         {
+			  mixed filter_fields;
 
+			  if(filter_context)
+			  {
+			    filter_fields = filter_context->get_default_filter();
+                          }
 			String.Buffer sb = String.Buffer();
 
 			sb+=("{");
 			foreach (myHashMap;string key;mixed val)  //NOTE! Could also use myKeyIndexList !!!
 			{
+			  mixed filter_fields;
+				if(filter_fields && multisetp(filter_fields) && filter_fields[key]) continue;
+				else if(filter_fields && functionp(filter_fields) && filter_fields(key, val)) continue;
 				if (obj)
 					sb+=(",");
 				obj = myHashMap[key];
@@ -714,11 +739,11 @@ static mixed cast(string to)
 					// boolean is a problem...
                                         else if(arrayp(obj))
                                         {
-                                           sb+=((string)JSONArray(obj));
+                                           sb+=((string)JSONArray(obj, filter_context));
                                         }
                                         else if(mappingp(obj))
                                         {
-                                           sb+=((string)JSONObject(obj));
+                                           sb+=((string)JSONObject(obj, filter_context));
                                         }
 					else
 					{

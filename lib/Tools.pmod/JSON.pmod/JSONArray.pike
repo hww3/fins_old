@@ -33,12 +33,16 @@
 
 import Tools.JSON;
 
+private mixed filter_context;
+
 //! The ArrayList where the JSONArray's properties are kept.
 private array myArrayList;
 
 //! Construct a JSONArray, empty, from a JSON datastream, or a Pike array.
-static void create(void|JSONTokener|string|array x)
+static void create(void|JSONTokener|string|array x, void|mixed filter_context)
 {
+  set_filter_context(filter_context);
+
   myArrayList = ({});
   if(stringp(x))
   {
@@ -52,6 +56,11 @@ static void create(void|JSONTokener|string|array x)
   {
     myArrayList = copy_value(x);
   }
+}
+
+public void set_filter_context(mixed|void ctx)
+{
+  filter_context = ctx;
 }
 
 //! Construct a JSONArray from a JSONTokener.
@@ -289,12 +298,12 @@ public string join(string separator)
     }
     else if(arrayp(obj))
     {
-      sb+=((string)JSONArray(obj));
+      sb+=((string)JSONArray(obj, filter_context));
     }
     else if(mappingp(obj))
     {
 
-      sb+=((string)JSONObject(obj));
+      sb+=((string)JSONObject(obj, filter_context));
     }
     else
     {
@@ -525,6 +534,8 @@ public JSONObject toJSONObject(JSONArray names)
     return 0;
   }
   JSONObject jo = JSONObject();
+  if(filter_context)
+    jo->set_filter_context(filter_context);
   for (int i=0; i <sizeof(names); i++)
   {
     jo->put((string)names[i], opt(i));

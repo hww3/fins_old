@@ -135,7 +135,7 @@ public Template.Template low_get_template(program templateType, string templateN
 {
   object t;
 
-werror("low_get_template(%O, %O, %O, %O)\n", templateType, templateName, context, is_layout);
+// werror("low_get_template(%O, %O, %O, %O)\n", templateType, templateName, context, is_layout);
 
   if(!context) 
   {

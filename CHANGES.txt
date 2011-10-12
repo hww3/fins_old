@@ -26,6 +26,23 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+-  Added RESTController, a framework for building REST style CRUD+JSON 
+     endpoints.
+-  Added MethodController, which presents an endpoint with HTTP methods
+    triggering specifically defined handlers
+- Added "additivity" setting to logging configuration, which allows
+    a child logger to use settings from the parent as default values.
+- Log Appenders that write to files will now create the path to the 
+    file if it doesn't already exist.
+- Added log level of "TRACE" for extremely low level logging.
+    NOTE: existing log level identifiers have changed in code, so if  
+    any specify the numeric log level directly, these will inadvertently
+    be logging 1 higer than intended (TRACE instead of DEBUG, for example.)
+- DataObjectInstance->render_json, render_mapping and render_xml can all
+    take an optional multiset containing fields to exclude from rendered
+    content.
+- Tools.JSON can now filter values from the rendered JSON through the use
+     of Tools.JSON.RenderContext, which is passed to serialize().
 - Added field config_name in Fins.Configuration that contains the 
        "base" name of the config file in use, that is "dev" for a config
         file called dev.cfg.

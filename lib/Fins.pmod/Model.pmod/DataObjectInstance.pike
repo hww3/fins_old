@@ -346,7 +346,7 @@ Parser.XML.Tree.SimpleNode render_xml_node(multiset filter_fields)
   {
 	string indval = "";
 	mapping attrs = ([]);
-	if(filter_fields[i]) continute;
+	if(filter_fields[i]) continue;
 
 	if(master_object->fields[i]->is_shadow) continue;	
 	if(master_object->primary_key == master_object->fields[i])

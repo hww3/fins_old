@@ -6,9 +6,10 @@
 mapping(string:.DataObject) object_definitions = ([]);
 mapping(program:.DataObject) program_definitions = ([]);
 mapping(string:program) instance_definitions = ([]);
-static mapping(string:mapping(object:object)) scaffold_controllers = ([]);
-static object model_module;
-static object object_module;
+protected mapping(string:mapping(object:object)) scaffold_controllers = ([]);
+protected object model_module;
+protected object object_module;
+protected object json_render_context;
 
 object log = Tools.Logging.get_logger("fins.model");
 
@@ -33,6 +34,14 @@ class objects(object repository)
 void set_default_context(.DataModelContext c)
 {
 	default_context = c;
+}
+
+object get_json_render_context()
+{
+  if(!json_render_context)
+    json_render_context = Tools.JSON.RenderContext();
+
+  return json_render_context;
 }
 
 //!

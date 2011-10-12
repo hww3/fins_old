@@ -54,15 +54,16 @@ mixed cast(string t)
   }
 }
 
-string render_json()
+string render_json(multiset filter_fields)
 {
-  mapping m = render_mapping();
+  mapping m = render_mapping(filter_fields);
   return Tools.JSON.serialize(m);
 }
 
-mapping render_mapping()
+mapping render_mapping(multiset filter_fields)
 {
   mapping m = get_atomic();
+  m-=filter_fields;
   foreach(m; string index; mixed val)
   {
     if(objectp(val) && functionp(val->get_atomic))
@@ -256,8 +257,11 @@ mixed get_atomic(int(0..1)|void norecurse, void|.DataModelContext c)
   if(norecurse)
   { 
     mapping mp = (["_objecttype": master_object->instance_name, "id": get_id()]);
-    string akn = master_object->alternate_key->name;
-    if(master_object->alternate_key) mp[akn] = get(akn);
+    if(master_object->alternate_key)
+    {
+      string akn = master_object->alternate_key->name;
+      if(master_object->alternate_key) mp[akn] = get(akn);
+    }
     return mp;
   }
   else
@@ -322,19 +326,19 @@ int is_new_object()
    return new_object;
 }
 
-string render_xml()
+string render_xml(multiset filter_fields)
 {
   object root = Parser.XML.Tree.SimpleRootNode();
 
   root->add_child(Parser.XML.Tree.SimpleNode(Parser.XML.Tree.XML_HEADER, "xml", (["version": "1.0"]), ""));
-  root->add_child(render_xml_node());
+  root->add_child(render_xml_node(filter_fields));
 
   return root->render_xml();
 }
 
 //! renders the attributes of the current object as an XML node object. This method does not perform a 
 //! recursive or deep traversion of any attached objects linked from this object
-Parser.XML.Tree.SimpleNode render_xml_node()
+Parser.XML.Tree.SimpleNode render_xml_node(multiset filter_fields)
 {
   object obj = Parser.XML.Tree.SimpleNode(Parser.XML.Tree.XML_ELEMENT, master_object->instance_name, ([]), "");
 
@@ -342,7 +346,8 @@ Parser.XML.Tree.SimpleNode render_xml_node()
   {
 	string indval = "";
 	mapping attrs = ([]);
-	
+	if(filter_fields[i]) continute;
+
 	if(master_object->fields[i]->is_shadow) continue;	
 	if(master_object->primary_key == master_object->fields[i])
 		attrs["key"] = "true";

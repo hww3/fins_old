@@ -137,7 +137,13 @@ int do_startup()
 
   if(hilfe_mode)
   {
-    write("Starting interactive interpreter...\n");
+    // apps typically have deferred startup for things like controllers
+    // and such. Running the back end once or twice will allow deferred actions
+    // to run so that we hopefully have things like controllers started up.
+    Pike.DefaultBackend(0.0);
+    Pike.DefaultBackend(0.0);
+
+    write("\nStarting interactive interpreter...\n");
     add_constant("application", app);
     object in = Stdio.FILE("stdin");
     object out = Stdio.File("stdout");

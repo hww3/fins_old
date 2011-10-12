@@ -515,7 +515,7 @@ void add_field(.DataModelContext context, .Field f, int|void force)
 {
    if(fields[f->name] && !force) 
    {
-	 log->info("Ignoring attempt to add existing field " + f->name +".");
+	 log->info("Ignoring attempt to add already defined field " + f->name +"=%O as %O.", fields[f->name], f);
      return;	
    }
    f->set_context(context);

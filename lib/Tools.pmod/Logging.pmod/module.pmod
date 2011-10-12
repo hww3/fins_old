@@ -160,7 +160,8 @@ Tools.Logging.Log.Logger create_logger(string loggername)
 
 mapping build_logger_config(string loggername)
 {
-  mapping cx; 
+  mapping cx = ([]);
+  mapping _cx;
   string cn;
   int isroot;
 
@@ -169,9 +170,8 @@ mapping build_logger_config(string loggername)
 
   // first, find the nearest logger in the hierarchy.
 
-  if(!(cx = config_values["logger." + loggername]))  // if we don't have an exact match
+  if(!(_cx = config_values["logger." + loggername]))  // if we don't have an exact match   
   {
-   
     array ln = indices(config_values);
 
     // get the closest match.
@@ -192,7 +192,7 @@ mapping build_logger_config(string loggername)
 //      else werror("no!\n");
     }
   }
-  else cn = loggername;
+  else cx=_cx, cn = loggername;
 
   if(!cn) cn = "default";
   mapping tc = config_values["logger." + cn];
@@ -213,12 +213,13 @@ mapping build_logger_config(string loggername)
       if(pln!=loggername)
       {
       	default_logger->debug("additivity is true, blending settings from parent logger %O", pln);
-        cx = build_logger_config(pln) + cx;
+        mapping lc = build_logger_config(pln);
+        cx = lc + cx;
       }
     }
   }
 
-  cx += config_values["logger." + cn];
+  cx += (config_values["logger." + cn]);
   cx["_name"] = cn;
 
   return cx;

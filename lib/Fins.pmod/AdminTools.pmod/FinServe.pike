@@ -12,11 +12,12 @@ constant default_port = 8080;
 constant my_version = "0.1";
 int my_port;
 
-string session_storagetype = "ram";
+//string session_storagetype = "ram";
 //string session_storagetype = "file";
-//string session_storagetype = "sqlite";
+string session_storagetype = "sqlite";
 //string session_storagedir = "/tmp/scriptrunner_storage";
 string session_storagedir;
+
 string logfile_path = "/tmp/scriptrunner.log";
 string session_cookie_name = "PSESSIONID";
 int session_timeout = 7200;

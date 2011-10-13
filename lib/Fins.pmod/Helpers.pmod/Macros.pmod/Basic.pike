@@ -274,13 +274,13 @@ string simple_macro_select(Fins.Template.TemplateData data, mapping|void args)
     {
       vn = vo;
       dn = vo;
-      buf->add("<option value=\"" + vn + "\">");
-      buf->add(dn);
+      buf->add("<option value=\"" + vn + "\"");
 
-      if(v == value)
-        buf->add("selected=\"1\"");
+      if(vn == value)
+        buf->add(" selected=\"1\"");
+
       buf->add(">");
-      buf->add(vo);
+      buf->add(dn);
       buf->add("</option>\n");
     }  
   }

@@ -54,20 +54,66 @@ mixed cast(string t)
   }
 }
 
-string render_json(multiset filter_fields)
+string render_json(multiset|object filter_fields)
 {
   mapping m = render_mapping(filter_fields);
-  return Tools.JSON.serialize(m);
+  return Tools.JSON.serialize(m, objectp(filter_fields)?filter_fields:0);
 }
 
-mapping render_mapping(multiset filter_fields)
+mapping render_mapping(multiset|object filter_fields)
 {
+  mixed fx; // the filter multiset or function.
   mapping m = get_atomic();
-  m-=filter_fields;
+  if(multisetp(filter_fields))
+    m-=filter_fields;
+  else if(objectp(filter_fields))
+  {
+    fx = filter_fields->get_filter_for_program(object_program(this));
+    if(multisetp(fx))
+      m-=fx;
+    if(!functionp(fx)) fx = 0;
+  }
   foreach(m; string index; mixed val)
   {
+    // if the filter function exists, use it to determine fields to be skipped.
+    if(fx && fx(index, val)) continue;
     if(objectp(val) && functionp(val->get_atomic))
+    {
+  //   werror(index+"\n");
 	  m[index] = val->get_atomic(1);
+  //   werror("%O\n", m[index]);
+	  
+	  if(val->master_object)
+	  {	
+	     string url;
+	     object ctrl = context->repository->get_scaffold_controller("json", val->master_object);
+//	werror("ctrl: %O, %O\n", val->master_object, ctrl);
+	    if(ctrl) 
+	    {
+  	      url = context->app->url_for_action(ctrl);
+  	      m[index]["$ref"] = url + "/:" + val["id"];
+	    }
+	  }
+	  else if(arrayp(m[index]))
+	  {
+//	werror(index +" is array\n");
+		foreach(m[index];int i; mixed ae)
+		{
+		  if(val[i]->master_object)
+		  {	
+		     string url;
+		     object ctrl = context->repository->get_scaffold_controller("json", val[i]->master_object);
+		    if(ctrl) 
+		    {
+	  	      url = context->app->url_for_action(ctrl);
+			  foreach(ae; string key;)
+			    m_delete(ae, key);
+	  	      ae["$ref"] = url + "/:" + ae["id"];
+		    }
+		  }
+		}
+	  }
+	}
 	else if(objectp(val) && functionp(val->format_http))
 	  m[index] = val->format_http();
   }

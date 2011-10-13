@@ -702,7 +702,7 @@ static mixed cast(string to)
 			  {
 			    filter_fields = filter_context->get_filter_for_program(object_program(myCustomRenderObject));
                           }
-			  return myCustomRenderObject->render_json(filter_fields);
+			  return myCustomRenderObject->render_json(filter_context);
 			}
 			else
                         {
@@ -740,6 +740,10 @@ static mixed cast(string to)
                                         else if(arrayp(obj))
                                         {
                                            sb+=((string)JSONArray(obj, filter_context));
+                                        }
+                                        else if(multisetp(obj))
+                                        {
+                                           sb+=((string)JSONArray((array)obj, filter_context));
                                         }
                                         else if(mappingp(obj))
                                         {

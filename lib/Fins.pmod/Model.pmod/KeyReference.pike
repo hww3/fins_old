@@ -67,6 +67,10 @@ mixed validate(mixed value, void|.DataObjectInstance i)
    }
    else if(objectp(value) && value->get_type() != otherobject)
      throw(Error.Generic(sprintf("Got %O object, expected %s.\n", value->get_value(), otherobject)));
+   else if(stringp(value) && ((int)value || value == "0"))
+   {
+     return (int)value;
+   }
    else if(!objectp(value))
      throw(Error.Generic(sprintf("Got a non-object value instead of expected %s.\n", otherobject)));
 

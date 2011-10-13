@@ -34,7 +34,7 @@ protected object model_object;
 protected object model_context;
 protected object render_context;
 
-void start()
+protected void start()
 {
   if(model_component)
   {
@@ -56,12 +56,16 @@ protected void method_head(Fins.Request request, Fins.Response response, mixed .
 protected void method_get(Fins.Request request, Fins.Response response, mixed ... args)
 {
   array|object items;
-// werror("args:%O\n", args);
+ werror("args:%O\n", args);
   if(!sizeof(args))
-    items = model_context->_find(model_object, ([]));
+    items = model_context->_find(model_object, request->variables);
   else
-    items = model_context->find_by_alternate(model_object, args*"/");
-
+  {
+    if(args[0][0] == ':')
+      items = model_context->find_by_id(model_object, (int)((args*"/")[1..]));
+    else
+      items = model_context->find_by_alternate(model_object, args*"/");
+  }
   response->set_type("text/json");
   response->set_data(Tools.JSON.serialize(items, render_context));
 }

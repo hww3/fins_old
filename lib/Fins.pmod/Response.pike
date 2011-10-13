@@ -374,7 +374,6 @@
      if(low_response) return response;
      if(!__rendered) render();
 
-werror("response: %O\n", response);
      if(!response->error) return 0;
      if (sizeof(cookies) > 1) 
      {
@@ -391,6 +390,5 @@ werror("response: %O\n", response);
  
     response->request = request;
 
-werror("response2: %O\n", response);
     return response;
   }

@@ -16,7 +16,7 @@ string session_storagetype = "ram";
 //string session_storagetype = "file";
 //string session_storagetype = "sqlite";
 //string session_storagedir = "/tmp/scriptrunner_storage";
-string session_storagedir = "/tmp/monotype_storage.sqlite3";
+string session_storagedir;
 string logfile_path = "/tmp/scriptrunner.log";
 string session_cookie_name = "PSESSIONID";
 int session_timeout = 7200;
@@ -42,7 +42,8 @@ int go_background = 0;
 private int has_started = 0;
 void print_help()
 {
-	werror("Help: fin_serve [-p portnum|--port=portnum|--hilfe] [-c|--config configname] [-d]  appname\n");
+	werror("Help: fin_serve [-p portnum|--port=portnum|--hilfe] [-s ram|file|sqlite|--session-manager=ram|file|sqlite [-l "
+		"storage_path|--session-storage-location=storage_path]] [-c|--config configname] [-d]  appname\n");
 }
 
 array tool_args;
@@ -70,6 +71,8 @@ int main(int argc, array(string) argv)
   foreach(Getopt.find_all_options(argv,aggregate(
     ({"port",Getopt.HAS_ARG,({"-p", "--port"}) }),
     ({"config",Getopt.HAS_ARG,({"-c", "--config"}) }),
+    ({"sessionmgr",Getopt.HAS_ARG,({"-s", "--session-manager"}) }),
+    ({"sessionloc",Getopt.HAS_ARG,({"-l", "--session-storage-location"}) }),
 #if constant(fork)
     ({"daemon",Getopt.NO_ARG,({"-d"}) }),
 #endif /* fork() */
@@ -85,6 +88,19 @@ int main(int argc, array(string) argv)
 		
 		case "config":
 		config_name = opt[1];
+		break;
+
+		case "sessionloc":
+		session_storagedir = opt[1];
+                break;
+
+		case "sessionmgr":
+		if(!(<"sqlite", "ram", "file">)[opt[1]])
+		{
+		  werror("Error: invalid session manager type '%s'. Valid options are sqlite, ram, file.", opt[1]);
+		  exit(1);
+		}
+		session_storagetype = opt[1];
 		break;
 		
 		case "hilfe":

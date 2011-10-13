@@ -26,6 +26,8 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+-  Added 2 new options to the fins start (FinServe) command for 
+     specifying session management details outside the app config file.
 -  Added RESTController, a framework for building REST style CRUD+JSON 
      endpoints.
 -  Added MethodController, which presents an endpoint with HTTP methods

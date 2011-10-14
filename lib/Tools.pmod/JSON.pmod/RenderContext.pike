@@ -11,6 +11,27 @@ protected multiset|function default_filter=(<>);
 
 protected mapping(program:multiset|function) program_filters = ([]);
 
+protected int max_parse_level = 5;
+protected int current_parse_level = 0;
+
+//!
+int(0..1) parse_depth_okay()
+{
+  return (max_parse_level > current_parse_level);
+}
+
+//!
+void increase_depth()
+{
+  current_parse_level++;
+}
+
+//!
+void decrease_depth()
+{
+  current_parse_level--;
+}
+
 //!
 void set_filter_for_program(program p, multiset|function f)
 {

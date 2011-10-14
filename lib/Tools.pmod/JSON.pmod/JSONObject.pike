@@ -693,6 +693,7 @@ static mixed cast(string to)
 //!  JSON object as formatted string
 		public string ToString()
 		{
+			if(filter_context) filter_context->increase_depth();
 			mixed obj;
 			//string s;
 			if(myCustomRenderObject)
@@ -702,7 +703,9 @@ static mixed cast(string to)
 			  {
 			    filter_fields = filter_context->get_filter_for_program(object_program(myCustomRenderObject));
                           }
-			  return myCustomRenderObject->render_json(filter_context);
+			  string rv = myCustomRenderObject->render_json(filter_context);
+  			  if(filter_context) filter_context->decrease_depth();
+                          return rv;
 			}
 			else
                         {
@@ -739,7 +742,7 @@ static mixed cast(string to)
 					// boolean is a problem...
                                         else if(arrayp(obj))
                                         {
-                                           sb+=((string)JSONArray(obj, filter_context));
+                                           sb+=((string)JSONArray((array)obj, filter_context));
                                         }
                                         else if(multisetp(obj))
                                         {
@@ -749,14 +752,21 @@ static mixed cast(string to)
                                         {
                                            sb+=((string)JSONObject(obj, filter_context));
                                         }
+					else if(objectp(obj))
+					{
+					  if(obj->format_http)
+					    sb+=(JSONUtils.Enquote(obj->format_http()));
+					  else
+					    sb+=((string)obj);
+					}
 					else
 					{
-		//			werror("obj: %O\n", obj);
 						sb+=((string)obj);
 					}
 				}
 			}
 			sb+=("}");
+			if(filter_context) filter_context->decrease_depth();
 			return sb->get();
 			}
 

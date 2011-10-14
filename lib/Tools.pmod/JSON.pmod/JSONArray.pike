@@ -276,6 +276,7 @@ public string join(string separator)
 {
   mixed obj;
   String.Buffer sb = String.Buffer();
+
   for (int i=0; i<sizeof(myArrayList); i++)
   {
     if (i > 0)

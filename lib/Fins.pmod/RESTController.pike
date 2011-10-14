@@ -34,6 +34,11 @@ protected object model_object;
 protected object model_context;
 protected object render_context;
 
+//!  function used to modify the data.
+//!  
+//!  receives an object or array of objects and returns an array, mapping or object.
+protected function(array|object:array|mapping|object) transform_function;
+
 protected void start()
 {
   if(model_component)
@@ -42,7 +47,7 @@ protected void start()
     model_object = model_context->repository->get_object(model_component);
     model_context->repository->set_scaffold_controller("json", model_object, this);
     render_context = model_context->repository->get_json_render_context();
-    render_context->set_filter_for_program(model_context->repository->get_instance(model_component), fields_to_filter);    
+    render_context->set_filter_for_program(model_context->repository->get_instance(model_component), fields_to_filter);
   }
 
   ::start();
@@ -55,10 +60,9 @@ protected void method_head(Fins.Request request, Fins.Response response, mixed .
 
 protected void method_get(Fins.Request request, Fins.Response response, mixed ... args)
 {
-  array|object items;
- werror("args:%O\n", args);
+  array|mapping|object items;
   if(!sizeof(args))
-    items = model_context->_find(model_object, request->variables);
+    items = model_context->_find(model_object, (request->variables-({""})));
   else
   {
     if(args[0][0] == ':')
@@ -67,5 +71,9 @@ protected void method_get(Fins.Request request, Fins.Response response, mixed ..
       items = model_context->find_by_alternate(model_object, args*"/");
   }
   response->set_type("text/json");
+
+  if(transform_function)
+    items = transform_function(items);
+
   response->set_data(Tools.JSON.serialize(items, render_context));
 }

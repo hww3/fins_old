@@ -26,6 +26,9 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+-  Added new __actions mapping to FinsController that allows events to be
+     defined without defining a method (or for when the method name would
+     conflict or otherwise be non-allowed, such as for reserved keywords).
 -  Added 2 new options to the fins start (FinServe) command for 
      specifying session management details outside the app config file.
 -  Added RESTController, a framework for building REST style CRUD+JSON 

@@ -33,6 +33,18 @@ array __before_filters = ({});
 array __after_filters = ({});
 array __around_filters = ({});
 
+//! Mapping of action names to actions.
+//!
+//! By default, actions are looked up in a controller class by index. Sometimes, it's not possible
+//! to create such an index, such as when the desired index is a reserved word like 'object', or one already
+//! present in the controller but with a different purpose, like 'start'.
+//!
+//! An entry may be placed in this mapping and it will be used as though there were a class member with the same name.
+//!
+//! The presence of an entry in this mapping for a given action will take priority over any action
+//! defined within the controller class.
+mapping(string:function|string|object) __actions = ([]);
+
 //! loads the controller, providing support for auto-reload of
 //! updated controller classes.
 //!
@@ -180,4 +192,11 @@ static void breakpoint(string desc, object id, object response,
 static string action_url(function|object action, array|void args, mapping|void vars)
 {
   return app->url_for_action(action, args, vars);
+}
+
+// this is used with the __actions mapping to provide an alternate way to define event handlers.
+protected mixed `[](mixed arg, mixed|void arg2)
+{
+werror("arg=%s: %O, %O\n",arg,  __actions[arg], ::`[](arg,2));
+    return __actions[arg] || ::`[](arg, arg2||2);
 }

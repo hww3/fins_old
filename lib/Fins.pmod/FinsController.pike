@@ -197,6 +197,5 @@ static string action_url(function|object action, array|void args, mapping|void v
 // this is used with the __actions mapping to provide an alternate way to define event handlers.
 protected mixed `[](mixed arg, mixed|void arg2)
 {
-werror("arg=%s: %O, %O\n",arg,  __actions[arg], ::`[](arg,2));
     return __actions[arg] || ::`[](arg, arg2||2);
 }

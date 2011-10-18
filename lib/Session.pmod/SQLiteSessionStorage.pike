@@ -14,15 +14,16 @@ void clean_sessions(int default_timeout)
   sql->query("DELETE FROM SESSIONS WHERE timeout + " + default_timeout + " < CURRENT_TIMESTAMP");
 }
 
-void set_storagedir(string directory)
+//! this is the pathname of the database file, not the full SQL url.
+void set_storagedir(string dbpath)
 {
   mixed e;
   e = catch 
   {
-    sql = Sql.Sql("sqlite://" + directory);
+    sql = Sql.Sql("sqlite://" + dbpath);
   };
-  if(e) throw(Error.Generic("Unable to create session storage database " + directory + ".\n"));
-  storage_dir = directory;
+  if(e) throw(Error.Generic("Unable to create session storage database " + dbpath + ".\n"));
+  storage_dir = dbpath;
 
   mixed rs = sql->query("PRAGMA table_info(SESSIONS)");
   if(!rs || !sizeof(rs))

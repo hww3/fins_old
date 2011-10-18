@@ -200,6 +200,7 @@ function genlogger(object al)
 {
   return lambda(mapping m){al->do_msg(10,"%O", m);};
 }
+
 void session_startup()
 {
   Session.SessionStorage s;
@@ -208,14 +209,14 @@ void session_startup()
 
   session_manager = Session.SessionManager();
 
-  if(app->config->web)
+  if(app->config["web"])
   {
-    if(app->config->web->session_storage_type)
-      session_storagetype = app->config->web->session_storage_type;
-    if(app->config->web->session_storage_location)
-      session_storagedir = app->config->web->session_storage_location;
-    if(app->config->web->session_timeout)
-      session_timeout = (int)app->config->web->session_timeout;
+    if(app->config["web"]->session_storage_type)
+      session_storagetype = app->config["web"]->session_storage_type;
+    if(app->config["web"]->session_storage_location)
+      session_storagedir = app->config["web"]->session_storage_location;
+    if(app->config["web"]->session_timeout)
+      session_timeout = (int)app->config["web"]->session_timeout;
   }
 
   switch(session_storagetype)

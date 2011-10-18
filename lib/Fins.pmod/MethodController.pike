@@ -3,11 +3,10 @@
 //! 
 //! @example
 //!
-//! @code
 //!  void method_post(Fins.Request request, Fins.Response response, mixed ... args)
 //!  {
 //!  }
-//! @code
+//!
 
 inherit Fins.FinsController;
 

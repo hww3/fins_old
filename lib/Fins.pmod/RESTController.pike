@@ -1,10 +1,15 @@
 //! A controller that impliments REST style JSON CRUD functionality
 //! for a given Model component.
 //!
-//! @todo
+//! @note
+//!  some TODO items
+//!
 //!  user authenticated changes
+//!
 //!  filtering more complex than by-field
+//!
 //!  search specifications for GET
+//!
 //!  record set limitations
 
 import Fins;

@@ -26,6 +26,9 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+-  Added stub Makefile for generating module reference documentation. 
+    The path to pike installation directory should be customized to 
+    suit your environment. 
 -  Added new __actions mapping to FinsController that allows events to be
      defined without defining a method (or for when the method name would
      conflict or otherwise be non-allowed, such as for reserved keywords).

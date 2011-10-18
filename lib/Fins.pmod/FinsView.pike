@@ -120,7 +120,7 @@ public Template.View get_string_view(string ts)
 
 //! get a view using the default template type. 
 //!
-//! @param
+//! @param tn
 //!   a string containing the name of the template to load. how this is loaded is dependent on
 //!   the behavior of the specified default template type
 //!

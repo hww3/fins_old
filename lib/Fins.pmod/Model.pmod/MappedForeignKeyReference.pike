@@ -6,13 +6,13 @@
 //!
 //! A type "user" has a primary key field id. A type "preference" has a foreign key field "user_id" that 
 //! indicates the user for which that preference is associated. The definition of the "preference" type 
-//! would contain a reference for the foreign key (a @Fins.Model.ForeignKeyRelationship) whereas the
-//! "user" object definition would contain the inverse relationship (@Fins.Model.InverseForeignKeyRelationship)
+//! would contain a reference for the foreign key (a @[Fins.Model.ForeignKeyRelationship]) whereas the
+//! "user" object definition would contain the inverse relationship (@[Fins.Model.InverseForeignKeyRelationship])
 //! which could be used to find all "preference" objects owned by that user.
 //! 
-//! Alternately, if the "preference" object had some field that identified the particular preference for this 
-//! user, perhaps "preference_name", we could use this relationship type to organize the user's preferences in a mapping
-//! by name, saving us from having to perform an additional find operation:
+//! This type of reference adds a twist to this idea: if the "preference" object had some field that identified the 
+//! particular preference for this user, perhaps "preference_name", we could use this (@[MappedForeignKeyReference]) relationship type to 
+//! organize the user's preferences in a mapping by name, saving us from having to perform an additional find operation:
 //!
 //! someuser["preferences"]["default_folder"]
 

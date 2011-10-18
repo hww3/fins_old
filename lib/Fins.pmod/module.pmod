@@ -1,5 +1,7 @@
 constant __author = "Bill Welliver <hww3@riverweb.com>";
 constant __version = "0.4";
+
+//! anyone remember what this is used for? Perhaps for something related to module installation?
 constant __components = ({
   "./Fins.pmod/",
   "./Fins.pmod/Application.pike",

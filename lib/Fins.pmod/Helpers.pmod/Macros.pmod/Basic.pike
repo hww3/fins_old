@@ -337,6 +337,7 @@ string simple_macro_textarea(Fins.Template.TemplateData data, mapping|void args)
 
   return buf->get();
 }
+
 //! args: var
 string simple_macro_autoformat(Fins.Template.TemplateData data, mapping|void args)
 {

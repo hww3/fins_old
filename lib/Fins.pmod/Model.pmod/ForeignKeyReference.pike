@@ -1,3 +1,4 @@
+
 //! This relationship represents one half (the many or child) of a one-to-many or parent-and-child between 
 //! one type and another. 
 //! Thie "child" uses the direct (ForeignKeyReference) relationship because it contains the field holding the foreign key.
@@ -9,9 +10,10 @@
 //! For example:
 //! A type "user" has a primary key field id. A type "preference" has a foreign key field "user_id" that 
 //! indicates the user for which that preference is associated. The definition of the "preference" type 
-//! would contain a reference for the foreign key (a @Fins.Model.ForeignKeyRelationship) whereas the
-//! "user" object definition would contain the inverse relationship (@Fins.Model.InverseForeignKeyRelationship)
+//! would contain a reference for the foreign key (a @[Fins.Model.ForeignKeyRelationship]) whereas the
+//! "user" object definition would contain the inverse relationship (@[Fins.Model.InverseForeignKeyRelationship])
 //! which could be used to find all "preference" objects owned by that user.
+
 
 inherit .Relationship;
 

@@ -23,14 +23,14 @@ object default_logger = Tools.Logging.Log.Logger();
 //!
 //!  [logger.logger_name] <-- configures a logger named "logger_name"
 //!
-//!  level=DEBUG|INFO|WARN|ERROR <-- optional log level for this logger
+//!  level=TRACE|DEBUG|INFO|WARN|ERROR <-- optional log level for this logger
 //!
 //!  appender=appender_name <-- use the appender "appender_name", may be specified multiple times
 //!
-//!  class=Some.Pike.Class <-- use the specified pike class for appending,
+//!  class=Some.Pike.Class <-- use the specified pike class as logger,
 //!    defaults to Tools.Logging.Log.Logger
 //!
-//!  additivity=false <-- do not use the parent configuration as a basis for this logger's configuration files to override.
+//!  additivity=false <-- do not use the parent configuration as a basis for this logger's configuration to override.
 //!
 //!  [appender.appender_name] <-- configures an appender named "appender_name"
 //!
@@ -46,6 +46,8 @@ object default_logger = Tools.Logging.Log.Logger();
 //!  regardless of configuration, a default logger will always be available.
 //!  a configuration file may specify an alternate default logger configuration
 //!  by using a config section called [default.logger].
+
+
 static void create()
 {
   create_default_appender();
@@ -73,7 +75,7 @@ void set_config_variables(mapping vars)
    config_variables =  _default_config_variables + mkmapping(("${" + indices(vars)[*])[*] + "}", values(vars)); 
 }
 
-// specifies a configuration file to be used, which will be loaded and parsed.
+//! specifies a configuration file to be used, which will be loaded and parsed.
 void set_config_file(string configfile)
 {
   default_logger->info("setting configuration file using " + configfile);
@@ -225,6 +227,7 @@ mapping build_logger_config(string loggername)
   return cx;
 }
 
+//!
 string get_default_level()
 {
   return (config_values["logger.default"]->level) || "INFO";

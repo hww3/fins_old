@@ -126,7 +126,7 @@ void register_types(object ctx)
   object im = ctx->repository->get_object_module();
   object mm = ctx->repository->get_model_module();
 
- werror("mm: %O\n", mm);
+   log->debug("Data mapping module: %O\n", mm);
   foreach(mkmapping(indices(mm), values(mm));string n; program c)
   {
     object d = c(ctx);
@@ -148,11 +148,11 @@ void register_types(object ctx)
 
 protected void remove_field_from_possibles(object ctx, string field_name, string instance_name)
 {
-	foreach(ctx->builder->possible_links; int i; mapping pl)
-	{
-	   if(pl && pl->obj && pl->obj->instance_name == instance_name && pl->field->name == field_name)
-	      ctx->builder->possible_links[i] = 0;
-	}
+  foreach(ctx->builder->possible_links; int i; mapping pl)
+  {
+    if(pl && pl->obj && pl->obj->instance_name == instance_name && pl->field->name == field_name)
+      ctx->builder->possible_links[i] = 0;
+  }
 }
 
 // there be monsters here...
@@ -181,7 +181,8 @@ void initialize_links(object ctx)
 	}
 	
     a->obj->add_field(ctx, Model.KeyReference(my_name, my_field, a->other_type, 0, a->nullable ));
-    remove_field_from_possibles(ctx, my_field, a->other_type);
+//    a->obj->remove_field(my_field);
+    remove_field_from_possibles(ctx, my_field, a->obj->instance_name);
   }
 
   foreach(ctx->builder->has_many;; mapping a)

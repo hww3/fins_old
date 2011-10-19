@@ -507,6 +507,17 @@ void add_default_value(.DataModelContext context, string field, mixed value)
   default_values[field] = value;
 }
 
+//! remove a field from the data mapping.
+.Field remove_field(string name)
+{
+  log->debug("removing field %O from %O.\n", name, this);
+  object f = fields[name];
+
+  m_delete(fields, name);
+
+  return f;
+}
+
 //! add a mapping of a Pike-name index in the data object to (typically) a
 //! field in the database table for this type.
 //! 

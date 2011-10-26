@@ -471,7 +471,7 @@ string simple_macro_format_date(Fins.Template.TemplateData data, mapping|void ar
 {
   if(arguments->var)
   {
-    object p = get_var_value(arguments->var, data->get_data());
+    object p = arguments->var;
 
     if(!p) return "";
 

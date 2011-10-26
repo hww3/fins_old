@@ -464,3 +464,20 @@ string simple_macro_context_root(Fins.Template.TemplateData data, mapping|void a
 {
   return data->get_request()->fins_app->context_root;
 }
+
+//! args: var, format
+//! where format is a Calendar object format type; default is ext_ymd.
+string simple_macro_format_date(Fins.Template.TemplateData data, mapping|void arguments)
+{
+  if(arguments->var)
+  {
+    object p = get_var_value(arguments->var, data->get_data());
+
+    if(!p) return "";
+
+    if(! arguments->format) arguments->format="ext_ymd";
+
+    return p["format_" + arguments->format]();
+
+  }
+}

@@ -12,11 +12,12 @@ constant default_port = 8080;
 constant my_version = "0.1";
 int my_port;
 
-//string session_storagetype = "ram";
+// we really want the default to be RAM.
+string session_storagetype = "ram";
 //string session_storagetype = "file";
-string session_storagetype = "sqlite";
+//string session_storagetype = "sqlite";
 //string session_storagedir = "/tmp/scriptrunner_storage";
-string session_storagedir;
+string session_storagedir = 0;
 
 string logfile_path = "/tmp/scriptrunner.log";
 string session_cookie_name = "PSESSIONID";
@@ -222,12 +223,22 @@ void session_startup()
   switch(session_storagetype)
   {
     case "file":
+      if(!session_storagedir)
+      {
+        Log.error("You must specify a filesystem location in order to use file-based session storage.");
+        exit(1);
+      }
       Log.info("SessionManager will use files in " + session_storagedir + " to store session data.");
       s = Session.FileSessionStorage();
       s->set_storagedir(session_storagedir);
       break;
 
     case "sqlite":
+      if(!session_storagedir)
+      {
+        Log.error("You must specify a database location in order to use SQLite session storage.");
+        exit(1);
+      }
       Log.info("SessionManager will use SQLite database " + session_storagedir + " to store session data.");
       s = Session.SQLiteSessionStorage();
       s->set_storagedir(session_storagedir);

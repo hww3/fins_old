@@ -26,7 +26,8 @@ object load_app(string app_dir, string config_name)
 
   program p;
 
-  cn = "application";
+  catch(cn = config["application"]["class"]);
+  if(!cn) cn = "application";
 mixed err = catch 
 {
   p = master()->cast_to_program(cn);

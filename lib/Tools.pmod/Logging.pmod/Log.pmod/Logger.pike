@@ -19,6 +19,7 @@ constant CRITICAL = 32;
 //!
 static array appenders = ({});
 
+int enabled = 1;
 int loglevel = TRACE|DEBUG|INFO|WARN|ERROR|CRITICAL;
 
 mapping log_strs = ([
@@ -67,6 +68,9 @@ void configure(mapping config)
     array appenders = Tools.Logging["get_appenders"](arrayp(config->appender)?config->appender:({config->appender}));
     set_appenders(appenders);
   }
+
+  if(config->enable)
+     enabled = Tools.Boolean.fromString(config->enable);
 }
 
 protected public void set_appenders(array a)

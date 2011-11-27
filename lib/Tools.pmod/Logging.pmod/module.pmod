@@ -32,10 +32,14 @@ object default_logger = Tools.Logging.Log.Logger();
 //!
 //!  additivity=false <-- do not use the parent configuration as a basis for this logger's configuration to override.
 //!
+//!  enable=true/false/yes/no <-- whether the logger should generate entries
+//!
 //!  [appender.appender_name] <-- configures an appender named "appender_name"
 //!
 //!  class=Some.Pike.Class <-- use the specified pike class for appending
 //!
+//!  enable=true/false/yes/no <-- whether the appender should generate entries
+//!  
 //!  example: Tools.Logging.Log.FileAppender uses argument "file" to specify logging file
 //!
 //!  if the configuring application specifies any, you may use substitution variables

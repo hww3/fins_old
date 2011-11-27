@@ -26,6 +26,10 @@ INCOMPATIBLE CHANGES
 
 NEW FEATURES AND BUG FIXES
 
+-  Added "_pipe_in_progress" option for telling FinServe that the any
+     response to the client will be managed by the application.
+-  Added "enable" config setting for Tools.Logging loggers and appenders. 
+-  Added Tools.Boolean with a new method: fromString().
 -  Added stub Makefile for generating module reference documentation. 
     The path to pike installation directory should be customized to 
     suit your environment. 

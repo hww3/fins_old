@@ -305,7 +305,8 @@ void handle_request(Protocols.HTTP.Server.Request request)
     if(mappingp(r))
     {
       access_logger(r);
-      request->response_and_finish(r);
+      if(!r->_is_pipe_response)
+        request->response_and_finish(r);
     }
     else if(stringp(r))
     {

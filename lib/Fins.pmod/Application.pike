@@ -820,7 +820,7 @@ array get_event(.Request request)
 	}
 	else
 	{
-	  throw(Error.Generic("Component " + comp + " is not a Controller.\n"));
+	  throw(Error.Generic(sprintf("Component %O is not a Controller: %O.\n", comp, ci)));
 	}
       }
       // otherwise, if it's an index function, we make it the event and add the component as an arg.

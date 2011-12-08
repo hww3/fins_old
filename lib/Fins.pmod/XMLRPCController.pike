@@ -10,13 +10,13 @@ inherit .FinsController;
 //! any other arguments will be passed from the XMLRPC request
 //! to the called method.
 
-public object index = XMLRPCRunner(this, ::`[]);
+ public object index = XMLRPCRunner(this, ::`[]);
 
-static mixed `[](mixed a)
+static mixed `[](mixed a, int|void a2)
 {
-  if(objectp(::`[](a, 2)))
+  if(objectp(::`[](a, a2||2)))
   {
-    return ::`[](a, 2);
+    return ::`[](a, a2||2);
   }
   else if(a == "index")
   {
@@ -25,7 +25,6 @@ static mixed `[](mixed a)
 
   else return UNDEFINED;
 }
-
 
 private class XMLRPCRunner(object obj, function indexer)
 {
@@ -63,6 +62,8 @@ private class XMLRPCRunner(object obj, function indexer)
 
         object X;
 
+      //  werror("XMLRPC: %O\n", request->raw[(off+4) ..]);
+
         if(catch(X=Protocols.XMLRPC.decode_call(request->raw[(off+4) ..])))
         {
                 error("Error decoding the XMLRPC Call. Are you not speaking XMLRPC?\n");
@@ -71,6 +72,7 @@ private class XMLRPCRunner(object obj, function indexer)
 
         mixed err = catch {
           mixed z = indexer(X->method_name, 2);
+//werror("XMLRPC: %O=%O\n", X, z);
           if(!functionp(z))
             throw(Error.Generic("Invalid method request: not a function.\n"));
           resp = z(request, @X->params);

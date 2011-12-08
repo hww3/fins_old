@@ -80,14 +80,16 @@ static object load_controller(string controller_name)
     else f = 0;
   }
 
+  mixed e;
+
   if(f)
   {
-    c = compile_string(Stdio.read_file(f), f);
+    e = catch(c = compile_string(Stdio.read_file(f), f));
   }
   else return 0;
 
   if(!c) log->error("Unable to load controller %s", controller_name);
-
+  if(e) log->exception("An exception occurred while loading a controller.", e);
   
   object o = c(app);
   o->__controller_name = cn;
